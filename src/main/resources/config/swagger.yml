@@ -1,0 +1,10 @@
+swagger:
+  basePackage : com.aiot.aiotbackstage.controller
+  title : 标题：AIOT-BACKSTAGE系统API说明文档
+  termsOfServiceUrl : http://192.168.1.54:8086/swagger-ui.html
+  description : 提供AIOT-BACKSTAGE后台所有的REST API文档
+  version : 0.0.1-SNAPSHOT
+  enable  : true
+  contactName : 技术人员
+  contactEmail : 610729719@qq.com
+  contactUrl : http://192.168.1.54:8086/swagger-ui.html
