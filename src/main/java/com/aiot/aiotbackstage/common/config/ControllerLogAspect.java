@@ -36,7 +36,7 @@ public class ControllerLogAspect {
      * 第三个*：选中的连接点的方法名字可以是任意名字
      * ..:表示任意参数
      */
-    @Pointcut("execution(public * com.quma.kuaidu.controller.*.*(..))")
+    @Pointcut("execution(public * com.aiot.aiotbackstage.controller.*.*(..))")
     public void webLog(){
 
     }

@@ -47,7 +47,6 @@ public class MyExceptionHandler {
         return new Result(HttpStatus.METHOD_NOT_ALLOWED.value(), ResultStatusCode.METHOD_NOT_ALLOWED.getMessage());
     }
 
-
     /**
      * 项目运行异常处理
      */
@@ -57,9 +56,7 @@ public class MyExceptionHandler {
     public Result handleException(Exception e, HttpServletRequest request) {
         log.error(request.getRequestURI() + ":服务运行异常",e);
         return new Result(HttpStatus.INTERNAL_SERVER_ERROR.value(),ResultStatusCode.SYSTEM_ERR.getMessage());
-
     }
-
 
     /**
      * 自定义异常处理
@@ -70,7 +67,6 @@ public class MyExceptionHandler {
     public Result handleException(MyException e, HttpServletRequest request) {
         log.error(request.getRequestURI() + ":自定义内部异常",e.getMsg());
         return new Result(e.getCode(),e.getMsg());
-
     }
 
 }
