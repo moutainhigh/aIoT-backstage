@@ -4,77 +4,40 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
-import lombok.Builder;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
-@Builder
 @TableName(value = "sys_user")
 public class SysUserEntity {
     /**
-     * 用户id
+     * 用户ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    @TableId(value = "user_id", type = IdType.AUTO)
+    private Long userId;
 
     /**
-     * 用户名称
+     * 用户的唯一标识
      */
-    @TableField(value = "username")
-    private String username;
+    @TableField(value = "wx_openid")
+    private String wxOpenid;
 
     /**
-     * 手机号
+     * 会话key
      */
-    @TableField(value = "telephone")
-    private String telephone;
+    @TableField(value = "session_key")
+    private String sessionKey;
 
     /**
-     * 邮箱
+     * 创建时间
      */
-    @TableField(value = "mail")
-    private String mail;
+    @TableField(value = "create_time")
+    private Date createTime;
 
     /**
-     * 加密后的密码
+     * 修改时间
      */
-    @TableField(value = "password")
-    private String password;
-
-    /**
-     * 用户所在部门的id
-     */
-    @TableField(value = "dept_id")
-    private Integer deptId;
-
-    /**
-     * 状态，1：正常，0：冻结状态，2：删除
-     */
-    @TableField(value = "status")
-    private Integer status;
-
-    /**
-     * 备注
-     */
-    @TableField(value = "remark")
-    private String remark;
-
-    /**
-     * 操作者
-     */
-    @TableField(value = "operator")
-    private String operator;
-
-    /**
-     * 最后一次更新时间
-     */
-    @TableField(value = "operate_time")
-    private Date operateTime;
-
-    /**
-     * 最后一次更新者的ip地址
-     */
-    @TableField(value = "operate_ip")
-    private String operateIp;
+    @TableField(value = "update_time")
+    private Date updateTime;
 }
