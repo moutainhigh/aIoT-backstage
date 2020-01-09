@@ -2,7 +2,7 @@ package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.model.param.UserLoginParam;
-import com.aiot.aiotbackstage.service.UserManageService;
+import com.aiot.aiotbackstage.service.IUserService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("users")
 @Api(tags = "用户管理接口", description = "User Controller")
-public class UserManageController {
+public class UserController {
 
 
     @Autowired
-    private UserManageService userManageService;
+    private IUserService IUserService;
 
 
     @ApiOperation(value = "用户登录", notes = "用户微信授权登录")
@@ -38,7 +38,7 @@ public class UserManageController {
     @PostMapping("/login")
     public Result userInfoList(@RequestBody @Validated UserLoginParam userLoginParam){
 
-        return Result.success(userManageService.userLogin(userLoginParam));
+        return Result.success(IUserService.userLogin(userLoginParam));
     }
 
 

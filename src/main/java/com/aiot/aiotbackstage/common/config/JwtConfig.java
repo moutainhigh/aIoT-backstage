@@ -53,6 +53,7 @@ public class JwtConfig {
         }
         String token = JWT.create()
                 .withClaim("wxOpenId", wxAccount.getWxOpenid())
+                .withClaim("userId", wxAccount.getUserId())
                 .withClaim("sessionKey", wxAccount.getSessionKey())
                 .withClaim("jwt-id", jwtId)
                 .withExpiresAt(new Date(System.currentTimeMillis() + expire_time*1000))  //JWT 配置过期时间的正确姿势

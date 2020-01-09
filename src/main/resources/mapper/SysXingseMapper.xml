@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysXingseMapper">
+  <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysXingseEntity">
+    <!--@mbg.generated-->
+    <!--@Table sys_xingse-->
+    <id column="xingse_id" jdbcType="BIGINT" property="xingseId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="parent_id" jdbcType="BIGINT" property="parentId" />
+    <result column="reference_url" jdbcType="VARCHAR" property="referenceUrl" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="desc" jdbcType="VARCHAR" property="desc" />
+    <result column="probability" jdbcType="VARCHAR" property="probability" />
+    <result column="detail_url" jdbcType="VARCHAR" property="detailUrl" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    xingse_id, user_id, parent_id, reference_url, `name`, `desc`, probability, detail_url, 
+    create_time, update_time
+  </sql>
+</mapper>

@@ -12,7 +12,7 @@ import com.aiot.aiotbackstage.model.vo.TokenVo;
  * @Date 2020/01/02  11:07
  * @Version 1.0
  **/
-public interface UserManageService {
+public interface IUserService {
 
     /**
      * 1 . 我们的微信小程序端传入code。

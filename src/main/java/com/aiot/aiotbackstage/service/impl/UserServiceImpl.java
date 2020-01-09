@@ -8,7 +8,7 @@ import com.aiot.aiotbackstage.model.entity.SysUserEntity;
 import com.aiot.aiotbackstage.model.param.UserLoginParam;
 import com.aiot.aiotbackstage.model.vo.Code2SessionVo;
 import com.aiot.aiotbackstage.model.vo.TokenVo;
-import com.aiot.aiotbackstage.service.UserManageService;
+import com.aiot.aiotbackstage.service.IUserService;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import java.util.Date;
  **/
 @Service
 @Slf4j
-public class UserManageServiceImpl implements UserManageService {
+public class UserServiceImpl implements IUserService {
 
     @Autowired
     private SysUserMapper userMapper;
