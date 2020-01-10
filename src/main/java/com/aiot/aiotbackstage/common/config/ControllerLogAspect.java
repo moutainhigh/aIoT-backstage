@@ -69,7 +69,7 @@ public class ControllerLogAspect {
             //如果target = register 那么args = userParam
             Object[] args = joinPoint.getArgs();
             if (args.length > 0){
-                params = args[0].toString();
+                params = args[0] == null ? "null" : args[0].toString();
             }
         }
         beforetime = System.currentTimeMillis();

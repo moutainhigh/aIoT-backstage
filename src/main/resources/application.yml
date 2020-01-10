@@ -1,6 +1,6 @@
 #配置端口
 server:
-  port: 8084
+  port: 8080
   tcp:
     port: 18080
 spring:
