@@ -24,6 +24,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
@@ -126,6 +132,12 @@
 			<groupId>com.github.tobato</groupId>
 			<artifactId>fastdfs-client</artifactId>
 			<version>1.26.2</version>
+		</dependency>
+		<!--OBS 文件上传-->
+		<dependency>
+			<groupId>com.huaweicloud</groupId>
+			<artifactId>esdk-obs-java</artifactId>
+			<version>3.19.7</version>
 		</dependency>
 
 		<dependency>
