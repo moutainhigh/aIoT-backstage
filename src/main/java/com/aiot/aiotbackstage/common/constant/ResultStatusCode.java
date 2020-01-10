@@ -16,36 +16,22 @@ import lombok.Getter;
 public enum ResultStatusCode {
     //成功
     SUCCESS(200,"成功"),
-    //参数错误100-199
-    PARAM_IS_INVALID(101,"参数无效"),
-    PARAM_IS_BLANK(102,"参数为空"),
-    PARAM_TYPE_BIND_ERROR(103,"参数类型错误"),
-    PARAM_NOT_COMPLETE(104,"参数缺失"),
-    BAD_REQUEST(105, "参数解析失败"),
-    TOKEN_NO_EXIT(106, "token令牌不存在"),
-    TOKEN_ERR(107, "令牌无效"),
-    TOKEN_TIMEOUT(108, "令牌已过期"),
+    //客户端错误400-499
+    PARAM_IS_INVALID(401,"参数无效"),
+    PARAM_IS_BLANK(402,"参数为空"),
+    PARAM_TYPE_BIND_ERROR(403,"参数类型错误"),
+    PARAM_NOT_COMPLETE(404,"参数缺失"),
+    BAD_REQUEST(405, "参数解析失败"),
+    TOKEN_NO_EXIT(406, "token令牌不存在"),
+    TOKEN_ERR(407, "令牌无效"),
+    TOKEN_TIMEOUT(408, "令牌已过期"),
+    METHOD_NOT_ALLOWED(409, "不支持当前请求方法"),
 
-    METHOD_NOT_ALLOWED(405, "不支持当前请求方法"),
+    //服务端错误500-599,
     SYSTEM_ERR(500, "服务器运行异常"),
+    USER_LIST_NO_EXIT(501, "用户数据不存在"),
+    FILE_ERR(502, "文件上传失败！"),
 
-    //用户错误200-299,
-    USER_LIST_NO_EXIT(200, "用户数据不存在"),
-
-
-    //部门错误300-399
-
-
-    //权限和权限模块的错误450-499
-
-
-    //权限和权限模块的错误550-599
-
-
-    //商户管理的错误600-699
-
-
-    //店铺管理的错误700-799
 
 
     ;
