@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -51,7 +52,7 @@ public class SysXingseEntity {
      * 相似度
      */
     @TableField(value = "probability")
-    private String probability;
+    private BigDecimal probability;
 
     /**
      * 详情地址

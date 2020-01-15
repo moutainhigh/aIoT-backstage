@@ -43,7 +43,7 @@ mybatis-plus:
     call-setters-on-nulls: true
     #这个配置会将执行的sql打印出来
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#  微信小程序配置 appid /appsecret/grant_type
+#  微信小程序配置
 wechat:
   app_id: yourappid    #小程序 appId
   app_secret: yourappsecret   #小程序 appSecret
@@ -54,7 +54,7 @@ aliyun:
   host: https://plantapi.xingseapp.com
   path: /item/identification
   method: POST
-  appCode: appcode
+  appCode: 1116529410564cfba495773bf9016d87
   contentType: application/x-www-form-urlencoded; charset=UTF-8
 #  华为云文件资源管理 OBS
 obs:

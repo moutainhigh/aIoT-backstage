@@ -31,6 +31,8 @@ public enum ResultStatusCode {
     SYSTEM_ERR(500, "服务器运行异常"),
     USER_LIST_NO_EXIT(501, "用户数据不存在"),
     FILE_ERR(502, "文件上传失败！"),
+    DB_ERR(503, "文件新增失败！"),
+    XINGSE_POST_ERR(504, "调用形色失败！"),
 
 
 
