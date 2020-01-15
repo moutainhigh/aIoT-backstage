@@ -1,6 +1,7 @@
 package com.aiot.aiotbackstage.server;
 
-import com.aiot.aiotbackstage.server.handler.DTUHandler;
+import com.aiot.aiotbackstage.server.codec.ModbusRtuCodec;
+import com.aiot.aiotbackstage.server.handler.DtuHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -8,9 +9,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.util.CharsetUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,15 +38,15 @@ public class TcpServer {
                         @Override
                         protected void initChannel(NioSocketChannel channel) throws Exception {
                             channel.pipeline()
-                                    .addLast(new StringDecoder(CharsetUtil.UTF_8))
-                                    .addLast(new StringEncoder(CharsetUtil.UTF_8))
-                                    .addLast(new DTUHandler());
+                                    .addLast(new ModbusRtuCodec())
+                                    .addLast(new DtuHandler());
                         }
                     })
                     .bind(new InetSocketAddress(port))
                     .sync();
             // 监听服务器关闭监听
             f.channel().closeFuture().sync();
+            log.info("tcp server started at {}", port);
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
