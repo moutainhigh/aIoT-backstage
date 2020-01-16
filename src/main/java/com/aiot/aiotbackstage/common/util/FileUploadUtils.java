@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -45,11 +46,13 @@ public class FileUploadUtils {
             ObsClient obsClient = new ObsClient(obsConfig.getAk(), obsConfig.getSk(), obsConfig.getEndPoint());
             // 上传文件，注意：上传内容大小不能超过5GB
             String objectKey = multipartFile.getOriginalFilename();
+            File file=new File(objectKey);
+            String name = file.getName();
             InputStream inputStream = multipartFile.getInputStream();
-            PutObjectResult putObjectResult = obsClient.putObject(obsConfig.getBucketName(), objectKey, inputStream);
-            String url = "https://" + putObjectResult.getObjectUrl();
+            PutObjectResult putObjectResult = obsClient.putObject(obsConfig.getBucketName(), name, inputStream);
+            String url = putObjectResult.getObjectUrl();
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("name", objectKey);
+            jsonObject.put("name", name);
             jsonObject.put("url", url);
             inputStream.close();
             obsClient.close();

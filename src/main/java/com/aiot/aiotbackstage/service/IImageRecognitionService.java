@@ -11,5 +11,5 @@ import java.util.List;
  * @CreateTime 2020/1/7 17:28
  */
 public interface IImageRecognitionService {
-    List<ImageRecognitionVo> fileUpload(MultipartFile multipartFile, String userId);
+    List<ImageRecognitionVo> fileUpload(MultipartFile multipartFile, Long userId);
 }

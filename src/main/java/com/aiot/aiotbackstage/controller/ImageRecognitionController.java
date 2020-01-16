@@ -1,6 +1,5 @@
 package com.aiot.aiotbackstage.controller;
 
-import com.aiot.aiotbackstage.common.config.ObsConfig;
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.service.IImageRecognitionService;
 import io.swagger.annotations.Api;
@@ -10,10 +9,7 @@ import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -30,8 +26,6 @@ public class ImageRecognitionController {
     @Autowired
     private IImageRecognitionService iImageRecognitionService;
 
-    @Autowired
-    private ObsConfig obsConfig;
 
     @ApiOperation(value = "用户图片识别(形色)", notes = "用户图片识别(形色)")
     @ApiResponses({
@@ -39,8 +33,10 @@ public class ImageRecognitionController {
     })
     @ResponseBody
     @PostMapping("/fileUpload")
-    public Result fileUpload(@RequestParam(value = "file", required = false) MultipartFile multipartFile) {
-        String userId="";
+    public Result fileUpload(@RequestParam(value = "file", required = false) MultipartFile multipartFile,
+    @RequestHeader String token
+    ) {
+        Long userId=1L;
         return Result.success(iImageRecognitionService.fileUpload(multipartFile,userId));
     }
 

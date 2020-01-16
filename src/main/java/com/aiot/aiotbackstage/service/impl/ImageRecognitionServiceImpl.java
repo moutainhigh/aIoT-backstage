@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description 形色实现
+ * @Description 形色控制器
  * @Author xiaowenhui
  * @CreateTime 2020/1/7 17:29
  */
@@ -34,7 +34,7 @@ public class ImageRecognitionServiceImpl implements IImageRecognitionService {
     private SysXingseMapper xingseMapper;
 
     @Override
-    public List<ImageRecognitionVo> fileUpload(MultipartFile multipartFile, String userId) {
+    public List<ImageRecognitionVo> fileUpload(MultipartFile multipartFile, Long userId) {
 
         //待形色照片上传到OBS
         JSONObject jsonObject = fileUploadUtils.obsFileUpload(multipartFile);
@@ -45,9 +45,9 @@ public class ImageRecognitionServiceImpl implements IImageRecognitionService {
         SysXingseEntity xingseEntity = xingseMapper.selectOne(Wrappers.<SysXingseEntity>lambdaQuery()
                 .eq(SysXingseEntity::getUserId, userId)
                 .eq(SysXingseEntity::getParentId, 0L)
-                .eq(SysXingseEntity::getName, name));
+                .eq(SysXingseEntity::getImgName, name));
 
-        List<SysXingseEntity> sysXingseEntities = null;
+        List<SysXingseEntity> sysXingseEntities ;
         //如果存在直接返回
         if(!ObjectUtils.isEmpty(xingseEntity)){
             Long xingseId = xingseEntity.getXingseId();
@@ -62,8 +62,8 @@ public class ImageRecognitionServiceImpl implements IImageRecognitionService {
         sysXingseEntities.stream().forEach(sysXingseEntity -> {
             ImageRecognitionVo recognitionVo=new ImageRecognitionVo();
             recognitionVo.setReferenceUrl(sysXingseEntity.getReferenceUrl());
-            recognitionVo.setName(sysXingseEntity.getName());
-            recognitionVo.setDesc(sysXingseEntity.getDesc());
+            recognitionVo.setName(sysXingseEntity.getImgName());
+            recognitionVo.setDesc(sysXingseEntity.getImgDesc());
             recognitionVo.setProbability(sysXingseEntity.getProbability());
             recognitionVo.setDetailUrl(sysXingseEntity.getDetailUrl());
             imageRecognitionVos.add(recognitionVo);
@@ -84,8 +84,8 @@ public class ImageRecognitionServiceImpl implements IImageRecognitionService {
         xingseEntity.setUserId(0L);
         xingseEntity.setParentId(0L);
         xingseEntity.setReferenceUrl(url);
-        xingseEntity.setName(name);
-        xingseEntity.setDesc(name);
+        xingseEntity.setImgName(name);
+        xingseEntity.setImgDesc(name);
         xingseEntity.setProbability(new BigDecimal("0"));
         xingseEntity.setDetailUrl(url);
         xingseEntity.setCreateTime(new Date());
@@ -101,8 +101,8 @@ public class ImageRecognitionServiceImpl implements IImageRecognitionService {
             xingseEntityNew.setUserId(0L);
             xingseEntityNew.setParentId(xingseEntity.getXingseId());
             xingseEntityNew.setReferenceUrl((String)stringObjectMap.get("reference_url"));
-            xingseEntityNew.setName((String)stringObjectMap.get("name"));
-            xingseEntityNew.setDesc((String)stringObjectMap.get("desc"));
+            xingseEntityNew.setImgName((String)stringObjectMap.get("name"));
+            xingseEntityNew.setImgDesc((String)stringObjectMap.get("desc"));
             xingseEntityNew.setProbability((BigDecimal)stringObjectMap.get("probability"));
             xingseEntityNew.setDetailUrl((String)stringObjectMap.get("detail_url"));
             xingseEntityNew.setCreateTime(new Date());

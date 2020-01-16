@@ -39,14 +39,14 @@ public class SysXingseEntity {
     /**
      * 名称
      */
-    @TableField(value = "name")
-    private String name;
+    @TableField(value = "img_name")
+    private String imgName;
 
     /**
      * 描述
      */
-    @TableField(value = "desc")
-    private String desc;
+    @TableField(value = "img_desc")
+    private String imgDesc;
 
     /**
      * 相似度
