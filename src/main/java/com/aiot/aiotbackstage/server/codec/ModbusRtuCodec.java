@@ -1,9 +1,12 @@
 package com.aiot.aiotbackstage.server.codec;
 
+import com.aiot.aiotbackstage.model.dto.RtuData;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -16,24 +19,23 @@ import java.util.List;
  *
  * @author Avernus
  */
+@Slf4j
 public class ModbusRtuCodec extends ByteToMessageCodec<int[]> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        //问询帧
-        ByteBuf req = in.readBytes(8);
-        int addr = in.readByte();
-        int func = in.readByte();
-        int length = in.readByte();
-        //数据区
-        ByteBuf datum = in.readBytes(length);
+        byte[] bytes = new byte[in.readableBytes()];
+        in.readBytes(bytes);
+        log.info("from {}, received {}",ctx.channel().localAddress(), Arrays.toString(bytes));
+        int addr = bytes[0];
+        int func = bytes[1];
+        int length = bytes[2];
         int[] data = new int[length];
-        for (int i = 0; i < length; i++) {
-            data[i] = datum.readByte();
+        for (int i = 0; i < data.length; i++) {
+            data[i] = bytes[3 + i];
         }
-        //校验码
-        ByteBuf CRC = in.readBytes(2);
-        out.add(data);
+        RtuData rtuData = new RtuData(addr, func, length, data);
+        out.add(rtuData);
     }
 
 

@@ -8,5 +8,5 @@ COPY aiot-backstage-0.0.1-SNAPSHOT.jar app.jar
 
 RUN bash -c "touch /app.jar"
 
-EXPOSE 8084
+EXPOSE 8080 18080
 ENTRYPOINT ["java", "-jar", "app.jar"]
