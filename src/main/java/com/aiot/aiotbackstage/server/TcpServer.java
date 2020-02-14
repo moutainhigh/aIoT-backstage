@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Avernus
@@ -26,6 +29,8 @@ public class TcpServer {
 
     @Value("${server.tcp.port}")
     private int port;
+
+    public static final Map<SocketAddress, Integer> addrs = new HashMap<>();
 
     public void start() throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -44,9 +49,9 @@ public class TcpServer {
                     })
                     .bind(new InetSocketAddress(port))
                     .sync();
+            log.info("tcp server started at {}", port);
             // 监听服务器关闭监听
             f.channel().closeFuture().sync();
-            log.info("tcp server started at {}", port);
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();

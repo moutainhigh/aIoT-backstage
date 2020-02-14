@@ -13,6 +13,10 @@ import lombok.NoArgsConstructor;
 public class RtuData {
 
     /**
+     * rtu识别码
+     */
+    private int rtu;
+    /**
      * 地址码
      */
     private int addr;
@@ -42,7 +46,8 @@ public class RtuData {
      */
     private int crc2;
 
-    public RtuData(int addr, int func, int dataLength, int[] data) {
+    public RtuData(int rtu, int addr, int func, int dataLength, int[] data) {
+        this.rtu = rtu;
         this.addr = addr;
         this.func = func;
         this.dataLength = dataLength;
