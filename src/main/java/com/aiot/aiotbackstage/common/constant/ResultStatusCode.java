@@ -33,6 +33,12 @@ public enum ResultStatusCode {
     FILE_ERR(502, "文件上传失败！"),
     DB_ERR(503, "文件新增失败！"),
     XINGSE_POST_ERR(504, "调用形色失败！"),
+    MEASURES_NO_EXIT(505, "措施信息暂未录入！"),
+    GIS_NO_EXIT(506, "GIS站点信息暂未录入！"),
+    SIQING_NO_EXIT(507, "四情信息不存在！"),
+    USER_NAME_NO_EXIT(508, "用户名不存在！"),
+    USER_PASSWORD_NO_EXIT(509, "密码不正确！"),
+    NO_ROLE_NO_EXIT(510, "您没有权限访问！"),
 
 
 

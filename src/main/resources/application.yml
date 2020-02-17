@@ -44,8 +44,8 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #  微信小程序配置
 wechat:
-  app_id: yourappid    #小程序 appId
-  app_secret: yourappsecret   #小程序 appSecret
+  app_id: wx3ef669658b5e2db2    #小程序 appId
+  app_secret: 5cac2396266f612d3100f77bc71660f3   #小程序 appSecret
   grant_type: authorization_code #授权类型
   session_host: https://api.weixin.qq.com/sns/jscode2session
 #  阿里云的形色

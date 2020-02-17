@@ -3,6 +3,7 @@ package com.aiot.aiotbackstage.common.exception;
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -67,6 +68,19 @@ public class MyExceptionHandler {
     public Result handleException(MyException e, HttpServletRequest request) {
         log.error(request.getRequestURI() + ":自定义内部异常",e.getMsg());
         return new Result(e.getCode(),e.getMsg());
+    }
+
+    /**
+     * 处理访问方法时权限不足问题
+     * @param req
+     * @param e
+     * @return
+     */
+    @ResponseStatus(HttpStatus.OK)
+    @ExceptionHandler(value = UnauthorizedException.class)
+    @ResponseBody
+    public Result defaultErrorHandler(HttpServletRequest req, Exception e)  {
+        return new Result(ResultStatusCode.NO_ROLE_NO_EXIT);
     }
 
 }

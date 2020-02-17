@@ -30,6 +30,24 @@ public class SysUserEntity {
     private String sessionKey;
 
     /**
+     * 用户名
+     */
+    @TableField(value = "user_name")
+    private String userName;
+
+    /**
+     * 密码
+     */
+    @TableField(value = "password")
+    private String password;
+
+    /**
+     * 登陆类型
+     */
+    @TableField(value = "login_type")
+    private Integer loginType;
+
+    /**
      * 创建时间
      */
     @TableField(value = "create_time")

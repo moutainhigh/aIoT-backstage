@@ -34,7 +34,7 @@ public class ImageRecognitionController {
     @ResponseBody
     @PostMapping("/fileUpload")
     public Result fileUpload(@RequestParam(value = "file", required = false) MultipartFile multipartFile,
-    @RequestHeader String token
+                             @RequestHeader String token
     ) {
         Long userId=1L;
         return Result.success(iImageRecognitionService.fileUpload(multipartFile,userId));

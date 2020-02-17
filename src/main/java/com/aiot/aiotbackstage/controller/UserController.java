@@ -2,14 +2,13 @@ package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.model.param.UserLoginParam;
-import com.aiot.aiotbackstage.service.IUserService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -21,13 +20,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @Version 1.0
  **/
 @Controller
-@RequestMapping("users")
 @Api(tags = "用户管理接口", description = "User Controller")
 public class UserController {
 
 
     @Autowired
-    private IUserService IUserService;
+    private com.aiot.aiotbackstage.service.IUserService IUserService;
 
 
     @ApiOperation(value = "用户登录", notes = "用户微信授权登录")
@@ -41,5 +39,14 @@ public class UserController {
         return Result.success(IUserService.userLogin(userLoginParam));
     }
 
-
+    @ApiOperation(value = "用户登出", notes = "用户登出(loginOut)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "部门Id",  paramType = "header", required = false, dataType = "String"),
+    })
+    @ResponseBody
+    @PostMapping("/loginOut")
+    public Result loginOut(@RequestHeader String token){
+//        IUserService.loginOut(token);
+        return Result.success();
+    }
 }

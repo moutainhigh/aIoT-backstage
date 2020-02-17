@@ -9,6 +9,7 @@ import com.aiot.aiotbackstage.service.IImageRecognitionService;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +35,7 @@ public class ImageRecognitionServiceImpl implements IImageRecognitionService {
     private SysXingseMapper xingseMapper;
 
     @Override
+    @RequiresAuthentication
     public List<ImageRecognitionVo> fileUpload(MultipartFile multipartFile, Long userId) {
 
         //待形色照片上传到OBS
@@ -78,7 +80,7 @@ public class ImageRecognitionServiceImpl implements IImageRecognitionService {
      * @param url
      * @return
      */
-    private List<SysXingseEntity>  addImageRecognition(List<Map<String,Object>> identifyResults,String name,String url){
+    private List<SysXingseEntity>  addImageRecognition(List<Map<String,Object>> identifyResults, String name, String url){
         //新增待形色的照片
         SysXingseEntity xingseEntity=new SysXingseEntity();
         xingseEntity.setUserId(0L);
