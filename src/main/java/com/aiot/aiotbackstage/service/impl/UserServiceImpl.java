@@ -5,6 +5,7 @@ import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.util.JWTUtil;
 import com.aiot.aiotbackstage.common.util.JsonUtils;
+import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.mapper.SysUserMapper;
 import com.aiot.aiotbackstage.model.entity.SysUserEntity;
 import com.aiot.aiotbackstage.model.param.UserLoginParam;
@@ -14,6 +15,7 @@ import com.aiot.aiotbackstage.service.IUserService;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Autowired
     private JWTUtil jwtUtil;
@@ -114,5 +119,32 @@ public class UserServiceImpl implements IUserService {
             }
         }
 
+    }
+
+    @Override
+    public void loginOut(String token) {
+        //用户退出逻辑
+        if (StringUtils.isEmpty(token)) {
+            throw new MyException(ResultStatusCode.LOGIN_OUT_ERR);
+        }
+        String username = jwtUtil.getUserNameByToken(token);
+        String jwtId = jwtUtil.getJwtIdByToken(token);
+        String wxOpenId = jwtUtil.getWxOpenIdByToken(token);
+        String sessionKey = jwtUtil.getSessionKeyByToken(token);
+        SysUserEntity sysUser;
+        if(StringUtils.isNotBlank(username)){
+            sysUser = userMapper.selectOne(Wrappers.<SysUserEntity>lambdaQuery()
+                    .eq(SysUserEntity::getUserName,username));
+        }else{
+            sysUser = userMapper.selectOne(Wrappers.<SysUserEntity>lambdaQuery()
+                    .eq(SysUserEntity::getWxOpenid,wxOpenId)
+                    .eq(SysUserEntity::getSessionKey,sessionKey));
+        }
+        if (sysUser != null) {
+            //清空用户Token缓存
+            redisUtils.del("JWT-SESSION-" + jwtId);
+        } else {
+            throw new MyException(ResultStatusCode.TOKEN_NO_EXIT);
+        }
     }
 }

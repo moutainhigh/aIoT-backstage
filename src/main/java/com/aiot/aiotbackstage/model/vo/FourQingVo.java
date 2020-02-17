@@ -34,6 +34,11 @@ public class FourQingVo {
     private List<SysSeedlingGrowthEntity> seedlingGrowth;
 
     /**
+     *虫情信息
+     */
+    private List<SysSeedlingGrowthEntity> chongqing;
+
+    /**
      * 土壤温度
      */
     private List<SysTempRegionVo> tempRegionVos;

@@ -3,14 +3,13 @@ package com.aiot.aiotbackstage.common.shiro;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
- * Created with IntelliJ IDEA
- *
- * @Author yuanhaoyue swithaoy@gmail.com
- * @Description token
- * @Date 2018-04-09
- * @Time 16:54
+ * xiaowenhui
+ *  token 工具类
  */
 public class JWTToken implements AuthenticationToken {
+
+    private static final long serialVersionUID = 1L;
+
     private String token;
 
     public JWTToken(String token) {

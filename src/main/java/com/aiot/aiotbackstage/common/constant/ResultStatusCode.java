@@ -22,7 +22,7 @@ public enum ResultStatusCode {
     PARAM_TYPE_BIND_ERROR(403,"参数类型错误"),
     PARAM_NOT_COMPLETE(404,"参数缺失"),
     BAD_REQUEST(405, "参数解析失败"),
-    TOKEN_NO_EXIT(406, "token令牌不存在"),
+    TOKEN_NO_EXIT(406, "token令牌失效"),
     TOKEN_ERR(407, "令牌无效"),
     TOKEN_TIMEOUT(408, "令牌已过期"),
     METHOD_NOT_ALLOWED(409, "不支持当前请求方法"),
@@ -39,6 +39,8 @@ public enum ResultStatusCode {
     USER_NAME_NO_EXIT(508, "用户名不存在！"),
     USER_PASSWORD_NO_EXIT(509, "密码不正确！"),
     NO_ROLE_NO_EXIT(510, "您没有权限访问！"),
+    LOGIN_OUT_ERR(511, "退出登录失败！"),
+    SYSSENSORREC_NO_EXIT(512, "该站点气象信息暂不存在！"),
 
 
 

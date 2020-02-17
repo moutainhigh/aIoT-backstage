@@ -2,6 +2,7 @@ package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.model.param.UserLoginParam;
+import com.aiot.aiotbackstage.service.IUserService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,7 +26,7 @@ public class UserController {
 
 
     @Autowired
-    private com.aiot.aiotbackstage.service.IUserService IUserService;
+    private IUserService iUserService;
 
 
     @ApiOperation(value = "用户登录", notes = "用户微信授权登录")
@@ -36,17 +37,15 @@ public class UserController {
     @PostMapping("/login")
     public Result userInfoList(@RequestBody @Validated UserLoginParam userLoginParam){
 
-        return Result.success(IUserService.userLogin(userLoginParam));
+        return Result.success(iUserService.userLogin(userLoginParam));
     }
 
     @ApiOperation(value = "用户登出", notes = "用户登出(loginOut)")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "token", value = "部门Id",  paramType = "header", required = false, dataType = "String"),
-    })
     @ResponseBody
     @PostMapping("/loginOut")
     public Result loginOut(@RequestHeader String token){
-//        IUserService.loginOut(token);
+
+        iUserService.loginOut(token);
         return Result.success();
     }
 }

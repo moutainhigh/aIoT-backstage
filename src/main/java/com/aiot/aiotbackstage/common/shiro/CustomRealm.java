@@ -3,6 +3,7 @@ package com.aiot.aiotbackstage.common.shiro;
 import com.aiot.aiotbackstage.common.util.JWTUtil;
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.*;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
@@ -14,22 +15,16 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Created with IntelliJ IDEA
- *
- * @Author yuanhaoyue swithaoy@gmail.com
- * @Description 自定义 Realm
- * @Date 2018-04-09
- * @Time 16:58
+ * xiaowenhui
+ *用户登录鉴权和获取用户授权
  */
 @Slf4j
 @Component
@@ -54,14 +49,6 @@ public class CustomRealm extends AuthorizingRealm {
     @Autowired
     private JWTUtil jwtUtil;
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
-
-    /**
-     * JWT 过期时间值 这里写死为和小程序时间一致 7200 秒，也就是两个小时
-     */
-    private static long expire_time = 7200;
-
     /**
      * 必须重写此方法，不然会报错
      */
@@ -82,20 +69,37 @@ public class CustomRealm extends AuthorizingRealm {
         String wxOpenId = jwtUtil.getWxOpenIdByToken(jwtToken);
         String sessionKey = jwtUtil.getSessionKeyByToken(jwtToken);
         String userName = jwtUtil.getUserNameByToken(jwtToken);
+        SysUserEntity sysUserEntity = null;
         if(userName == null){
-            if (wxOpenId == null || wxOpenId.equals(""))
-                throw new AuthenticationException("user account not exits , please check your token");
-            if (sessionKey == null || sessionKey.equals(""))
-                throw new AuthenticationException("sessionKey is invalid , please check your token");
+            if (wxOpenId == null || wxOpenId.equals("")) {
+                throw new AuthenticationException("token非法无效!");
+            }
+            if (sessionKey == null || sessionKey.equals("")) {
+                throw new AuthenticationException("token非法无效!");
+            }
+            // 查询用户信息
+            sysUserEntity= sysUserMapper.selectOne(Wrappers.<SysUserEntity>lambdaQuery()
+                    .eq(SysUserEntity::getWxOpenid, wxOpenId)
+                    .eq(SysUserEntity::getSessionKey,sessionKey));
+            if(ObjectUtils.isEmpty(sysUserEntity)){
+                throw new AuthenticationException("用户不存在!");
+            }
         }else{
-            if (userName == null || userName.equals(""))
-                throw new AuthenticationException("user account not exits , please check your token");
+            // 查询用户信息
+            sysUserEntity = sysUserMapper.selectOne(Wrappers.<SysUserEntity>lambdaQuery()
+                    .eq(SysUserEntity::getUserName, userName));
+            if(ObjectUtils.isEmpty(sysUserEntity)){
+                throw new AuthenticationException("用户不存在!");
+            }
         }
-        if (!jwtUtil.verify(jwtToken))
-            throw new AuthenticationException("token is invalid , please check your token");
-        redisTemplate.opsForValue().set("JWT-SESSION-" + jwtId, jwtToken, expire_time, TimeUnit.SECONDS);
-        return new SimpleAuthenticationInfo(jwtToken, jwtToken, "CustomRealm");
+        // 校验token是否超时失效 & 或者账号密码是否错误
+        if (!jwtUtil.jwtTokenRefresh(jwtToken,sysUserEntity)) {
+            throw new AuthenticationException("Token失效请重新登录!");
+        }
+        return new SimpleAuthenticationInfo(jwtToken, jwtToken, getName());
     }
+
+
 
     /**
      * 只有当需要检测用户权限的时候才会调用此方法，例如checkRole,checkPermission之类的

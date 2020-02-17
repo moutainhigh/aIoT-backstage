@@ -5,6 +5,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -15,14 +17,10 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created with IntelliJ IDEA
- *
- * @Author yuanhaoyue swithaoy@gmail.com
- * @Description JWT 工具类
- * @Date 2018-04-07
- * @Time 22:48
+ * JWT 工具类
  */
 @Component
+@Slf4j
 public class JWTUtil {
 
     /**
@@ -32,13 +30,13 @@ public class JWTUtil {
     /**
      * JWT 过期时间值 这里写死为和小程序时间一致 7200 秒，也就是两个小时
      */
-    private static long expire_time = 7200;
+    private static long expire_time = 600;
 
     @Resource
     private RedisTemplate redisTemplate;
 
     /**
-     * 生成 token, 5min后过期
+     * 生成 token, 10min后过期
      *
      * @param userEntity 用户名
      * @return 加密的token
@@ -68,47 +66,68 @@ public class JWTUtil {
                     .withExpiresAt(new Date(System.currentTimeMillis() + expire_time*1000))
                     .sign(algorithm);
         }
-        //2 . Redis缓存JWT, 注 : 请和JWT过期时间一致
+        log.info("token的key:{}","JWT-SESSION-" + jwtId);
+        //缓存redis
         redisTemplate.opsForValue().set("JWT-SESSION-" + jwtId, token, expire_time, TimeUnit.SECONDS);
+        //设置超时时间
+        redisTemplate.expire("JWT-SESSION-" + jwtId, expire_time, TimeUnit.SECONDS);
         return token;
     }
 
     /**
      * 根据Token 获取jwt-id
      */
-    private String getJwtIdByToken(String token) throws JWTDecodeException {
+    public String getJwtIdByToken(String token) throws JWTDecodeException {
         return JWT.decode(token).getClaim("jwt-id").asString();
     }
 
     /**
      * 校验 token 是否正确
      *
-     * @param token 用户名
-     * @return 是否正确
+     * userEntity
      */
-    public  boolean verify(String token) {
-        try {
+    public  boolean jwtTokenRefresh(String token,SysUserEntity userEntity) {
+        String jwtIdByToken =getJwtIdByToken(token);
+        String cacheToken = String.valueOf(redisTemplate.opsForValue().get("JWT-SESSION-"+jwtIdByToken));
+        if(StringUtils.isNotBlank(cacheToken)&&!cacheToken.equals("null")){
+            // 校验token有效性
+            if (!this.verify(cacheToken, userEntity)) {
+                this.createToken(userEntity);
+            } else {
+                redisTemplate.opsForValue().set( "JWT-SESSION-"+jwtIdByToken, cacheToken);
+                // 设置超时时间
+                redisTemplate.expire( "JWT-SESSION-"+jwtIdByToken, expire_time,TimeUnit.SECONDS);
+            }
+            return true;
+        }
+        return false;
+    }
 
+    /**
+     * 校验token是否正确
+     */
+    public  boolean verify(String token,SysUserEntity userEntity) {
+        try {
             Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
-            JWTVerifier verifier=null;
+            JWTVerifier verifier;
             if(getUserNameByToken(token) == null ){
                 verifier = JWT.require(algorithm)
-                        .withClaim("wxOpenId", getWxOpenIdByToken(token))
-                        .withClaim("sessionKey", getSessionKeyByToken(token))
+                        .withClaim("wxOpenId", userEntity.getWxOpenid())
+                        .withClaim("sessionKey", userEntity.getSessionKey())
                         .withClaim("jwt-id", getJwtIdByToken(token))
-                        .acceptExpiresAt(System.currentTimeMillis() + expire_time*1000 )  //JWT 正确的配置续期姿势
+                        .acceptExpiresAt(System.currentTimeMillis() + expire_time*1000 )
                         .build();
             }else {
                 verifier = JWT.require(algorithm)
-                        .withClaim("userName", getUserNameByToken(token))
+                        .withClaim("userName", userEntity.getUserName())
                         .withClaim("jwt-id", getJwtIdByToken(token))
-                        .acceptExpiresAt(System.currentTimeMillis() + expire_time*1000 )  //JWT 正确的配置续期姿势
+                        .acceptExpiresAt(System.currentTimeMillis() + expire_time*1000 )
                         .build();
             }
             //3 . 验证token
             verifier.verify(token);
             return true;
-        } catch (Exception e) { //捕捉到任何异常都视为校验失败
+        } catch (Exception exception) {
             return false;
         }
     }

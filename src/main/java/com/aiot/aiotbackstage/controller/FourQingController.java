@@ -38,4 +38,17 @@ public class FourQingController {
         return Result.success(fourQingService.monitorInfo(stationId));
     }
 
+    @ApiOperation(value = "气象信息(meteorological)", notes = "气象信息(meteorological)")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @ResponseBody
+    @GetMapping("/meteorological")
+    public Result meteorological(@RequestParam Long stationId
+    ) {
+        return Result.success(fourQingService.meteorological(stationId));
+    }
+
+
+
 }

@@ -23,4 +23,7 @@ public interface IUserService {
      * @return Token 返回后端 自定义登陆态 token  基于JWT实现
      */
     TokenVo userLogin(UserLoginParam userLoginParam);
+
+    void loginOut(String token);
+
 }

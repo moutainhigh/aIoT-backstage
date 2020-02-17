@@ -19,6 +19,12 @@ public class SysSeedlingGrowthEntity implements Serializable {
     private Long id;
 
     /**
+     * 类型 1-苗情，2-虫情
+     */
+    @TableField(value = "type")
+    private Integer type;
+
+    /**
      * 站点id
      */
     @TableField(value = "station_id")
