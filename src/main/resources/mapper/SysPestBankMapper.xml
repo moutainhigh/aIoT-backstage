@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysPestBankMapper">
+  <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysPestBankEntity">
+    <!--@mbg.generated-->
+    <!--@Table sys_pest_bank-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="pest_name" jdbcType="VARCHAR" property="pestName" />
+    <result column="pest_type" jdbcType="VARCHAR" property="pestType" />
+    <result column="pest_introduce" jdbcType="VARCHAR" property="pestIntroduce" />
+    <result column="pest_img" jdbcType="VARCHAR" property="pestImg" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, pest_name, pest_type, pest_introduce, pest_img, create_time, update_time
+  </sql>
+
+  <select id="pestBankInfoByNamePage" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List" />  from sys_pest_bank
+    <where>
+      <if test="pestName != null">
+        and id = #{pestName,jdbcType=VARCHAR}
+      </if>
+    </where>
+    ORDER BY create_time DESC
+    LIMIT #{page.offset},#{page.pageSize}
+  </select>
+
+
+</mapper>

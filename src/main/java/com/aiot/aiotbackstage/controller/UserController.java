@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @Version 1.0
  **/
 @Controller
-@Api(tags = "用户管理接口", description = "User Controller")
+@Api(tags = "用户管理API", description = "User Controller")
 public class UserController {
 
 

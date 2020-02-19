@@ -24,7 +24,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("spot")
-@Api(tags = "景区监测接口", description = "ScenicSpot Controller")
+@Api(tags = "景区监测API", description = "ScenicSpot Controller")
 @Slf4j
 @CrossOrigin
 public class ScenicSpotController {
