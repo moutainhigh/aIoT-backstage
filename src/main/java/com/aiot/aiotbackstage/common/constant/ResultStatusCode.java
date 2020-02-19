@@ -41,6 +41,7 @@ public enum ResultStatusCode {
     NO_ROLE_NO_EXIT(510, "您没有权限访问！"),
     LOGIN_OUT_ERR(511, "退出登录失败！"),
     SYSSENSORREC_NO_EXIT(512, "该站点气象信息暂不存在！"),
+    IMPORT_IS_NULL(513, "导入文件为空！"),
 
 
 

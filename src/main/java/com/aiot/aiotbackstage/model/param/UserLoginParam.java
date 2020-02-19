@@ -30,19 +30,19 @@ public class UserLoginParam implements Serializable {
     /**
      * 用户名
      */
-    @ApiModelProperty(value="用户名",name="userName",example="用户名")
+    @ApiModelProperty(value="用户名",name="userName",example="admin")
     private String userName;
 
     /**
      * 密码
      */
-    @ApiModelProperty(value="密码",name="password",example="密码")
+    @ApiModelProperty(value="密码",name="password",example="123")
     private String password;
 
     /**
      * 登陆类型
      */
-    @ApiModelProperty(value="登陆类型（1-微信登陆，2-后台登陆）",name="loginType",example="登陆类型")
+    @ApiModelProperty(value="登陆类型（1-微信登陆，2-后台登陆）",name="loginType",example="2")
     private Integer loginType;
 
 

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Controller
 @RequestMapping("measures")
-@Api(tags = "虫情诊断", description = "PreventiveMeasures Controller")
+@Api(tags = "虫情诊断API", description = "PreventiveMeasures Controller")
 @Slf4j
 @CrossOrigin
 public class PreventiveMeasuresController {

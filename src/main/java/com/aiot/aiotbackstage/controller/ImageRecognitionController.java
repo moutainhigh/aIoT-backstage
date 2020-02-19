@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Controller
 @RequestMapping("xingse")
-@Api(tags = "形色管理接口", description = "User Controller")
+@Api(tags = "形色管理API", description = "User Controller")
 @Slf4j
 public class ImageRecognitionController {
 
