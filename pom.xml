@@ -164,41 +164,41 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 
-<!--			<plugin>-->
-<!--				<groupId>com.spotify</groupId>-->
-<!--				<artifactId>docker-maven-plugin</artifactId>-->
-<!--				<version>1.0.0</version>-->
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>1.0.0</version>
 
-<!--				&lt;!&ndash;将插件绑定在某个phase执行&ndash;&gt;-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<id>build-image</id>-->
-<!--						&lt;!&ndash;将插件绑定在package这个phase上。也就是说，用户只需执行mvn package ，就会自动执行mvn docker:build&ndash;&gt;-->
-<!--						<phase>package</phase>-->
-<!--						<goals>-->
-<!--							<goal>build</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--				<configuration>-->
-<!--					<imageName>${docker.image.prefix}/${project.artifactId}</imageName>-->
-<!--					&lt;!&ndash;指定标签&ndash;&gt;-->
-<!--					<imageTags>-->
-<!--						<imageTag>latest</imageTag>-->
-<!--					</imageTags>-->
-<!--					&lt;!&ndash; 指定 Dockerfile 路径&ndash;&gt;-->
-<!--					<dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>-->
-<!--					&lt;!&ndash;指定远程 docker api地址&ndash;&gt;-->
-<!--					<dockerHost>http://192.168.1.54:2375</dockerHost>-->
-<!--					<resources>-->
-<!--						<resource>-->
-<!--							<targetPath>/</targetPath>-->
-<!--							<directory>${project.build.directory}</directory>-->
-<!--							<include>${project.build.finalName}.jar</include>-->
-<!--						</resource>-->
-<!--					</resources>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
+				<!--将插件绑定在某个phase执行-->
+				<executions>
+					<execution>
+						<id>build-image</id>
+						<!--将插件绑定在package这个phase上。也就是说，用户只需执行mvn package ，就会自动执行mvn docker:build-->
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<imageName>${docker.image.prefix}</imageName>
+					<!--指定标签-->
+					<imageTags>
+						<imageTag>latest</imageTag>
+					</imageTags>
+					<!-- 指定 Dockerfile 路径-->
+					<dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+					<!--指定远程 docker api地址-->
+					<dockerHost>http://127.0.0.1:2375</dockerHost>
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

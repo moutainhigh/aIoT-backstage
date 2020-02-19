@@ -2,13 +2,15 @@ package com.aiot.aiotbackstage.common.enums;
 
 /**
  * 指标值类型
+ * @author Avernus
  */
 public enum SensorType {
 
-    wind_direciont,
+    wind_speed,
+    wind_direction,
     humidity,
     temperature,
-    noisy,
+    noise,
     PM25,
     PM10,
     atmos;

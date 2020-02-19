@@ -3,9 +3,11 @@ package com.aiot.aiotbackstage.service.impl;
 import com.aiot.aiotbackstage.common.enums.RtuAddrCode;
 import com.aiot.aiotbackstage.common.enums.SensorType;
 import com.aiot.aiotbackstage.common.enums.WindDirection;
+import com.aiot.aiotbackstage.mapper.SysDustRecMapper;
 import com.aiot.aiotbackstage.mapper.SysSensorRecMapper;
 import com.aiot.aiotbackstage.mapper.SysSiteMapper;
 import com.aiot.aiotbackstage.model.dto.RtuData;
+import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
 import com.aiot.aiotbackstage.service.ISensorRecService;
@@ -18,11 +20,16 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
+/**
+ * @author Avernus
+ */
 @Service
 public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSensorRecEntity> implements ISensorRecService {
 
     @Resource
     private SysSiteMapper sysSiteMapper;
+    @Resource
+    private SysDustRecMapper sysDustRecMapper;
     @Resource
     private RedisTemplate redisTemplate;
 
@@ -36,54 +43,39 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         if (code == null) {
             return;
         }
+
+        Date time = new Date(System.currentTimeMillis());
         switch (code) {
             case WIND_SPEED:
-
+                SysSensorRecEntity ws = new SysSensorRecEntity(site.getId(), SensorType.wind_speed.name(), rtuData.getData()[0] / 10 + "", time);
+                save(ws);
+                break;
             case WIND_DIRECTION:
-                WindDirection trans = WindDirection.trans(rtuData.getData()[0]);
-                if (trans == null) {
-                    return;
-                }
-                SysSensorRecEntity wd = new SysSensorRecEntity()
-                        .setSiteId(site.getId())
-                        .setSensor(SensorType.wind_direciont.name())
-                        .setTime(new Date(System.currentTimeMillis()))
-                        .setValue(trans.name());
+                String trans = WindDirection.trans(rtuData.getData()[0]);
+                SysSensorRecEntity wd = new SysSensorRecEntity(site.getId(), SensorType.wind_direction.name(), trans, time);
                 save(wd);
-            case DUST:
-
+                break;
             case ATMOS:
-                SysSensorRecEntity humidity = new SysSensorRecEntity()
-                        .setSiteId(site.getId())
-                        .setSensor(SensorType.humidity.name())
-                        .setTime(new Date(System.currentTimeMillis()))
-                        .setValue(rtuData.getData()[0] / 10 + "");
-                SysSensorRecEntity temperature = new SysSensorRecEntity()
-                        .setSiteId(site.getId())
-                        .setSensor(SensorType.temperature.name())
-                        .setTime(new Date(System.currentTimeMillis()))
-                        .setValue(rtuData.getData()[1] / 10  + "");
-                SysSensorRecEntity noisy = new SysSensorRecEntity()
-                        .setSiteId(site.getId())
-                        .setSensor(SensorType.noisy.name())
-                        .setTime(new Date(System.currentTimeMillis()))
-                        .setValue(rtuData.getData()[2] / 10  + "");
-                SysSensorRecEntity PM25 = new SysSensorRecEntity()
-                        .setSiteId(site.getId())
-                        .setSensor(SensorType.PM25.name())
-                        .setTime(new Date(System.currentTimeMillis()))
-                        .setValue(rtuData.getData()[0]  + "");
-                SysSensorRecEntity PM10 = new SysSensorRecEntity()
-                        .setSiteId(site.getId())
-                        .setSensor(SensorType.PM10.name())
-                        .setTime(new Date(System.currentTimeMillis()))
-                        .setValue(rtuData.getData()[0]  + "");
-                SysSensorRecEntity atmos = new SysSensorRecEntity()
-                        .setSiteId(site.getId())
-                        .setSensor(SensorType.atmos.name())
-                        .setTime(new Date(System.currentTimeMillis()))
-                        .setValue(rtuData.getData()[0] / 10  + "");
+                SysSensorRecEntity humidity = new SysSensorRecEntity(site.getId(), SensorType.humidity.name(),rtuData.getData()[0] / 10 + "", time);
+                SysSensorRecEntity temperature = new SysSensorRecEntity(site.getId(), SensorType.temperature.name(), rtuData.getData()[1] / 10 + "", time);
+                SysSensorRecEntity noisy = new SysSensorRecEntity(site.getId(), SensorType.noise.name(), rtuData.getData()[2] / 10 + "", time);
+                SysSensorRecEntity PM25 = new SysSensorRecEntity(site.getId(), SensorType.PM25.name(), rtuData.getData()[3] + "", time);
+                SysSensorRecEntity PM10 = new SysSensorRecEntity(site.getId(), SensorType.PM10.name(), rtuData.getData()[4] + "", time);
+                SysSensorRecEntity atmos = new SysSensorRecEntity(site.getId(), SensorType.atmos.name(), rtuData.getData()[5] / 10 + "", time);
                 save(humidity, temperature, noisy, PM10, PM25, atmos);
+                break;
+            case DUST_10CM:
+                SysDustRecEntity dust10 = new SysDustRecEntity(site.getId(), 10, rtuData.getData(), time);
+                save(dust10);
+                break;
+            case DUST_20CM:
+                SysDustRecEntity dust20 = new SysDustRecEntity(site.getId(), 20, rtuData.getData(), time);
+                save(dust20);
+                break;
+            case DUST_40CM:
+                SysDustRecEntity dust40 = new SysDustRecEntity(site.getId(), 40, rtuData.getData(), time);
+                save(dust40);
+                break;
             default:
 
         }
@@ -95,5 +87,10 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
             redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getSensor(), entity.getValue(), 60, TimeUnit.SECONDS);
         }
         saveBatch(list);
+    }
+
+    private void save(SysDustRecEntity entity) {
+        redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getDepth(), entity, 60, TimeUnit.SECONDS);
+        sysDustRecMapper.insert(entity);
     }
 }

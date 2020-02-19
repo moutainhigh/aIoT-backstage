@@ -2,6 +2,7 @@ package com.aiot.aiotbackstage.common.enums;
 
 /**
  * 风向对照表
+ * @author Avernus
  */
 public enum WindDirection {
 
@@ -20,12 +21,12 @@ public enum WindDirection {
         this.value = value;
     }
 
-    public static WindDirection trans(int value) {
+    public static String trans(int value) {
         for (WindDirection enums : WindDirection.values()) {
             if (enums.value == value) {
-                return enums;
+                return enums.name();
             }
         }
-        return null;
+        return "";
     }
 }

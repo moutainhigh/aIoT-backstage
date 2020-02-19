@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysDustRecMapper">
+    <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysDustRecEntity">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="site_id" jdbcType="BIGINT" property="siteId" />
+        <result column="depth" jdbcType="BIGINT" property="depth" />
+        <result column="wc" jdbcType="DOUBLE" property="wc" />
+        <result column="temperature" jdbcType="DOUBLE" property="temperature" />
+        <result column="ec" jdbcType="DOUBLE" property="ec" />
+        <result column="salinity" jdbcType="DOUBLE" property="salinity" />
+        <result column="tds" jdbcType="DOUBLE" property="tds" />
+        <result column="epsilon" jdbcType="DOUBLE" property="epsilon" />
+        <result column="time" jdbcType="TIMESTAMP" property="time" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, site_id siteId, depth, wc, temperature, ec, salinity, tds, epsilon, `time`
+    </sql>
+</mapper>

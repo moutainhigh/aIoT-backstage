@@ -8,12 +8,6 @@ import com.aiot.aiotbackstage.service.ISensorRecService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.util.Arrays;
-
 
 /**
  *  * 采用 Modbus-RTU 通讯规约，格式如下：
@@ -47,9 +41,14 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
                 datum[i] = Integer.parseInt(hexs[i], 16);
             }
 
-            int[] values = new int[datum[2] / 2];
-            for (int i = 0; i < datum[2]; i ++) {
-                if (i % 2 != 0) continue;
+            int addr = datum[0];
+            int func = datum[1];
+            int dataAreaLength = datum[2];
+            int[] values = new int[dataAreaLength / 2];
+            for (int i = 0; i < dataAreaLength; i ++) {
+                if (i % 2 != 0) {
+                    continue;
+                }
                 values[i / 2] = Integer.parseInt(hexs[i + 3] + hexs[i + 4], 16);
             }
 
@@ -57,13 +56,13 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
             if (rtu == null) {
                 return;
             }
-            RtuData rtuData = new RtuData(rtu, datum[0], datum[1], datum[2], values, datum[datum.length -2], datum[datum.length - 1]);
+            RtuData rtuData = new RtuData(rtu, addr, func, dataAreaLength, values, datum[datum.length -2], datum[datum.length - 1]);
+            log.info("from {}, received data {}",rtu, rtuData);
 
             if (service == null) {
                 service = SpringContextHolder.getBean(ISensorRecService.class);
             }
             service.receive(rtuData);
-            log.info("from {}, received data {}",rtu, rtuData);
         }
     }
 
