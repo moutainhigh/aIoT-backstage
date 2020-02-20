@@ -1,6 +1,7 @@
 package com.aiot.aiotbackstage.common.fiter;
 
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
+import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.shiro.JWTToken;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
@@ -46,7 +47,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
                 executeLogin(request, response);
                 return true;
             } catch (Exception e) {
-                throw new ArithmeticException(ResultStatusCode.TOKEN_NO_EXIT.getMessage());
+                throw new MyException(ResultStatusCode.TOKEN_NO_EXIT);
             }
         }
         //如果请求头不存在 Token，则可能是执行登陆操作或者是游客状态访问，无需检查 token，直接返回 true
