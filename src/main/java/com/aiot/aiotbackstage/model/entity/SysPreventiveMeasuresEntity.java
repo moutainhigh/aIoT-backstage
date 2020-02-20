@@ -22,6 +22,12 @@ public class SysPreventiveMeasuresEntity implements Serializable {
     private String name;
 
     /**
+     * 害虫id
+     */
+    @TableField(value = "insect_info_id")
+    private Long insectInfoId;
+
+    /**
      * 季节
      */
     @TableField(value = "season")

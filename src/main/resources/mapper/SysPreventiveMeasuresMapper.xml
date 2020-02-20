@@ -6,6 +6,7 @@
     <!--@Table sys_preventive_measures-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="insect_info_id" jdbcType="BIGINT" property="insectInfoId" />
     <result column="season" jdbcType="VARCHAR" property="season" />
     <result column="picture" jdbcType="VARCHAR" property="picture" />
     <result column="measures_info" jdbcType="LONGVARCHAR" property="measuresInfo" />
