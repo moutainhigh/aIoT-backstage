@@ -5,48 +5,69 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
+@Accessors(chain = true)
 @TableName(value = "sys_seedling_growth")
-public class SysSeedlingGrowthEntity implements Serializable {
-    /**
-     * 苗情id
-     */
+public class SysSeedlingGrowthEntity {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 类型 1-苗情，2-虫情
-     */
-    @TableField(value = "type")
-    private Integer type;
-
-    /**
      * 站点id
      */
-    @TableField(value = "station_id")
-    private Long stationId;
+    @TableField(value = "site_id")
+    private String siteId;
 
     /**
-     * 苗情图片
+     * 多光谱数据的唯一编号
      */
-    @TableField(value = "station_img")
-    private String stationImg;
+    @TableField(value = "guid")
+    private String guid;
+
+    /**
+     * 多光谱分析日期
+     */
+    @TableField(value = "date")
+    private Date date;
+
+    /**
+     * 总面积，单位平方米
+     */
+    @TableField(value = "total_area")
+    private BigDecimal totalArea;
+
+    /**
+     * 优质的
+     */
+    @TableField(value = "good")
+    private BigDecimal good;
+
+    /**
+     * 正常的
+     */
+    @TableField(value = "normal")
+    private BigDecimal normal;
+
+    /**
+     * 亚健康的
+     */
+    @TableField(value = "sub_health")
+    private BigDecimal subHealth;
+
+    /**
+     * 不健康的
+     */
+    @TableField(value = "unhealthy")
+    private BigDecimal unhealthy;
 
     /**
      * 创建时间
      */
     @TableField(value = "create_time")
     private Date createTime;
-
-    /**
-     * 修改时间
-     */
-    @TableField(value = "update_time")
-    private Date updateTime;
-
-    private static final long serialVersionUID = 1L;
 }

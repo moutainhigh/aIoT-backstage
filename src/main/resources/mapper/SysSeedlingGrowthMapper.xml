@@ -5,14 +5,18 @@
     <!--@mbg.generated-->
     <!--@Table sys_seedling_growth-->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="station_id" jdbcType="BIGINT" property="stationId" />
-    <result column="type" jdbcType="INTEGER" property="type" />
-    <result column="station_img" jdbcType="VARCHAR" property="stationImg" />
+    <result column="site_id" jdbcType="BIGINT" property="siteId" />
+    <result column="guid" jdbcType="VARCHAR" property="guid" />
+    <result column="date" jdbcType="TIMESTAMP" property="date" />
+    <result column="total_area" jdbcType="DECIMAL" property="totalArea" />
+    <result column="good" jdbcType="DECIMAL" property="good" />
+    <result column="normal" jdbcType="DECIMAL" property="normal" />
+    <result column="sub_health" jdbcType="DECIMAL" property="subHealth" />
+    <result column="unhealthy" jdbcType="DECIMAL" property="unhealthy" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, type, station_id, station_img, create_time, update_time
+    id, guid, `date`, total_area, good, normal, sub_health, unhealthy, create_time
   </sql>
 </mapper>

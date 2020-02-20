@@ -78,6 +78,18 @@ public class PestBankController {
         return Result.success();
     }
 
+    @ApiOperation(value = "害虫信息删除(modifyPestInfo)", notes = "害虫信息删除(modifyPestInfo)")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @ResponseBody
+    @DeleteMapping("/{id}")
+    public Result deletePestInfo(@PathVariable Long id
+    ) {
+        pestBankService.deletePestInfo(id);
+        return Result.success();
+    }
+
     /**
      * 下载虫情库excel模板
      */

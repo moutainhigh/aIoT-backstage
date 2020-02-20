@@ -2,10 +2,9 @@ package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.service.IFourQingService;
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,21 +26,7 @@ public class FourQingController {
     @Autowired
     private IFourQingService fourQingService;
 
-    @ApiOperation(value = "实时监测数据接口(monitorInfo)", notes = "实时监测数据接口(monitorInfo)")
-    @ApiResponses({
-            @ApiResponse(code = 200,message = "成功")
-    })
-    @ResponseBody
-    @GetMapping("/monitorInfo")
-    public Result monitorInfo(@RequestParam Long stationId
-    ) {
-        return Result.success(fourQingService.monitorInfo(stationId));
-    }
-
     @ApiOperation(value = "气象信息(meteorological)", notes = "气象信息(meteorological)")
-    @ApiResponses({
-            @ApiResponse(code = 200,message = "成功")
-    })
     @ResponseBody
     @GetMapping("/meteorological")
     public Result meteorological(@RequestParam Long stationId
@@ -49,6 +34,25 @@ public class FourQingController {
         return Result.success(fourQingService.meteorological(stationId));
     }
 
+    @ApiOperation(value = "苗情(seedlingGrowth)注意：该接口只用于GIS", notes = "苗情(seedlingGrowth)")
+    @ResponseBody
+    @PostMapping("/seedlingGrowth")
+    public Result seedlingGrowth(@RequestBody JSONObject jsonParam
+    ) {
+        log.info("GIS传过来的苗情数据:【{}】",jsonParam.toJSONString());
+        fourQingService.seedlingGrowth(jsonParam);
+        return Result.success();
+    }
+
+    @ApiOperation(value = "灾情(disasterSituation)注意：该接口只用于GIS", notes = "灾情(disasterSituation)")
+    @ResponseBody
+    @PostMapping("/disasterSituation")
+    public Result disasterSituation(@RequestBody JSONObject jsonParam
+    ) {
+        log.info("GIS传过来的灾情数据:【{}】",jsonParam.toJSONString());
+        fourQingService.disasterSituation(jsonParam);
+        return Result.success();
+    }
 
 
 }

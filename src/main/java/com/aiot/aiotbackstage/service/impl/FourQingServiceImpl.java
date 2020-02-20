@@ -6,11 +6,13 @@ import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.vo.*;
 import com.aiot.aiotbackstage.service.IFourQingService;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,109 +26,12 @@ public class FourQingServiceImpl implements IFourQingService {
     private SysHumidityTempMapper humidityTempMapper;
 
     @Autowired
-    private SysMeteorologicalInfoMapper meteorologicalInfoMapper;
-
-    @Autowired
     private SysSeedlingGrowthMapper seedlingGrowthMapper;
 
     @Autowired
     private SysSensorRecMapper sysSensorRecMapper;
 
 
-    @Override
-    public FourQingVo monitorInfo(Long stationId) {
-
-        FourQingVo qingVo=new FourQingVo();
-        qingVo.setStationId(stationId);
-        //灾情
-        List<SysDisasterSituationEntity> disasterSituationEntities =
-                disasterSituationMapper.selectList(Wrappers
-                        .<SysDisasterSituationEntity>lambdaQuery()
-                        .eq(SysDisasterSituationEntity::getStationId, stationId));
-        if(CollectionUtils.isEmpty(disasterSituationEntities)){
-            qingVo.setDisasterSituation(null);
-        }
-        qingVo.setDisasterSituation(disasterSituationEntities);
-
-        //气象信息
-        List<SysMeteorologicalInfoEntity> meteorologicalInfoEntities =
-                meteorologicalInfoMapper.selectList(Wrappers
-                        .<SysMeteorologicalInfoEntity>lambdaQuery()
-                        .eq(SysMeteorologicalInfoEntity::getStationId, stationId));
-        if(CollectionUtils.isEmpty(meteorologicalInfoEntities)){
-            qingVo.setMeteorologicalInfo(null);
-        }
-        qingVo.setMeteorologicalInfo(meteorologicalInfoEntities);
-
-
-        List<SysSeedlingGrowthEntity> sysSeedlingGrowthEntities =
-                seedlingGrowthMapper.selectList(Wrappers
-                        .<SysSeedlingGrowthEntity>lambdaQuery()
-                        .eq(SysSeedlingGrowthEntity::getStationId, stationId));
-        if(CollectionUtils.isEmpty(sysSeedlingGrowthEntities)){
-            qingVo.setSeedlingGrowth(null);
-        }
-        Map<Integer, List<SysSeedlingGrowthEntity>> collect = sysSeedlingGrowthEntities.stream().collect(Collectors.groupingBy(SysSeedlingGrowthEntity::getType, Collectors.toList()));
-        //苗情
-        qingVo.setSeedlingGrowth(collect.get(1));
-        //虫情
-        qingVo.setChongqing(collect.get(2));
-
-        List<SysTempRegionVo> tempRegionVos=new ArrayList<>();
-        List<SysHumidityRegionVo> humidityRegionVos=new ArrayList<>();
-        List<SysHumidityTempEntity> humidityTempEntities = humidityTempMapper.selectList(Wrappers
-                .<SysHumidityTempEntity>lambdaQuery()
-                .eq(SysHumidityTempEntity::getStationId, stationId));
-        Map<Integer, List<SysHumidityTempEntity>> typeCollect = humidityTempEntities
-                .stream()
-                .collect(Collectors
-                        .groupingBy(SysHumidityTempEntity::getType, Collectors.toList()));
-        List<SysHumidityTempEntity> humidityTempEntities1 = typeCollect.get(1);
-        List<SysHumidityTempEntity> humidityTempEntities2 = typeCollect.get(2);
-        TreeMap<String, List<SysHumidityTempEntity>> regionCollect = humidityTempEntities1
-                .stream()
-                .collect(Collectors
-                .groupingBy(SysHumidityTempEntity::getRegion, TreeMap::new, Collectors.toList()));
-        Set<String> strings = regionCollect.keySet();
-        strings.stream().forEach(s -> {
-            SysTempRegionVo sysTempRegionVo=new SysTempRegionVo();
-            sysTempRegionVo.setRegion(s);
-            List<SysHumidityTempEntity> humidityTempEntitieList = regionCollect.get(s);
-            List<SysHumidityTempTimeVo> humidityTempTimeVo=new ArrayList<>();
-            humidityTempEntitieList.stream().forEach(sysHumidityTempEntity -> {
-                SysHumidityTempTimeVo sysHumidityTempTimeVo=new SysHumidityTempTimeVo();
-                sysHumidityTempTimeVo.setTime(sysHumidityTempEntity.getTime());
-                sysHumidityTempTimeVo.setVar(sysHumidityTempEntity.getVar());
-                humidityTempTimeVo.add(sysHumidityTempTimeVo);
-            });
-            sysTempRegionVo.setHumidityTempTimes(humidityTempTimeVo);
-            tempRegionVos.add(sysTempRegionVo);
-        });
-        TreeMap<String, List<SysHumidityTempEntity>> regionHumidityCollect = humidityTempEntities2
-                .stream()
-                .collect(Collectors
-                        .groupingBy(SysHumidityTempEntity::getRegion, TreeMap::new, Collectors.toList()));
-        Set<String> strings1 = regionHumidityCollect.keySet();
-        strings1.stream().forEach(s -> {
-            SysHumidityRegionVo humidityRegionVo=new SysHumidityRegionVo();
-            humidityRegionVo.setRegion(s);
-            List<SysHumidityTempEntity> humidityTempEntitieList = regionHumidityCollect.get(s);
-            List<SysHumidityTempTimeVo> humidityTempTimeVo=new ArrayList<>();
-            humidityTempEntitieList.stream().forEach(sysHumidityTempEntity -> {
-                SysHumidityTempTimeVo sysHumidityTempTimeVo=new SysHumidityTempTimeVo();
-                sysHumidityTempTimeVo.setTime(sysHumidityTempEntity.getTime());
-                sysHumidityTempTimeVo.setVar(sysHumidityTempEntity.getVar());
-                humidityTempTimeVo.add(sysHumidityTempTimeVo);
-            });
-            humidityRegionVo.setHumidityTempTimes(humidityTempTimeVo);
-            humidityRegionVos.add(humidityRegionVo);
-        });
-        //土壤温度
-        qingVo.setTempRegionVos(tempRegionVos);
-        //土壤湿度
-        qingVo.setHumidityRegionVos(humidityRegionVos);
-        return qingVo;
-    }
 
     @Override
     public List<SysSensorRecVo> meteorological(Long stationId) {
@@ -169,5 +74,50 @@ public class FourQingServiceImpl implements IFourQingService {
             sensorRecVos.add(sensorRecVo);
         });
         return sensorRecVos;
+    }
+
+    @Override
+    public void seedlingGrowth(JSONObject jsonParam) {
+        String guid = (String)jsonParam.get("ID");
+//        String siteId = (String)jsonParam.get("siteId");   TODO 保留
+        Date date = (Date)jsonParam.get("date");
+        BigDecimal totalArea = (BigDecimal)jsonParam.get("totalArea");
+        BigDecimal good = (BigDecimal)jsonParam.get("good");
+        BigDecimal normal = (BigDecimal)jsonParam.get("normal");
+        BigDecimal subHealth = (BigDecimal)jsonParam.get("subHealth");
+        BigDecimal unhealthy = (BigDecimal)jsonParam.get("unhealthy");
+        SysSeedlingGrowthEntity seedlingGrowthEntity=new SysSeedlingGrowthEntity();
+        seedlingGrowthEntity.setGuid(guid);
+//        seedlingGrowthEntity.setSiteId(siteId);
+        seedlingGrowthEntity.setDate(date);
+        seedlingGrowthEntity.setTotalArea(totalArea);
+        seedlingGrowthEntity.setGood(good);
+        seedlingGrowthEntity.setNormal(normal);
+        seedlingGrowthEntity.setSubHealth(subHealth);
+        seedlingGrowthEntity.setUnhealthy(unhealthy);
+        seedlingGrowthEntity.setCreateTime(new Date());
+        seedlingGrowthMapper.insert(seedlingGrowthEntity);
+
+    }
+
+    @Override
+    public void disasterSituation(JSONObject jsonParam) {
+        String guid = (String)jsonParam.get("ID");
+//        String siteId = (String)jsonParam.get("siteId"); TODO 保留
+        Date date = (Date)jsonParam.get("date");
+        BigDecimal totalArea = (BigDecimal)jsonParam.get("totalArea");
+        BigDecimal serious = (BigDecimal)jsonParam.get("serious");
+        BigDecimal medium = (BigDecimal)jsonParam.get("medium");
+        BigDecimal normal = (BigDecimal)jsonParam.get("normal");
+        SysDisasterSituationEntity disasterSituationEntity=new SysDisasterSituationEntity();
+//        disasterSituationEntity.setSiteId(siteId);
+        disasterSituationEntity.setGuid(guid);
+        disasterSituationEntity.setDate(date);
+        disasterSituationEntity.setTotalArea(totalArea);
+        disasterSituationEntity.setSerious(serious);
+        disasterSituationEntity.setMedium(medium);
+        disasterSituationEntity.setNormal(normal);
+        disasterSituationEntity.setCreateTime(new Date());
+        disasterSituationMapper.insert(disasterSituationEntity);
     }
 }

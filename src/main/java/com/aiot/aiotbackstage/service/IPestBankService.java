@@ -26,4 +26,6 @@ public interface IPestBankService {
     void importWatchExcel(MultipartFile xlsFile);
 
     void exportExcel(String pestName, HttpServletRequest request, HttpServletResponse response) throws IOException;
+
+    void deletePestInfo(Long id);
 }
