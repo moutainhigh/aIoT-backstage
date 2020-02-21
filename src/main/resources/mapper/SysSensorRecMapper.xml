@@ -21,4 +21,29 @@
         from sys_sensor_rec
     </select>
 
+    <select id="findAllAverageByDay" parameterType="map" resultType="map">
+        SELECT
+            a.sensor,
+            a.fmt_date AS `date`,
+            AVG( a.`value` ) AS `value`
+        FROM
+            (
+                SELECT
+                    *,
+                    DATE_FORMAT( time, '%Y-%m-%d' ) AS fmt_date,
+                    DATE_FORMAT( time, '%H:%i:%s' ) AS fmt_time
+                FROM
+                    sys_sensor_rec
+            ) AS a
+        WHERE
+           a.time &gt;= #{startTime}
+            AND a.time &lt;= #{endTime}
+            AND a.fmt_time &gt;= #{sTime}
+            AND a.fmt_time &lt;= #{eTime}
+            AND a.site_id = #{siteId}
+        GROUP BY
+            a.sensor,
+            a.fmt_date
+    </select>
+
 </mapper>

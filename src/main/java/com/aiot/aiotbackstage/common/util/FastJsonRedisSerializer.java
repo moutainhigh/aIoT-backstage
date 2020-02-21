@@ -22,7 +22,8 @@ public class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
 
     private Class<T> clazz;
     static {
-        ParserConfig.getGlobalInstance().addAccept("com.aiot.aiotbackstage.model.entity.SysUserEntity");
+        // TODO by wl
+//        ParserConfig.getGlobalInstance().addAccept("com.aiot.aiotbackstage.model.entity.SysUserEntity");
     }
     public FastJsonRedisSerializer(Class<T> clazz) {
         super();

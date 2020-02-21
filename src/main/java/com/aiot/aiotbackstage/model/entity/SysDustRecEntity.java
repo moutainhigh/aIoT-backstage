@@ -60,6 +60,9 @@ public class SysDustRecEntity {
      */
     private Date time;
 
+    public SysDustRecEntity() {
+    }
+
     public SysDustRecEntity(Integer siteId, Integer depth, int[] datum, Date time) {
         this.siteId = siteId;
         this.depth = depth;
