@@ -20,18 +20,7 @@ import java.util.stream.Collectors;
 public class FourQingServiceImpl implements IFourQingService {
 
     @Autowired
-    private SysDisasterSituationMapper disasterSituationMapper;
-
-    @Autowired
-    private SysHumidityTempMapper humidityTempMapper;
-
-    @Autowired
-    private SysSeedlingGrowthMapper seedlingGrowthMapper;
-
-    @Autowired
     private SysSensorRecMapper sysSensorRecMapper;
-
-
 
     @Override
     public List<SysSensorRecVo> meteorological(Long stationId) {
@@ -76,48 +65,5 @@ public class FourQingServiceImpl implements IFourQingService {
         return sensorRecVos;
     }
 
-    @Override
-    public void seedlingGrowth(JSONObject jsonParam) {
-        String guid = (String)jsonParam.get("ID");
-//        String siteId = (String)jsonParam.get("siteId");   TODO 保留
-        Date date = (Date)jsonParam.get("date");
-        BigDecimal totalArea = (BigDecimal)jsonParam.get("totalArea");
-        BigDecimal good = (BigDecimal)jsonParam.get("good");
-        BigDecimal normal = (BigDecimal)jsonParam.get("normal");
-        BigDecimal subHealth = (BigDecimal)jsonParam.get("subHealth");
-        BigDecimal unhealthy = (BigDecimal)jsonParam.get("unhealthy");
-        SysSeedlingGrowthEntity seedlingGrowthEntity=new SysSeedlingGrowthEntity();
-        seedlingGrowthEntity.setGuid(guid);
-//        seedlingGrowthEntity.setSiteId(siteId);
-        seedlingGrowthEntity.setDate(date);
-        seedlingGrowthEntity.setTotalArea(totalArea);
-        seedlingGrowthEntity.setGood(good);
-        seedlingGrowthEntity.setNormal(normal);
-        seedlingGrowthEntity.setSubHealth(subHealth);
-        seedlingGrowthEntity.setUnhealthy(unhealthy);
-        seedlingGrowthEntity.setCreateTime(new Date());
-        seedlingGrowthMapper.insert(seedlingGrowthEntity);
 
-    }
-
-    @Override
-    public void disasterSituation(JSONObject jsonParam) {
-        String guid = (String)jsonParam.get("ID");
-//        String siteId = (String)jsonParam.get("siteId"); TODO 保留
-        Date date = (Date)jsonParam.get("date");
-        BigDecimal totalArea = (BigDecimal)jsonParam.get("totalArea");
-        BigDecimal serious = (BigDecimal)jsonParam.get("serious");
-        BigDecimal medium = (BigDecimal)jsonParam.get("medium");
-        BigDecimal normal = (BigDecimal)jsonParam.get("normal");
-        SysDisasterSituationEntity disasterSituationEntity=new SysDisasterSituationEntity();
-//        disasterSituationEntity.setSiteId(siteId);
-        disasterSituationEntity.setGuid(guid);
-        disasterSituationEntity.setDate(date);
-        disasterSituationEntity.setTotalArea(totalArea);
-        disasterSituationEntity.setSerious(serious);
-        disasterSituationEntity.setMedium(medium);
-        disasterSituationEntity.setNormal(normal);
-        disasterSituationEntity.setCreateTime(new Date());
-        disasterSituationMapper.insert(disasterSituationEntity);
-    }
 }

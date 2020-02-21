@@ -83,4 +83,17 @@ public class MyExceptionHandler {
         return new Result(ResultStatusCode.NO_ROLE_NO_EXIT);
     }
 
+    /**
+     * 处理访问方法时权限不足问题
+     * @param req
+     * @param e
+     * @return
+     */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(value = ArithmeticException.class)
+    @ResponseBody
+    public Result arithmeticException(HttpServletRequest req, Exception e)  {
+        return new Result(ResultStatusCode.TOKEN_NO_EXIT);
+    }
+
 }

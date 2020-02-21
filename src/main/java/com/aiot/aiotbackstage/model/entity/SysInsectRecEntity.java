@@ -1,12 +1,14 @@
 package com.aiot.aiotbackstage.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 import java.util.Date;
 
 /**
  * @author Avernus
  */
+@Data
 @TableName("sys_insect_rec")
 public class SysInsectRecEntity {
 

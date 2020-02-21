@@ -1,21 +1,18 @@
 package com.aiot.aiotbackstage.server.codec;
 
 import com.aiot.aiotbackstage.common.util.HexConvert;
-import com.aiot.aiotbackstage.model.dto.RtuData;
-import com.aiot.aiotbackstage.server.TcpServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author Avernus
  */
 @Slf4j
-public class ModbusRtuCodec extends ByteToMessageCodec<int[]> {
+public class ModbusRtuCodec extends ByteToMessageCodec<String> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
@@ -28,8 +25,9 @@ public class ModbusRtuCodec extends ByteToMessageCodec<int[]> {
 
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, int[] msg, ByteBuf out) throws Exception {
-
+    protected void encode(ChannelHandlerContext ctx, String msg, ByteBuf out) throws Exception {
+        byte[] bytes = HexConvert.hexStringToBytes(msg);
+        out.writeBytes(bytes);
     }
 
 }
