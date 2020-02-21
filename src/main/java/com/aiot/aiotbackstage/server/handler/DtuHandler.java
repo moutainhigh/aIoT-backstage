@@ -5,9 +5,12 @@ import com.aiot.aiotbackstage.common.util.SpringContextHolder;
 import com.aiot.aiotbackstage.model.dto.RtuData;
 import com.aiot.aiotbackstage.server.TcpServer;
 import com.aiot.aiotbackstage.service.ISensorRecService;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
 
 /**
  *  * 采用 Modbus-RTU 通讯规约，格式如下：
@@ -31,10 +34,19 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
 
         if (asc.startsWith("register")) {
             //注册包
-            TcpServer.addrs.put(ctx.channel().remoteAddress(), Integer.parseInt(asc.split("-")[1]));
+            TcpServer.channels.put(Integer.parseInt(asc.split("-")[1]), ctx.channel());
             log.info("from {}, received hex {}, asc {}",ctx.channel().remoteAddress(), hex, asc);
         } else {
             //数据包
+            Integer rtu = 0;
+            for (Map.Entry<Integer, Channel> entry : TcpServer.channels.entrySet()) {
+                if (entry.getValue().equals(ctx.channel())) {
+                    rtu = entry.getKey();
+                }
+            }
+            if (rtu == 0) {
+                return;
+            }
             String[] hexs = hex.split(" ");
             int[] datum = new int[hexs.length];
             for (int i = 0; i < hexs.length; i ++) {
@@ -52,12 +64,8 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
                 values[i / 2] = Integer.parseInt(hexs[i + 3] + hexs[i + 4], 16);
             }
 
-            Integer rtu = TcpServer.addrs.get(ctx.channel().remoteAddress());
-            if (rtu == null) {
-                return;
-            }
             RtuData rtuData = new RtuData(rtu, addr, func, dataAreaLength, values, datum[datum.length -2], datum[datum.length - 1]);
-            log.info("from {}, received data {}",rtu, rtuData);
+            log.info("from {}--{}, received data {}",ctx.channel().remoteAddress() , rtu, rtuData);
 
             if (service == null) {
                 service = SpringContextHolder.getBean(ISensorRecService.class);
