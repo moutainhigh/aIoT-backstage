@@ -2,6 +2,7 @@ package com.aiot.aiotbackstage.service.impl;
 
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
+import com.aiot.aiotbackstage.common.util.ExcelUtils;
 import com.aiot.aiotbackstage.mapper.SysPestBankMapper;
 import com.aiot.aiotbackstage.model.entity.SysPestBankEntity;
 import com.aiot.aiotbackstage.model.param.AddPestBankParam;
@@ -10,9 +11,9 @@ import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.PestBankParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.IPestBankService;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -31,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description 害虫库业务
@@ -136,31 +138,16 @@ public class PestBankServiceImpl implements IPestBankService {
     @Override
     public void exportExcel(String pestName, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        HSSFWorkbook workBook = new HSSFWorkbook();// 创建excel工作簿
-        HSSFFont headFont = workBook.createFont();
-        headFont.setFontName("Arial");
-        headFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-        headFont.setFontHeightInPoints((short) 10);// 字体大小
-        HSSFCellStyle headStyle = workBook.createCellStyle();
-        headStyle.setFont(headFont);
-        headStyle.setLocked(true);
-        headStyle.setWrapText(true);// 自动换行
-        headStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);// 左右居中
-        headStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);// 上下居中
-        //设置上下左右四个边框宽度
-        headStyle.setBorderTop(HSSFBorderFormatting.BORDER_THIN);
-        headStyle.setBorderBottom(HSSFBorderFormatting.BORDER_THIN);
-        headStyle.setBorderLeft(HSSFBorderFormatting.BORDER_THIN);
-        headStyle.setBorderRight(HSSFBorderFormatting.BORDER_THIN);
-        //设置上下左右四个边框颜色
-        headStyle.setTopBorderColor(HSSFColor.RED.index);
-        headStyle.setBottomBorderColor(HSSFColor.RED.index);
-        headStyle.setLeftBorderColor(HSSFColor.RED.index);
-        headStyle.setRightBorderColor(HSSFColor.RED.index);
-        headStyle.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
-        headStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        Map<String, Object> stringObjectMap = ExcelUtils.setExcelStyle();
+        HSSFWorkbook workBook = (HSSFWorkbook)stringObjectMap.get("workBook");
+        HSSFCellStyle headStyle = (HSSFCellStyle)stringObjectMap.get("headStyle");
+        HSSFCellStyle style = (HSSFCellStyle)stringObjectMap.get("style");
 
         HSSFSheet sheet = workBook.createSheet("虫情库信息");
+        sheet.setColumnWidth(0,30 * 256);
+        sheet.setColumnWidth(1,20 * 256);
+        sheet.setColumnWidth(2,100 * 256);
+        sheet.setColumnWidth(3,50 * 256);
         //此处添加数据
         HSSFRow headerRow1 = sheet.createRow(0);
         headerRow1.setHeight((short) 600);// 设置表格行的高度
@@ -187,10 +174,18 @@ public class PestBankServiceImpl implements IPestBankService {
         }
         sysPestBankEntities.stream().forEach(sysPestBankEntity -> {
             HSSFRow headerRow2 = sheet.createRow(sysPestBankEntity.getId().intValue());
-            headerRow2.createCell(0).setCellValue(sysPestBankEntity.getPestType());
-            headerRow2.createCell(1).setCellValue(sysPestBankEntity.getPestName());
-            headerRow2.createCell(2).setCellValue(sysPestBankEntity.getPestIntroduce());
-            headerRow2.createCell(3).setCellValue(sysPestBankEntity.getPestImg());
+            HSSFCell cell4 = headerRow2.createCell(0);
+            cell4.setCellValue(sysPestBankEntity.getPestType());
+            cell4.setCellStyle(style);
+            HSSFCell cell5 = headerRow2.createCell(1);
+            cell5.setCellValue(sysPestBankEntity.getPestName());
+            cell5.setCellStyle(style);
+            HSSFCell cell6 = headerRow2.createCell(2);
+            cell6.setCellValue(sysPestBankEntity.getPestIntroduce());
+            cell6.setCellStyle(style);
+            HSSFCell cell7 = headerRow2.createCell(3);
+            cell7.setCellValue(sysPestBankEntity.getPestImg());
+            cell7.setCellStyle(style);
         });
         //清空response
         response.reset();
@@ -201,5 +196,14 @@ public class PestBankServiceImpl implements IPestBankService {
         os.flush();
         os.close();
         workBook.close();
+    }
+
+    @Override
+    public void deletePestInfo(Long id) {
+        SysPestBankEntity pestBankEntity = pestBankMapper.selectById(id);
+        if(ObjectUtils.isEmpty(pestBankEntity)){
+            throw new MyException(ResultStatusCode.PEST_BANK_NO_EXIT);
+        }
+        pestBankMapper.deleteById(id);
     }
 }

@@ -5,13 +5,17 @@
     <!--@mbg.generated-->
     <!--@Table sys_disaster_situation-->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="station_id" jdbcType="BIGINT" property="stationId" />
-    <result column="disaster_video" jdbcType="VARCHAR" property="disasterVideo" />
+    <result column="site_id" jdbcType="BIGINT" property="siteId" />
+    <result column="guid" jdbcType="VARCHAR" property="guid" />
+    <result column="date" jdbcType="TIMESTAMP" property="date" />
+    <result column="total_area" jdbcType="DECIMAL" property="totalArea" />
+    <result column="serious" jdbcType="DECIMAL" property="serious" />
+    <result column="medium" jdbcType="DECIMAL" property="medium" />
+    <result column="normal" jdbcType="DECIMAL" property="normal" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, station_id, disaster_video, create_time, update_time
+    id, guid, `date`, total_area, serious, medium, normal, create_time
   </sql>
 </mapper>
