@@ -1,52 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiot.aiotbackstage.mapper.SysDustRecMapper">
-
     <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysDustRecEntity">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="site_id" jdbcType="BIGINT" property="siteId"/>
-        <result column="depth" jdbcType="BIGINT" property="depth"/>
-        <result column="wc" jdbcType="DOUBLE" property="wc"/>
-        <result column="temperature" jdbcType="DOUBLE" property="temperature"/>
-        <result column="ec" jdbcType="DOUBLE" property="ec"/>
-        <result column="salinity" jdbcType="DOUBLE" property="salinity"/>
-        <result column="tds" jdbcType="DOUBLE" property="tds"/>
-        <result column="epsilon" jdbcType="DOUBLE" property="epsilon"/>
-        <result column="time" jdbcType="TIMESTAMP" property="time"/>
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="site_id" jdbcType="BIGINT" property="siteId" />
+        <result column="depth" jdbcType="BIGINT" property="depth" />
+        <result column="wc" jdbcType="DOUBLE" property="wc" />
+        <result column="temperature" jdbcType="DOUBLE" property="temperature" />
+        <result column="ec" jdbcType="DOUBLE" property="ec" />
+        <result column="salinity" jdbcType="DOUBLE" property="salinity" />
+        <result column="tds" jdbcType="DOUBLE" property="tds" />
+        <result column="epsilon" jdbcType="DOUBLE" property="epsilon" />
+        <result column="time" jdbcType="TIMESTAMP" property="time" />
     </resultMap>
-
-    <resultMap id="ResultFormatDate" extends="BaseResultMap" type="com.aiot.aiotbackstage.model.vo.SysDustRecVo">
-        <result column="fmt_date" jdbcType="TIMESTAMP" javaType="String" property="date"/>
-    </resultMap>
-
     <sql id="Base_Column_List">
         id, site_id siteId, depth, wc, temperature, ec, salinity, tds, epsilon, `time`
     </sql>
-
-    <select id="findAllDepthAverageByDay" parameterType="map" resultMap="ResultFormatDate">
-        SELECT
-            a.depth,
-            a.fmt_date,
-            AVG( a.wc ) AS wc,
-            AVG( a.temperature ) AS temperature,
-            AVG( a.ec ) AS ec,
-            AVG( a.salinity ) AS salinity,
-            AVG( a.tds ) AS tds,
-            AVG( a.epsilon ) AS epsilon
-        FROM
-            (
-                SELECT
-                    *,
-                    DATE_FORMAT( time, '%Y-%m-%d' ) AS fmt_date
-                FROM
-                    sys_dust_rec
-            ) AS a
-        WHERE
-            a.time &gt;= #{startTime}
-            AND a.time &lt;= #{endTime}
-            AND a.site_id = #{siteId}
-        GROUP BY
-            a.depth,
-            a.fmt_date
-    </select>
 </mapper>

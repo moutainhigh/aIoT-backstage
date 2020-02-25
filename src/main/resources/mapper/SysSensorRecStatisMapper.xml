@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysSensorRecStatisMapper">
+
+    <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysSensorRecStatisEntity">
+        <id column="id" property="id"/>
+        <result column="site_id" property="siteId"/>
+        <result column="date" property="date"/>
+        <result column="hour" property="hour"/>
+        <result column="wind_speed" property="windSpeed"/>
+        <result column="wind_direction" property="windDirection"/>
+        <result column="humidity" property="humidity"/>
+        <result column="temperature" property="temperature"/>
+        <result column="noisy" property="noisy"/>
+        <result column="PM10" property="PM10"/>
+        <result column="PM25" property="PM25"/>
+        <result column="atmos" property="atmos"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <insert id="batchInsert">
+        INSERT INTO sys_sensor_rec_statis
+        (
+        site_id,
+        `date`,
+        `hour`,
+        wind_speed,
+        wind_direction,
+        humidity,
+        temperature,
+        noisy,
+        PM10,
+        PM25,
+        atmos
+        )
+        VALUES
+        <foreach collection="data" item="item" separator=",">
+            (
+            #{item.siteId},
+            #{item.date},
+            #{item.hour},
+            #{item.windSpeed},
+            #{item.windDirection},
+            #{item.humidity},
+            #{item.temperature},
+            #{item.noisy},
+            #{item.PM10},
+            #{item.PM25},
+            #{item.atmos}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        wind_speed = VALUES( wind_speed ),
+        wind_direction = VALUES( wind_direction ),
+        humidity = VALUES( humidity ),
+        temperature = VALUES( temperature ),
+        noisy = VALUES( noisy ),
+        PM10 = VALUES( PM10 ),
+        PM25 = VALUES( PM25 ),
+        atmos = VALUES( atmos )
+    </insert>
+
+    <select id="findAllBySiteId" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM
+            sys_sensor_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startTime}
+            AND #{endTime}
+    </select>
+
+</mapper>

@@ -12,6 +12,9 @@ public class DoubleUtils {
                 size--;
             }
         }
+        if (size <= 0) {
+            return 0D;
+        }
         return sum / size;
     }
 }

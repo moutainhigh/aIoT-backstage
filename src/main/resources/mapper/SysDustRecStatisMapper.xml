@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysDustRecStatisMapper">
+
+    <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysDustRecStatisEntity">
+        <id column="id" property="id"/>
+        <result column="site_id" property="siteId"/>
+        <result column="depth" property="depth"/>
+        <result column="date" property="date"/>
+        <result column="hour" property="hour"/>
+        <result column="wc" property="wc"/>
+        <result column="temperature" property="temperature"/>
+        <result column="ec" property="ec"/>
+        <result column="salinity" property="salinity"/>
+        <result column="tds" property="tds"/>
+        <result column="epsilon" property="epsilon"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <insert id="batchInsert">
+        INSERT INTO sys_dust_rec_statis
+        ( site_id, depth, `date`, `hour`, wc, temperature, ec, salinity, tds, epsilon )
+        VALUES
+        <foreach collection="data" item="item" separator=",">
+            (
+            #{item.siteId},
+            #{item.depth},
+            #{item.date},
+            #{item.hour},
+            #{item.wc},
+            #{item.temperature},
+            #{item.ec},
+            #{item.salinity},
+            #{item.tds},
+            #{item.epsilon}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        wc = VALUES( wc ),
+        temperature = VALUES( temperature ),
+        ec = VALUES( ec ),
+        salinity = VALUES( salinity ),
+        tds = VALUES( tds ),
+        epsilon = VALUES( epsilon )
+    </insert>
+
+    <select id="findAllBySiteId" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM
+            sys_dust_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startTime}
+            AND #{endTime}
+    </select>
+
+    <select id="findAllDaily" resultMap="BaseResultMap">
+        SELECT
+            depth,
+            `date`,
+            AVG( wc ) AS wc,
+            AVG( temperature ) AS temperature,
+            AVG( ec ) AS ec,
+            AVG( salinity ) AS salinity,
+            AVG( tds ) AS tds,
+            AVG( epsilon ) AS epsilon
+        FROM
+            sys_dust_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startTime}
+            AND #{endTime}
+        GROUP BY
+            depth,
+            `date`
+    </select>
+
+</mapper>

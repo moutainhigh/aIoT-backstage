@@ -3,9 +3,11 @@ package com.aiot.aiotbackstage.controller;
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.model.dto.YunFeiData;
+import com.aiot.aiotbackstage.server.schedule.DataStatisSchedule;
 import com.aiot.aiotbackstage.service.impl.SensorRecServiceImpl;
-import com.aiot.aiotbackstage.service.impl.SysDustRecServiceImpl;
-import com.aiot.aiotbackstage.service.impl.SysInsectRecServiceImpl;
+import com.aiot.aiotbackstage.service.impl.SensorRecStatisServiceImpl;
+import com.aiot.aiotbackstage.service.impl.SysDustRecStatisServiceImpl;
+import com.aiot.aiotbackstage.service.impl.SysInsectRecStatisServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,13 +24,16 @@ import java.util.Map;
 public class DataController {
 
     @Autowired
-    private SysInsectRecServiceImpl sysInsectRecService;
+    private SysInsectRecStatisServiceImpl sysInsectRecStatisService;
 
     @Autowired
-    private SysDustRecServiceImpl sysDustRecService;
+    private SysDustRecStatisServiceImpl sysDustRecStatisService;
 
     @Autowired
-    private SensorRecServiceImpl sensorRecService;
+    private SensorRecStatisServiceImpl sensorRecStatisService;
+
+    @Autowired
+    private DataStatisSchedule dataStatisSchedule;
 
     @RequestMapping(value = "/insectDevice", method = RequestMethod.POST)
     public Result insectDevice(@RequestBody Map data) {
@@ -59,7 +64,7 @@ public class DataController {
         if (!(startTime instanceof Long) || !(endTime instanceof Long)) {
             return Result.error(ResultStatusCode.PARAM_IS_INVALID);
         }
-        return Result.success(sysInsectRecService.getSitesPestNumStat((long) startTime, (long) endTime));
+        return Result.success(sysInsectRecStatisService.getAllSitesPestNumStat((long) startTime, (long) endTime));
     }
 
     /**
@@ -81,7 +86,7 @@ public class DataController {
         if (!(startTime instanceof Long) || !(endTime instanceof Long)) {
             return Result.error(ResultStatusCode.PARAM_IS_INVALID);
         }
-        return Result.success(sysInsectRecService.getPestNumStatBySiteId(siteId, (long) startTime, (long) endTime));
+        return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, (long) startTime, (long) endTime));
     }
 
     /**
@@ -90,7 +95,7 @@ public class DataController {
      * @param siteId    站点ID
      * @param startTime 开始时间
      * @param endTime   结束时间
-     * @param isMax     是否最大值筛选：1、最大值，其他：最小值
+     * @param isMax     是否最大值筛选：1、最大值，0：最小值，不传：不与虫害关联
      * @return
      */
     @PostMapping("{siteId}/soilInfo")
@@ -104,10 +109,14 @@ public class DataController {
         if (!(startTime instanceof Long) || !(endTime instanceof Long)) {
             return Result.error(ResultStatusCode.PARAM_IS_INVALID);
         }
-        if (params.containsKey("isMax") && (int) params.get("isMax") == 1) {
-            return Result.success(sysDustRecService.getBiggestPestSoilInfo(siteId, (long) startTime, (long) endTime));
+        if (params.containsKey("isMax")) {
+            if ((int) params.get("isMax") == 0 || (int) params.get("isMax") == 1) {
+                return Result.success(sysDustRecStatisService.getMaxOrMinPestSoilInfo(siteId, (long) startTime, (long) endTime, (int) params.get("isMax")));
+            } else {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
         } else {
-            return Result.success(sysDustRecService.getMinimumPestSoilInfo(siteId, (long) startTime, (long) endTime));
+            return Result.success(sysDustRecStatisService.getPestSoilInfo(siteId, (long) startTime, (long) endTime));
         }
     }
 
@@ -117,7 +126,7 @@ public class DataController {
      * @param siteId    站点ID
      * @param startTime 开始时间
      * @param endTime   结束时间
-     * @param isMax     是否最大值筛选：1、最大值，其他：最小值
+     * @param isMax     是否最大值筛选：1、最大值，0：最小值，不传：不与虫害关联
      * @return
      */
     @PostMapping("{siteId}/meteInfo")
@@ -131,11 +140,21 @@ public class DataController {
         if (!(startTime instanceof Long) || !(endTime instanceof Long)) {
             return Result.error(ResultStatusCode.PARAM_IS_INVALID);
         }
-        if (params.containsKey("isMax") && (int) params.get("isMax") == 1) {
-            return Result.success(sensorRecService.getBiggestPestMeteInfo(siteId, (long) startTime, (long) endTime));
+        if (params.containsKey("isMax")) {
+            if ((int) params.get("isMax") == 0 || (int) params.get("isMax") == 1) {
+                return Result.success(sensorRecStatisService.getMaxOrMinPestMeteInfo(siteId, (long) startTime, (long) endTime, (int) params.get("isMax")));
+            } else {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
         } else {
-            return Result.success(sensorRecService.getMinimumPestMeteInfo(siteId, (long) startTime, (long) endTime));
+            return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, (long) startTime, (long) endTime));
         }
+    }
+
+    @PostMapping("statis")
+    public Result statis() {
+        dataStatisSchedule.start();
+        return Result.success();
     }
 }
 
