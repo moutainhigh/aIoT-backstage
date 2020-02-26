@@ -43,7 +43,7 @@
             FROM
                 sys_insect_rec_statis
             WHERE
-                `date` BETWEEN #{startTime} AND #{endTime}
+                `date` BETWEEN #{startDate} AND #{endDate}
         ) AS a
         LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
         LEFT JOIN sys_site AS ss ON ss.id = sid.site_id
@@ -84,7 +84,7 @@
                     FROM
                         sys_insect_rec_statis
                     WHERE
-                        `date` BETWEEN #{startTime} AND #{endTime}
+                        `date` BETWEEN #{startDate} AND #{endDate}
                 ) AS a
                 LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
                 WHERE
@@ -113,7 +113,7 @@
             FROM
                 sys_insect_rec_statis
             WHERE
-                `date` BETWEEN #{startTime} AND #{endTime}
+                `date` BETWEEN #{startDate} AND #{endDate}
         ) AS a
         LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
         WHERE

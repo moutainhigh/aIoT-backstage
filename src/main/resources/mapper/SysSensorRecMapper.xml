@@ -9,6 +9,7 @@
         <result column="value" jdbcType="VARCHAR" property="value" />
         <result column="time" jdbcType="TIMESTAMP" property="time" />
     </resultMap>
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id, site_id siteId, sensor, `value`, `time`
@@ -19,6 +20,36 @@
         select
         <include refid="Base_Column_List" />
         from sys_sensor_rec
+    </select>
+
+    <select id="findAllAverageHourly" parameterType="map" resultType="map">
+        SELECT
+            a.site_id,
+            a.sensor,
+            a.fmt_date AS `date`,
+            a.fmt_hour AS `hour`,
+            AVG( a.`value` ) AS `value`
+        FROM
+            (
+                SELECT
+                    site_id,
+                    sensor,
+                    `value`,
+                    DATE_FORMAT( `time`, '%Y-%m-%d' ) AS fmt_date,
+                    DATE_FORMAT( `time`, '%H' ) AS fmt_hour
+                FROM
+                    sys_sensor_rec
+                <where>
+                    <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+                        `time` BETWEEN #{startTime} AND #{endTime}
+                    </if>
+                </where>
+            ) AS a
+        GROUP BY
+            a.site_id,
+            a.sensor,
+            a.fmt_date,
+            a.fmt_hour
     </select>
 
 </mapper>

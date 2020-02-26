@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface ISysInsectRecStatisService extends IService<SysInsectRecStatisEntity> {
-    List<Map<String, Object>> getAllSitesPestNumStat(long startTime, long endTime);
 
-    List<Map<String, Object>> getSomeSitePestNumStat(String siteId, long startTime, long endTime);
+    List<Map<String, Object>> getAllSitesPestNumStat(long startDate, long endDate);
+
+    List<Map<String, Object>> getSomeSitePestNumStat(String siteId, long startDate, long endDate);
 }

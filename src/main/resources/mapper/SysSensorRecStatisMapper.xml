@@ -68,8 +68,7 @@
             sys_sensor_rec_statis
         WHERE
             site_id = #{siteId}
-            AND `date` BETWEEN #{startTime}
-            AND #{endTime}
+            AND `date` BETWEEN #{startDate} AND #{endDate}
     </select>
 
 </mapper>

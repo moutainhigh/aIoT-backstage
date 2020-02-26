@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMapper, SysDustRecStatisEntity> implements ISysDustRecStatisService {
+public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMapper, SysDustRecStatisEntity>
+        implements ISysDustRecStatisService {
 
     @Autowired
     private SysDustRecStatisMapper sysDustRecStatisMapper;
@@ -25,43 +26,43 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
      * 获取每天土壤信息平均值
      *
      * @param siteId    站点ID
-     * @param startTime 开始时间
-     * @param endTime   结束时间
+     * @param startDate 开始日期
+     * @param endDate   结束日期
      * @return
      */
     @Override
-    public List<SysDustRecStatisEntity> getPestSoilInfo(String siteId, long startTime, long endTime) {
-        Date startDate = new Date(startTime);
-        Date endDate = new Date(endTime);
+    public List<SysDustRecStatisEntity> getPestSoilInfo(String siteId, long startDate, long endDate) {
+        Date sDate = new Date(startDate);
+        Date eDate = new Date(endDate);
 
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
-        params.put("startTime", DateUtils.formatDate(startDate, "yyyy-MM-dd HH:mm:ss"));
-        params.put("endTime", DateUtils.formatDate(endDate, "yyyy-MM-dd HH:mm:ss"));
+        params.put("startDate", DateUtils.formatDate(sDate, "yyyy-MM-dd"));
+        params.put("endDate", DateUtils.formatDate(eDate, "yyyy-MM-dd"));
 
         // 查询当天每小时平均值
-        if (DateUtils.formatDate(startDate, "yyyy-MM-dd")
-                .equals(DateUtils.formatDate(startDate, "yyyy-MM-dd"))) {
+        if (DateUtils.formatDate(sDate, "yyyy-MM-dd")
+                .equals(DateUtils.formatDate(eDate, "yyyy-MM-dd"))) {
             return sysDustRecStatisMapper.findAllBySiteId(params);
         }
         return sysDustRecStatisMapper.findAllDaily(params);
     }
 
     /**
-     * 最大虫害土壤信息
+     * 最*虫害土壤信息
      *
      * @param siteId    站点ID
-     * @param startTime 开始时间
-     * @param endTime   结束时间
+     * @param startDate 开始日期
+     * @param endDate   结束日期
      * @param isMax     1：最大，0：最小
      * @return
      */
     @Override
-    public List<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, long startTime, long endTime, int isMax) {
+    public List<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, long startDate, long endDate, int isMax) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
-        params.put("startTime", DateUtils.formatDate(new Date(startTime), "yyyy-MM-dd"));
-        params.put("endTime", DateUtils.formatDate(new Date(endTime), "yyyy-MM-dd"));
+        params.put("startDate", DateUtils.formatDate(new Date(startDate), "yyyy-MM-dd"));
+        params.put("endDate", DateUtils.formatDate(new Date(endDate), "yyyy-MM-dd"));
         params.put("isMax", isMax);
         // 获取虫害最大日期
         List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
@@ -69,8 +70,8 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
             String pestDate = String.valueOf(pestResult.get(0).get("date"));
             params.clear();
             params.put("siteId", siteId);
-            params.put("startTime", pestDate);
-            params.put("endTime", pestDate);
+            params.put("startDate", pestDate);
+            params.put("endDate", pestDate);
             return sysDustRecStatisMapper.findAllDaily(params);
         }
         return null;

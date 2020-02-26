@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMapper, SysSensorRecStatisEntity> implements ISensorRecStatisService {
+public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMapper, SysSensorRecStatisEntity>
+        implements ISensorRecStatisService {
 
     @Autowired
     private SysInsectRecStatisMapper sysInsectRecStatisMapper;
@@ -21,33 +22,50 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
     @Autowired
     private SysSensorRecStatisMapper sysSensorRecStatisMapper;
 
+    /**
+     * 获取每天土壤信息平均值
+     *
+     * @param siteId    站点ID
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     * @return
+     */
     @Override
-    public List<SysSensorRecStatisEntity> getPestMeteInfo(String siteId, long startTime, long endTime) {
-        Date startDate = new Date(startTime);
-        Date endDate = new Date(endTime);
+    public List<SysSensorRecStatisEntity> getPestMeteInfo(String siteId, long startDate, long endDate) {
+        Date sDate = new Date(startDate);
+        Date eDate = new Date(endDate);
 
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
-        params.put("startTime", DateUtils.formatDate(startDate, "yyyy-MM-dd"));
-        params.put("endTime", DateUtils.formatDate(endDate, "yyyy-MM-dd"));
+        params.put("startDate", DateUtils.formatDate(sDate, "yyyy-MM-dd"));
+        params.put("endDate", DateUtils.formatDate(eDate, "yyyy-MM-dd"));
 
         List<SysSensorRecStatisEntity> result = sysSensorRecStatisMapper.findAllBySiteId(params);
 
         // 查询当天每小时平均值
-        if (DateUtils.formatDate(startDate, "yyyy-MM-dd")
-                .equals(DateUtils.formatDate(startDate, "yyyy-MM-dd"))) {
+        if (DateUtils.formatDate(sDate, "yyyy-MM-dd")
+                .equals(DateUtils.formatDate(eDate, "yyyy-MM-dd"))) {
             return result;
         }
 
         return formatDayOrNight(result);
     }
 
+    /**
+     * 最*虫害气象信息
+     *
+     * @param siteId    站点ID
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     * @param isMax     1：最大，0：最小
+     * @return
+     */
     @Override
-    public List<SysSensorRecStatisEntity> getMaxOrMinPestMeteInfo(String siteId, long startTime, long endTime, int isMax) {
+    public List<SysSensorRecStatisEntity> getMaxOrMinPestMeteInfo(String siteId, long startDate, long endDate, int isMax) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
-        params.put("startTime", DateUtils.formatDate(new Date(startTime), "yyyy-MM-dd"));
-        params.put("endTime", DateUtils.formatDate(new Date(endTime), "yyyy-MM-dd"));
+        params.put("startDate", DateUtils.formatDate(new Date(startDate), "yyyy-MM-dd"));
+        params.put("endDate", DateUtils.formatDate(new Date(endDate), "yyyy-MM-dd"));
         params.put("isMax", isMax);
         List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
 
@@ -55,8 +73,8 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
             String pestDate = String.valueOf(pestResult.get(0).get("date"));
             params.clear();
             params.put("siteId", siteId);
-            params.put("startTime", pestDate);
-            params.put("endTime", pestDate);
+            params.put("startDate", pestDate);
+            params.put("endDate", pestDate);
             return formatDayOrNight(sysSensorRecStatisMapper.findAllBySiteId(params));
         }
         return null;

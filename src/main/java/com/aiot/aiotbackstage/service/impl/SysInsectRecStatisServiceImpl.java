@@ -20,19 +20,19 @@ public class SysInsectRecStatisServiceImpl extends ServiceImpl<SysInsectRecStati
     private SysInsectRecStatisMapper sysInsectRecStatisMapper;
 
     @Override
-    public List<Map<String, Object>> getAllSitesPestNumStat(long startTime, long endTime) {
+    public List<Map<String, Object>> getAllSitesPestNumStat(long startDate, long endDate) {
         Map<String, Object> params = new HashMap<>();
-        params.put("startTime", DateUtils.formatDate(new Date(startTime), "yyyy-MM-dd"));
-        params.put("endTime", DateUtils.formatDate(new Date(endTime), "yyyy-MM-dd"));
+        params.put("startDate", DateUtils.formatDate(new Date(startDate), "yyyy-MM-dd"));
+        params.put("endDate", DateUtils.formatDate(new Date(endDate), "yyyy-MM-dd"));
         return sysInsectRecStatisMapper.findAllGroupBySiteId(params);
     }
 
     @Override
-    public List<Map<String, Object>> getSomeSitePestNumStat(String siteId, long startTime, long endTime) {
+    public List<Map<String, Object>> getSomeSitePestNumStat(String siteId, long startDate, long endDate) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
-        params.put("startTime", DateUtils.formatDate(new Date(startTime), "yyyy-MM-dd"));
-        params.put("endTime", DateUtils.formatDate(new Date(endTime), "yyyy-MM-dd"));
+        params.put("startDate", DateUtils.formatDate(new Date(startDate), "yyyy-MM-dd"));
+        params.put("endDate", DateUtils.formatDate(new Date(endDate), "yyyy-MM-dd"));
         return sysInsectRecStatisMapper.findAllBySiteId(params);
     }
 }

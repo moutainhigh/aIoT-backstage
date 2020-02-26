@@ -21,8 +21,8 @@ public interface SysInsectRecStatisMapper extends BaseMapper<SysInsectRecStatisE
     /**
      * 通过站点ID分组查询
      *
-     * @param startTime 开始时间
-     * @param endTime   结束时间
+     * @param startDate 开始日期
+     * @param endDate   结束日期
      * @return
      */
     List<Map<String, Object>> findAllGroupBySiteId(Map<String, Object> params);
@@ -31,8 +31,8 @@ public interface SysInsectRecStatisMapper extends BaseMapper<SysInsectRecStatisE
      * 通过站点ID查询
      *
      * @param siteId    站点ID
-     * @param startTime 开始时间
-     * @param endTime   结束时间
+     * @param startDate 开始日期
+     * @param endDate   结束日期
      * @return
      */
     List<Map<String, Object>> findAllBySiteId(Map<String, Object> params);
@@ -41,8 +41,8 @@ public interface SysInsectRecStatisMapper extends BaseMapper<SysInsectRecStatisE
      * 查询虫害最严重/最轻日期
      *
      * @param siteId    站点ID
-     * @param startTime 开始时间
-     * @param endTime   结束时间
+     * @param startDate 开始日期
+     * @param endDate   结束日期
      * @param isMax     1：最严重，其他非空：最轻，空：全查
      * @return
      */

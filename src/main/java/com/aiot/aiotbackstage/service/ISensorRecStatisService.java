@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ISensorRecStatisService extends IService<SysSensorRecStatisEntity> {
 
-    List<SysSensorRecStatisEntity> getPestMeteInfo(String siteId, long startTime, long endTime);
+    List<SysSensorRecStatisEntity> getPestMeteInfo(String siteId, long startDate, long endDate);
 
-    List<SysSensorRecStatisEntity> getMaxOrMinPestMeteInfo(String siteId, long startTime, long endTime, int isMax);
+    List<SysSensorRecStatisEntity> getMaxOrMinPestMeteInfo(String siteId, long startDate, long endDate, int isMax);
 }
