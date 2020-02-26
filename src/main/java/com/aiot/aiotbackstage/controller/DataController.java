@@ -74,12 +74,12 @@ public class DataController {
      * @param endDate   结束日期
      * @return
      */
-    @PostMapping("{siteId}/pestNumStat")
-    public Result sitePestNumStat(@PathVariable("siteId") String siteId,
-                                  @RequestBody Map<String, Object> params) {
-        if (!params.containsKey("startDate") || !params.containsKey("endDate")) {
+    @PostMapping("site/pestNumStat")
+    public Result sitePestNumStat(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("siteId") || !params.containsKey("startDate") || !params.containsKey("endDate")) {
             return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
         }
+        String siteId = String.valueOf(params.get("siteId"));
         Object startDate = params.get("startDate");
         Object endDate = params.get("endDate");
         if (!(startDate instanceof Long) || !(endDate instanceof Long)) {
@@ -97,12 +97,12 @@ public class DataController {
      * @param isMax     是否最大值筛选：1、最大值，0：最小值，不传：不与虫害关联
      * @return
      */
-    @PostMapping("{siteId}/soilInfo")
-    public Result soilInfo(@PathVariable String siteId,
-                           @RequestBody Map<String, Object> params) {
-        if (!params.containsKey("startDate") || !params.containsKey("endDate")) {
+    @PostMapping("site/soilInfo")
+    public Result soilInfo(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("siteId") || !params.containsKey("startDate") || !params.containsKey("endDate")) {
             return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
         }
+        String siteId = String.valueOf(params.get("siteId"));
         Object startDate = params.get("startDate");
         Object endDate = params.get("endDate");
         if (!(startDate instanceof Long) || !(endDate instanceof Long)) {
@@ -128,12 +128,12 @@ public class DataController {
      * @param isMax     是否最大值筛选：1、最大值，0：最小值，不传：不与虫害关联
      * @return
      */
-    @PostMapping("{siteId}/meteInfo")
-    public Result meteorologicalInfo(@PathVariable String siteId,
-                                     @RequestBody Map<String, Object> params) {
-        if (!params.containsKey("startDate") || !params.containsKey("endDate")) {
+    @PostMapping("site/meteInfo")
+    public Result meteorologicalInfo(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("siteId") || !params.containsKey("startDate") || !params.containsKey("endDate")) {
             return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
         }
+        String siteId = String.valueOf(params.get("startDate"));
         Object startDate = params.get("startDate");
         Object endDate = params.get("endDate");
         if (!(startDate instanceof Long) || !(endDate instanceof Long)) {

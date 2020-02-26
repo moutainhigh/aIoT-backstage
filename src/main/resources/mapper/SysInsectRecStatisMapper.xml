@@ -2,16 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiot.aiotbackstage.mapper.SysInsectRecStatisMapper">
 
-    <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysInsectRecStatisEntity">
-
-    </resultMap>
-
-<!--    <resultMap id="BaseVoMap" type="com.aiot.aiotbackstage.model.vo.SysInsectRecStatisVo">-->
-<!--        <id column="site_id" property="siteId"/>-->
-<!--        <id column="name" property="siteName"/>-->
-<!--        <id column="num" property="num"/>-->
-<!--    </resultMap>-->
-
     <insert id="batchInsert">
         INSERT INTO sys_insect_rec_statis ( device_id, insect_id, `date`, `hour`, num )
         VALUES

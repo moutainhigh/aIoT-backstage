@@ -43,6 +43,7 @@ public enum ResultStatusCode {
     SYSSENSORREC_NO_EXIT(512, "该站点气象信息暂不存在！"),
     IMPORT_IS_NULL(513, "导入文件为空！"),
     PEST_BANK_NO_EXIT(514, "害虫标识不存在！"),
+    NO_RESULT(515, "查询无结果"),
 
 
 
