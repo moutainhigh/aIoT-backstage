@@ -1,8 +1,9 @@
 package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
+import com.aiot.aiotbackstage.model.param.DisasterSituationGisParam;
+import com.aiot.aiotbackstage.model.param.SeedlingGrowthGisParam;
 import com.aiot.aiotbackstage.service.IGisService;
-import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -42,20 +43,18 @@ public class GisController {
     @ApiOperation(value = "苗情(seedlingGrowth)注意：该接口只用于GIS", notes = "苗情(seedlingGrowth)")
     @ResponseBody
     @PostMapping("/seedlingGrowth")
-    public Result seedlingGrowth(@RequestBody JSONObject jsonParam
+    public Result seedlingGrowth(@RequestBody SeedlingGrowthGisParam param
     ) {
-        log.info("GIS传过来的苗情数据:【{}】",jsonParam.toJSONString());
-        iGisService.seedlingGrowth(jsonParam);
+        iGisService.seedlingGrowth(param);
         return Result.success();
     }
 
     @ApiOperation(value = "灾情(disasterSituation)注意：该接口只用于GIS", notes = "灾情(disasterSituation)")
     @ResponseBody
     @PostMapping("/disasterSituation")
-    public Result disasterSituation(@RequestBody JSONObject jsonParam
-    ) {
-        log.info("GIS传过来的灾情数据:【{}】",jsonParam.toJSONString());
-        iGisService.disasterSituation(jsonParam);
+    public Result disasterSituation(@RequestBody DisasterSituationGisParam  param
+                                    ) {
+        iGisService.disasterSituation(param);
         return Result.success();
     }
 

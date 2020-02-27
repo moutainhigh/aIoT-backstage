@@ -1,11 +1,10 @@
 package com.aiot.aiotbackstage.model.vo;
 
-import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysInsectRecEntity;
-import com.aiot.aiotbackstage.model.entity.SysSensorRecEntity;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description TODO
@@ -15,9 +14,9 @@ import java.util.List;
 @Data
 public class SensorInfoVo {
 
-    private List<SysSensorRecEntity> sensorRecVos;
+    private List<Map<String,String>> sensorRecVos;
 
-    private List<SysDustRecEntity> dustRecVos;
+    private List<Map<String,String>> dustRecVos;
 
     private List<SysInsectRecEntity> insectRecVos;
 }

@@ -5,11 +5,18 @@ import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.util.JWTUtil;
 import com.aiot.aiotbackstage.common.util.JsonUtils;
+import com.aiot.aiotbackstage.common.util.MD5Utils;
 import com.aiot.aiotbackstage.common.util.RedisUtils;
-import com.aiot.aiotbackstage.mapper.SysUserMapper;
+import com.aiot.aiotbackstage.mapper.*;
+import com.aiot.aiotbackstage.model.entity.SysInsectRecEntity;
+import com.aiot.aiotbackstage.model.entity.SysRoleEntity;
 import com.aiot.aiotbackstage.model.entity.SysUserEntity;
+import com.aiot.aiotbackstage.model.entity.SysUserRoleEntity;
+import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.UserLoginParam;
+import com.aiot.aiotbackstage.model.param.UserParam;
 import com.aiot.aiotbackstage.model.vo.Code2SessionVo;
+import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.model.vo.TokenVo;
 import com.aiot.aiotbackstage.service.IUserService;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -21,7 +28,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @ClassName UserManageServiceImpl
@@ -37,6 +51,18 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private SysUserMapper userMapper;
+
+    @Autowired
+    private SysUserRoleMapper userRoleMapper;
+
+    @Autowired
+    private SysRoleMapper roleMapper;
+
+    @Autowired
+    private SysRoleMenuMapper roleMenuMapper;
+
+    @Autowired
+    private SysMenuMapper menuMapper;
 
 
     @Autowired
@@ -83,7 +109,8 @@ public class UserServiceImpl implements IUserService {
             if(ObjectUtils.isEmpty(sysUserEntity)){
                 throw new MyException(ResultStatusCode.USER_NAME_NO_EXIT);
             }
-            if(!sysUserEntity.getPassword().equals(userLoginParam.getPassword())){
+            String passWord = MD5Utils.encrypt(userLoginParam.getPassword());
+            if(!sysUserEntity.getPassword().equals(passWord)){
                 throw new MyException(ResultStatusCode.USER_PASSWORD_NO_EXIT);
             }
             //5 . JWT 返回自定义登陆态 Token
@@ -102,6 +129,7 @@ public class UserServiceImpl implements IUserService {
                 SysUserEntity sysUserEntity = userMapper.selectOne(Wrappers.<SysUserEntity>lambdaQuery()
                         .eq(SysUserEntity::getWxOpenid, response.getOpenid()));
                 if (ObjectUtils.isEmpty(sysUserEntity)) {
+                    sysUserEntity=new SysUserEntity();
                     sysUserEntity.setWxOpenid(response.getOpenid());  //不存在就新建用户
                     sysUserEntity.setSessionKey(response.getSession_key());
                     sysUserEntity.setLoginType(1);
@@ -109,6 +137,7 @@ public class UserServiceImpl implements IUserService {
                     sysUserEntity.setUpdateTime(new Date());
                     userMapper.insert(sysUserEntity);
                 }
+                log.info("sysUserEntity----[{}]", JsonUtils.objectToJson(sysUserEntity));
                 //4 . 更新sessionKey和登陆时间
                 sysUserEntity.setSessionKey(response.getSession_key());
                 sysUserEntity.setUpdateTime(new Date());
@@ -145,6 +174,240 @@ public class UserServiceImpl implements IUserService {
             redisUtils.del("JWT-SESSION-" + jwtId);
         } else {
             throw new MyException(ResultStatusCode.TOKEN_NO_EXIT);
+        }
+    }
+
+    @Autowired
+    private SysInsectRecMapper insectRecMapper;
+//    private SysSensorRecMapper sensorRecMapper;
+    @Override
+    public void test() {
+
+        batchSave ();
+
+    }
+    /**
+     * 检查用户信息是否存在
+     * @param userParam
+     */
+    private void checkUserInfo(UserParam userParam){
+        //查询该用户是否存在
+        SysUserEntity userEntity = userMapper.selectOne(Wrappers.<SysUserEntity>lambdaQuery()
+                .eq(SysUserEntity::getUserName, userParam.getUserName()));
+        if (ObjectUtils.isNotEmpty(userEntity)) {
+            throw new MyException(ResultStatusCode.USER_HAS_EXISTED);
+        }
+    }
+    @Override
+    public void saveUser(UserParam userParam) {
+        checkUserInfo(userParam);
+        SysUserEntity userEntity=new SysUserEntity();
+        userEntity.setUserName(userParam.getUserName());
+        String encryptedPassword = MD5Utils.encrypt(userParam.getPassword());
+        userEntity.setPassword(encryptedPassword);
+        userEntity.setLoginType(2);
+        userEntity.setCreateTime(new Date());
+        userEntity.setUpdateTime(new Date());
+        userMapper.insert(userEntity);
+        SysUserRoleEntity userRoleEntity=new SysUserRoleEntity();
+        userRoleEntity.setUserId(userEntity.getUserId());
+        userRoleEntity.setRoleId(userParam.getRoleId());
+        userRoleMapper.insert(userRoleEntity);
+    }
+
+    @Override
+    public void updateUser(UserParam userParam) {
+        SysUserEntity phoneEntity = SysUserEntity.builder().userId(userParam.getUserId()).build();
+        if (ObjectUtils.isEmpty(phoneEntity)) {
+            throw new MyException(ResultStatusCode.USER_HAS_NO_EXISTED);
+        }
+        SysUserEntity userEntity=new SysUserEntity();
+        userEntity.setUserId(phoneEntity.getUserId());
+        userEntity.setUserName(userParam.getUserName());
+        String encryptedPassword = MD5Utils.encrypt(userParam.getPassword());
+        userEntity.setPassword(encryptedPassword);
+        userEntity.setUpdateTime(new Date());
+        //修改用户信息
+        userMapper.updateById(userEntity);
+        //修改用户角色
+        SysUserRoleEntity userRoleEntity=new SysUserRoleEntity();
+        userRoleEntity.setRoleId(userParam.getRoleId());
+        userRoleMapper.update(userRoleEntity,Wrappers.<SysUserRoleEntity>lambdaQuery()
+                .eq(SysUserRoleEntity::getUserId,userEntity.getUserId()));
+    }
+
+    @Override
+    public PageResult<SysUserEntity> userPage(PageParam param) {
+        PageParam pageQuery=new PageParam();
+        pageQuery.setPageSize(param.getPageSize());
+        pageQuery.setPageNumber(param.getPageNumber());
+        //查询后台用户
+        List<SysUserEntity> sysUserEntities = userMapper.userPageInfo(pageQuery);
+        sysUserEntities.stream().forEach(userEntity -> {
+            List<SysUserRoleEntity> sysUserRoleEntityList = userRoleMapper.selectList(Wrappers.<SysUserRoleEntity>lambdaQuery()
+                    .eq(SysUserRoleEntity::getUserId, userEntity.getUserId()));
+            sysUserRoleEntityList.stream().forEach(sysUserRoleEntity -> {
+                SysRoleEntity sysRoleEntities = roleMapper.selectById(sysUserRoleEntity.getRoleId());
+                if(ObjectUtils.isNotEmpty(sysRoleEntities)){
+                    userEntity.setRoleName(sysRoleEntities.getRoleName());
+                    userEntity.setRoleId(sysRoleEntities.getRoleId());
+                }
+            });
+        });
+        Integer total = userMapper.selectCount(null);
+        return PageResult.<SysUserEntity>builder().total(total).pageData(sysUserEntities).build();
+    }
+
+    @Override
+    public void delUser(UserParam userParam) {
+        SysUserEntity phoneEntity = SysUserEntity.builder().userId(userParam.getUserId()).build();
+        if (ObjectUtils.isEmpty(phoneEntity)) {
+            throw new MyException(ResultStatusCode.USER_HAS_NO_EXISTED);
+        }
+        //删除该用户
+        userMapper.deleteById(userParam.getUserId());
+        //删除该用户对应的角色数据
+        userRoleMapper.delete(Wrappers.<SysUserRoleEntity>lambdaQuery()
+                .eq(SysUserRoleEntity::getUserId,userParam.getUserId()));
+    }
+
+    @Override
+    public void isToken(String token) {
+        String jwtId = jwtUtil.getJwtIdByToken(token);
+        String b = (String) redisUtils.get("JWT-SESSION-" + jwtId);
+        if(b == null || b.equals("")){
+            throw new MyException(ResultStatusCode.TOKEN_NO_EXIT);
+        }
+    }
+
+    public Date parseDate (String text) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date startDate = null;
+        try {
+            startDate = format.parse(text);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return startDate;
+    }
+    public static Date strToDateLong(String strDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        ParsePosition pos = new ParsePosition(0);
+        Date strtodate = formatter.parse(strDate, pos);
+        return strtodate;
+    }
+
+    public void  batchSave () {
+        ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+        cachedThreadPool.execute(new Task(this.parseDate("2017-01-01 00:00:00"), this.parseDate("2017-03-01 00:00:00")));
+        cachedThreadPool.execute(new Task(this.parseDate("2017-03-01 00:00:00"), this.parseDate("2017-06-01 00:00:00")));
+        cachedThreadPool.execute(new Task(this.parseDate("2017-06-01 00:00:00"), this.parseDate("2017-09-01 00:00:00")));
+        cachedThreadPool.execute(new Task(this.parseDate("2017-09-01 00:00:00"), this.parseDate("2018-01-01 00:00:00")));
+
+        cachedThreadPool.execute(new Task(this.parseDate("2018-01-01 00:00:00"), this.parseDate("2018-03-01 00:00:00")));
+        cachedThreadPool.execute(new Task(this.parseDate("2018-03-01 00:00:00"), this.parseDate("2018-06-01 00:00:00")));
+        cachedThreadPool.execute(new Task(this.parseDate("2018-06-01 00:00:00"), this.parseDate("2018-09-01 00:00:00")));
+        cachedThreadPool.execute(new Task(this.parseDate("2018-09-01 00:00:00"), this.parseDate("2019-01-01 00:00:00")));
+
+        cachedThreadPool.execute(new Task(this.parseDate("2019-01-01 00:00:00"), this.parseDate("2019-03-01 00:00:00")));
+        cachedThreadPool.execute(new Task(this.parseDate("2019-03-01 00:00:00"), this.parseDate("2019-06-01 00:00:00")));
+        cachedThreadPool.execute(new Task(this.parseDate("2019-06-01 00:00:00"), this.parseDate("2019-09-01 00:00:00")));
+        cachedThreadPool.execute(new Task(this.parseDate("2019-09-01 00:00:00"), this.parseDate("2020-01-01 00:00:00")));
+
+        cachedThreadPool.execute(new Task(this.parseDate("2020-01-01 00:00:00"), this.parseDate("2020-03-01 00:00:00")));
+
+    }
+    class Task implements Runnable {
+        private Date sdate;
+        private Date edate;
+
+        public Task(Date sdate,Date edate) {
+            this.sdate = sdate;
+            this.edate = edate;
+        }
+
+        @Override
+        public void run() {
+            System.out.println("测试数据生成中..."+sdate);
+//            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            log.info("1---------{}",formatter.format(sdate));
+            while (sdate.before(edate)) {
+//                DecimalFormat df = new DecimalFormat( "0.00" );
+                // sdate=每加五分钟的值
+                // sdate = +5m
+                // 执行插入语句，建议批量提交事物
+                SysInsectRecEntity insectRecEntity=new SysInsectRecEntity();
+                insectRecEntity.setDeviceId((int)(Math.random()*14)+1);
+                insectRecEntity.setImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
+                insectRecEntity.setResultImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
+                insectRecEntity.setResult(((int)(Math.random()*262))+","+((int)(Math.random()*100))
+                        +"#"+((int)(Math.random()*262))+","+((int)(Math.random()*100)));
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(sdate);
+                cal.add(Calendar.HOUR, 1);
+                Date time = cal.getTime();
+                insectRecEntity.setTime(time);
+                sdate=time;
+                insectRecMapper.insert(insectRecEntity);
+
+//                SysSensorRecEntity dustRec=new SysSensorRecEntity();
+//                dustRec.setSiteId((int)(Math.random()*8)+1);
+//                dustRec.setSensor("wind_speed");
+//                dustRec.setValue(df.format( Math.random()*20));
+//
+//                sensorRecMapper.insert(dustRec);
+//
+//                SysSensorRecEntity dustRec1=new SysSensorRecEntity();
+//                dustRec1.setSiteId((int)(Math.random()*8)+1);
+//                dustRec1.setSensor("wind_direction");
+//
+//                dustRec1.setValue(df.format( Math.random()*20));
+//                dustRec1.setTime(sdate);
+//                sensorRecMapper.insert(dustRec1);
+//
+//                SysSensorRecEntity dustRec2=new SysSensorRecEntity();
+//                dustRec2.setSiteId((int)(Math.random()*8)+1);
+//                dustRec2.setSensor("humidity");
+//                dustRec2.setValue(df.format( Math.random()*40));
+//                dustRec2.setTime(sdate);
+//                sensorRecMapper.insert(dustRec2);
+//
+//                SysSensorRecEntity dustRec3=new SysSensorRecEntity();
+//                dustRec3.setSiteId((int)(Math.random()*8)+1);
+//                dustRec3.setSensor("temperature");
+//                dustRec3.setValue(df.format( Math.random()*50));
+//                dustRec3.setTime(sdate);
+//                sensorRecMapper.insert(dustRec3);
+//
+//                SysSensorRecEntity dustRec4=new SysSensorRecEntity();
+//                dustRec4.setSiteId((int)(Math.random()*8)+1);
+//                dustRec4.setSensor("noise");
+//                dustRec4.setValue(df.format( Math.random()*50));
+//                dustRec4.setTime(sdate);
+//                sensorRecMapper.insert(dustRec4);
+//
+//                SysSensorRecEntity dustRec5=new SysSensorRecEntity();
+//                dustRec5.setSiteId((int)(Math.random()*8)+1);
+//                dustRec5.setSensor("PM25");
+//                dustRec5.setValue(df.format( Math.random()*100));
+//                dustRec5.setTime(sdate);
+//                sensorRecMapper.insert(dustRec5);
+//
+//                SysSensorRecEntity dustRec6=new SysSensorRecEntity();
+//                dustRec6.setSiteId((int)(Math.random()*8)+1);
+//                dustRec6.setSensor("PM10");
+//                dustRec6.setValue(df.format( Math.random()*100));
+//                dustRec6.setTime(sdate);
+//                sensorRecMapper.insert(dustRec6);
+//
+//                SysSensorRecEntity dustRec7=new SysSensorRecEntity();
+//                dustRec7.setSiteId((int)(Math.random()*8)+1);
+//                dustRec7.setSensor("atmos");
+//                dustRec7.setValue(df.format( Math.random()*200));
+//                dustRec7.setTime(sdate);
+//                sensorRecMapper.insert(dustRec7);
+//                log.info("2---------{}",formatter.format(sdate));
+            }
         }
     }
 }

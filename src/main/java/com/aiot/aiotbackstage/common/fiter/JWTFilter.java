@@ -1,8 +1,7 @@
 package com.aiot.aiotbackstage.common.fiter;
 
-import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
-import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.shiro.JWTToken;
+import lombok.SneakyThrows;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLEncoder;
 
 /**
  * xiaowenhui
@@ -38,6 +36,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
     /**
      * 如果带有 token，则对 token 进行检查，否则直接通过
      */
+    @SneakyThrows
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws UnauthorizedException {
         //判断请求的请求头是否带上 "Token"
@@ -46,8 +45,10 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
             try {
                 executeLogin(request, response);
                 return true;
-            } catch (Exception e) {
-                throw new MyException(ResultStatusCode.TOKEN_NO_EXIT);
+            }catch (UnauthorizedException e) {
+                response403(response);
+            }catch (Exception e){
+                response401(response);
             }
         }
         //如果请求头不存在 Token，则可能是执行登陆操作或者是游客状态访问，无需检查 token，直接返回 true
@@ -90,12 +91,25 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
     /**
      * 将非法请求跳转到 /unauthorized/**
      */
-    private void responseError(ServletResponse response, String message) {
+    private void response401(ServletResponse response) {
         try {
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
             //设置编码，否则中文字符在重定向时会变为空字符串
-            message = URLEncoder.encode(message, "UTF-8");
-            httpServletResponse.sendRedirect("/unauthorized/" + message);
+//            message = URLEncoder.encode(message, "UTF-8");
+            httpServletResponse.sendRedirect("/unauthorized");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+    /**
+     * 将非法请求跳转到 /unauthorized/**
+     */
+    private void response403(ServletResponse response) {
+        try {
+            HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+            //设置编码，否则中文字符在重定向时会变为空字符串
+//            message = URLEncoder.encode(message, "UTF-8");
+            httpServletResponse.sendRedirect("/unauthorized403");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

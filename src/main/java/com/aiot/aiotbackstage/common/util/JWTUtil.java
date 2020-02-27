@@ -30,7 +30,7 @@ public class JWTUtil {
     /**
      * JWT 过期时间值 这里写死为和小程序时间一致 7200 秒，也就是两个小时
      */
-    private static long expire_time = 600;
+    private static long expire_time = 60000;
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -56,21 +56,28 @@ public class JWTUtil {
             token= JWT.create()
                     .withClaim("wxOpenId", userEntity.getWxOpenid())
                     .withClaim("sessionKey", userEntity.getSessionKey())
+                    .withClaim("userId", userEntity.getUserId())
                     .withClaim("jwt-id", jwtId)
                     .withExpiresAt(new Date(System.currentTimeMillis() + expire_time*1000))
                     .sign(algorithm);
         }else{
             token= JWT.create()
                     .withClaim("userName", userEntity.getUserName())
+                    .withClaim("userId", userEntity.getUserId())
                     .withClaim("jwt-id", jwtId)
                     .withExpiresAt(new Date(System.currentTimeMillis() + expire_time*1000))
                     .sign(algorithm);
         }
         log.info("token的key:{}","JWT-SESSION-" + jwtId);
         //缓存redis
-        redisTemplate.opsForValue().set("JWT-SESSION-" + jwtId, token, expire_time, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set("JWT-SESSION-" + jwtId,
+                token,
+                expire_time,
+                TimeUnit.SECONDS);
         //设置超时时间
-        redisTemplate.expire("JWT-SESSION-" + jwtId, expire_time, TimeUnit.SECONDS);
+        redisTemplate.expire("JWT-SESSION-" + jwtId,
+                expire_time,
+                TimeUnit.SECONDS);
         return token;
     }
 
@@ -86,7 +93,7 @@ public class JWTUtil {
      *
      * userEntity
      */
-    public  boolean jwtTokenRefresh(String token,SysUserEntity userEntity) {
+    public  boolean jwtTokenRefresh(String token, SysUserEntity userEntity) {
         String jwtIdByToken =getJwtIdByToken(token);
         String cacheToken = String.valueOf(redisTemplate.opsForValue().get("JWT-SESSION-"+jwtIdByToken));
         if(StringUtils.isNotBlank(cacheToken)&&!cacheToken.equals("null")){
@@ -94,9 +101,14 @@ public class JWTUtil {
             if (!this.verify(cacheToken, userEntity)) {
                 this.createToken(userEntity);
             } else {
-                redisTemplate.opsForValue().set( "JWT-SESSION-"+jwtIdByToken, cacheToken);
+                redisTemplate.opsForValue().set("JWT-SESSION-" + jwtIdByToken,
+                        cacheToken,
+                        expire_time,
+                        TimeUnit.SECONDS);
                 // 设置超时时间
-                redisTemplate.expire( "JWT-SESSION-"+jwtIdByToken, expire_time,TimeUnit.SECONDS);
+                redisTemplate.expire( "JWT-SESSION-"+jwtIdByToken,
+                        expire_time,
+                        TimeUnit.SECONDS);
             }
             return true;
         }
@@ -106,7 +118,7 @@ public class JWTUtil {
     /**
      * 校验token是否正确
      */
-    public  boolean verify(String token,SysUserEntity userEntity) {
+    public  boolean verify(String token, SysUserEntity userEntity) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
             JWTVerifier verifier;
@@ -114,12 +126,14 @@ public class JWTUtil {
                 verifier = JWT.require(algorithm)
                         .withClaim("wxOpenId", userEntity.getWxOpenid())
                         .withClaim("sessionKey", userEntity.getSessionKey())
+                        .withClaim("userId", userEntity.getUserId())
                         .withClaim("jwt-id", getJwtIdByToken(token))
                         .acceptExpiresAt(System.currentTimeMillis() + expire_time*1000 )
                         .build();
             }else {
                 verifier = JWT.require(algorithm)
                         .withClaim("userName", userEntity.getUserName())
+                        .withClaim("userId", userEntity.getUserId())
                         .withClaim("jwt-id", getJwtIdByToken(token))
                         .acceptExpiresAt(System.currentTimeMillis() + expire_time*1000 )
                         .build();
@@ -130,6 +144,13 @@ public class JWTUtil {
         } catch (Exception exception) {
             return false;
         }
+    }
+
+    /**
+     * 根据Token获取userId
+     */
+    public Long getUserIdByToken(String token) throws JWTDecodeException {
+        return JWT.decode(token).getClaim("userId").asLong();
     }
 
     /**
