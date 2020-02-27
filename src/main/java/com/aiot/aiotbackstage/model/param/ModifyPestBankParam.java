@@ -11,10 +11,10 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @ApiModel(value="害虫库修改",description="害虫库修改")
-public class ModifyPestBankParam extends AddPestBankParam{
+public class ModifyPestBankParam extends AddPestBankParam {
 
-    @ApiModelProperty(value="害虫标识",name="pestName",example="害虫标识")
+    @ApiModelProperty(value="害虫标识",name="id",example="害虫标识")
     @NotNull(message = "害虫标识不能为空")
-    private Long pestBankId;
+    private Long id;
 
 }

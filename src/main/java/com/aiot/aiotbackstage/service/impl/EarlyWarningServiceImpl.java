@@ -45,7 +45,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
     @Override
     public void earlyInfoAdd(WarnRuleParam param) {
         SysWarnRuleEntity warnRuleEntity=new SysWarnRuleEntity();
-        warnRuleEntity.setEarlyType(param.getEarlyType());
+        warnRuleEntity.setEarlyType(earlyType(param.getEarlyType()));
         warnRuleEntity.setEarlyName(param.getEarlyName());
         warnRuleEntity.setEarlyDepth(param.getEarlyDepth());
         warnRuleEntity.setEarlyThreshold(param.getEarlyThreshold());
@@ -54,6 +54,18 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnRuleEntity.setCreateTime(new Date());
         warnRuleEntity.setUpdateTime(new Date());
         warnRuleMapper.insert(warnRuleEntity);
+    }
+
+    private String earlyType(String earlyType){
+        if(earlyType.equals("1")){
+            return "苗情";
+        }else if(earlyType.equals("2")){
+            return "灾情";
+        }else if(earlyType.equals("3")){
+            return "气象";
+        }else {
+            return "土壤";
+        }
     }
 
 

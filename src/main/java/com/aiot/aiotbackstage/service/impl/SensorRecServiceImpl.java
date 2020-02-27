@@ -10,6 +10,7 @@ import com.aiot.aiotbackstage.model.dto.RtuData;
 import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
+import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.ISensorRecService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,6 +33,8 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     private SysDustRecMapper sysDustRecMapper;
     @Resource
     private RedisTemplate redisTemplate;
+    @Resource
+    private IEarlyWarningService earlyWarningService;
 
     @Override
     public void receive(RtuData rtuData) {
@@ -85,6 +88,11 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         List<SysSensorRecEntity> list = Arrays.asList(entities);
         for (SysSensorRecEntity entity : list) {
             redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getSensor(), entity.getValue(), 60, TimeUnit.SECONDS);
+            try {
+                earlyWarningService.earlyWarningReport("气象",entity.getSensor(),null,entity.getValue(),entity.getSiteId());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         saveBatch(list);
     }
@@ -92,5 +100,15 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     private void save(SysDustRecEntity entity) {
         redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getDepth(), entity, 60, TimeUnit.SECONDS);
         sysDustRecMapper.insert(entity);
+        try {
+            earlyWarningService.earlyWarningReport("土壤","ec",entity.getDepth()+"cm",entity.getEc().toString(),entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤","epsilon",entity.getDepth()+"cm",entity.getEpsilon().toString(),entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤","salinity",entity.getDepth()+"cm",entity.getSalinity().toString(),entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤","temperature",entity.getDepth()+"cm",entity.getTemperature().toString(),entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤","wc",entity.getDepth()+"cm",entity.getWc().toString(),entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤","tds",entity.getDepth()+"cm",entity.getTds().toString(),entity.getSiteId());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
