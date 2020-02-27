@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ISysDustRecStatisService extends IService<SysDustRecStatisEntity> {
 
-    List<SysDustRecStatisEntity> getPestSoilInfo(String siteId, String startDate, String endDate);
+    List<SysDustRecStatisEntity> getPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize);
 
     PageResult<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, String startDate, String endDate, int isMax, int pageIndex, int pageSize);
 }

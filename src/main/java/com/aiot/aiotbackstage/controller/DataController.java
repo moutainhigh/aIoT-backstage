@@ -9,6 +9,7 @@ import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.server.schedule.DataStatisSchedule;
 import com.aiot.aiotbackstage.service.impl.SensorRecStatisServiceImpl;
 import com.aiot.aiotbackstage.service.impl.SysDustRecStatisServiceImpl;
+import com.aiot.aiotbackstage.service.impl.SysInsectRecServiceImpl;
 import com.aiot.aiotbackstage.service.impl.SysInsectRecStatisServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/data")
 public class DataController {
+
+    @Autowired
+    private SysInsectRecServiceImpl sysInsectRecService;
 
     @Autowired
     private SysInsectRecStatisServiceImpl sysInsectRecStatisService;
@@ -204,7 +208,7 @@ public class DataController {
                 && (Integer.parseInt(isMax) == 0 || Integer.parseInt(isMax) == 1)) {
             return Result.success(sysDustRecStatisService.getMaxOrMinPestSoilInfo(siteId, startDate, endDate, Integer.parseInt(isMax), pageIndex, pageSize));
         } else {
-            return Result.success(sysDustRecStatisService.getPestSoilInfo(siteId, startDate, endDate));
+            return Result.success(sysDustRecStatisService.getPestSoilInfo(siteId, startDate, endDate, pageIndex, pageSize));
         }
     }
 

@@ -26,10 +26,12 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
      * @param siteId    站点ID
      * @param startDate 开始日期
      * @param endDate   结束日期
+     * @param pageIndex 页码
+     * @param pageSize  分页大小
      * @return
      */
     @Override
-    public List<SysDustRecStatisEntity> getPestSoilInfo(String siteId, String startDate, String endDate) {
+    public List<SysDustRecStatisEntity> getPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
         params.put("startDate", startDate);
@@ -37,8 +39,15 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
 
         // 查询当天每小时平均值
         if (startDate.equals(endDate)) {
+            int total = sysDustRecStatisMapper.countAllBySiteId(params);
+            params.put("pageIndex", pageIndex);
+            params.put("pageSize", pageSize);
             return sysDustRecStatisMapper.findAllBySiteId(params);
+            // TODO
+//            return PageResult
         }
+        params.put("pageIndex", pageIndex);
+        params.put("pageSize", pageSize);
         return sysDustRecStatisMapper.findAllDaily(params);
     }
 
