@@ -60,4 +60,28 @@ public interface SysSensorRecStatisMapper extends BaseMapper<SysSensorRecStatisE
      * @return
      */
     List<SysSensorRecStatisEntity> findAllBySiteIdDaily(Map<String, Object> params);
+
+    /**
+     * 通过站点ID查询日间平均值
+     *
+     * @param siteId    站点ID
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     * @param pageIndex 页码
+     * @param pageSize  分页大小
+     * @return
+     */
+    List<SysSensorRecStatisEntity> findAllBySiteIdDailyDay(Map<String, Object> params);
+
+    /**
+     * 通过站点ID查询夜间平均值
+     *
+     * @param siteId    站点ID
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     * @param pageIndex 页码
+     * @param pageSize  分页大小
+     * @return
+     */
+    List<SysSensorRecStatisEntity> findAllBySiteIdDailyNight(Map<String, Object> params);
 }

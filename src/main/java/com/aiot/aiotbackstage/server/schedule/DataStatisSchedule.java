@@ -1,5 +1,6 @@
 package com.aiot.aiotbackstage.server.schedule;
 
+import com.aiot.aiotbackstage.common.constant.Constants;
 import com.aiot.aiotbackstage.common.enums.SensorType;
 import com.aiot.aiotbackstage.common.util.ListUtils;
 import com.aiot.aiotbackstage.mapper.*;
@@ -34,8 +35,6 @@ public class DataStatisSchedule {
 
     @Autowired
     private SysSensorRecStatisMapper sysSensorRecStatisMapper;
-
-    private static final int PARTITION_SIZE = 1000;
 
     /**
      * 手动执行
@@ -82,14 +81,13 @@ public class DataStatisSchedule {
     /**
      * 害虫统计
      */
-//    @Scheduled(cron = "0 * * * * ?")
     public void startPestStatis(String startTime, String endTime) {
         Map<String, Object> params = new HashMap<>();
         params.put("startTime", startTime);
         params.put("endTime", endTime);
         List<SysInsectRecStatisEntity> pestHourly = sysInsectRecMapper.findAllPestNumHourly(params);
         int pestInsertCount = 0;
-        for (List<SysInsectRecStatisEntity> entities : ListUtils.partition(pestHourly, PARTITION_SIZE)) {
+        for (List<SysInsectRecStatisEntity> entities : ListUtils.partition(pestHourly, Constants.Sql.MAX_BATCH_INSERT_SIZE)) {
             pestInsertCount += sysInsectRecStatisMapper.batchInsert(entities);
         }
         log.info("insert pest statis : {}", pestInsertCount);
@@ -98,14 +96,13 @@ public class DataStatisSchedule {
     /**
      * 土壤统计
      */
-//    @Scheduled(cron = "0 * * * * ?")
     public void startSoilStatis(String startTime, String endTime) {
         Map<String, Object> params = new HashMap<>();
         params.put("startTime", startTime);
         params.put("endTime", endTime);
         List<SysDustRecStatisEntity> soilHourly = sysDustRecMapper.findAllAverageHourly(params);
         int soilInsertCount = 0;
-        for (List<SysDustRecStatisEntity> entities : ListUtils.partition(soilHourly, PARTITION_SIZE)) {
+        for (List<SysDustRecStatisEntity> entities : ListUtils.partition(soilHourly, Constants.Sql.MAX_BATCH_INSERT_SIZE)) {
             soilInsertCount += sysDustRecStatisMapper.batchInsert(entities);
         }
         log.info("insert soil statis : {}", soilInsertCount);
@@ -114,14 +111,13 @@ public class DataStatisSchedule {
     /**
      * 气象统计
      */
-//    @Scheduled(cron = "0 * * * * ?")
     public void startMeteStatis(String startTime, String endTime) {
         Map<String, Object> params = new HashMap<>();
         params.put("startTime", startTime);
         params.put("endTime", endTime);
         List<SysSensorRecStatisEntity> meteDaily = formatMeteHourly(sysSensorRecMapper.findAllAverageHourly(params));
         int meteInsertCount = 0;
-        for (List<SysSensorRecStatisEntity> entities : ListUtils.partition(meteDaily, PARTITION_SIZE)) {
+        for (List<SysSensorRecStatisEntity> entities : ListUtils.partition(meteDaily, Constants.Sql.MAX_BATCH_INSERT_SIZE)) {
             meteInsertCount += sysSensorRecStatisMapper.batchInsert(entities);
         }
         log.info("insert mete statis : {}", meteInsertCount);

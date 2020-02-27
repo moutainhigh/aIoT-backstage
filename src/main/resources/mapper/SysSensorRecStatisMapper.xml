@@ -104,19 +104,73 @@
     <select id="findAllBySiteIdDaily" resultMap="BaseResultMap">
         SELECT
             `date`,
-            AVG(wind_speed),
-            AVG(wind_direction),
-            AVG(humidity),
-            AVG(temperature),
-            AVG(noisy),
-            AVG(PM10),
-            AVG(PM25),
-            AVG(atmos)
+            AVG(wind_speed) AS wind_speed,
+            AVG(wind_direction) AS wind_direction,
+            AVG(humidity) AS humidity,
+            AVG(temperature) AS temperature,
+            AVG(noisy) AS noisy,
+            AVG(PM10) AS PM10,
+            AVG(PM25) AS PM25,
+            AVG(atmos) AS atmos
         FROM
             sys_sensor_rec_statis
         WHERE
             site_id = #{siteId}
             AND `date` BETWEEN #{startDate} AND #{endDate}
+        GROUP BY
+            `date`
+        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
+            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="findAllBySiteIdDailyDay" resultMap="BaseResultMap">
+        SELECT
+            `date`,
+            AVG(wind_speed) AS wind_speed,
+            AVG(wind_direction) AS wind_direction,
+            AVG(humidity) AS humidity,
+            AVG(temperature) AS temperature,
+            AVG(noisy) AS noisy,
+            AVG(PM10) AS PM10,
+            AVG(PM25) AS PM25,
+            AVG(atmos) AS atmos
+        FROM
+            sys_sensor_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startDate} AND #{endDate}
+            AND `hour` &gt; 6
+            AND `hour` &lt; 19
+        GROUP BY
+            `date`
+        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
+            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="findAllBySiteIdDailyNight" resultMap="BaseResultMap">
+        SELECT
+            `date`,
+            AVG(wind_speed) AS wind_speed,
+            AVG(wind_direction) AS wind_direction,
+            AVG(humidity) AS humidity,
+            AVG(temperature) AS temperature,
+            AVG(noisy) AS noisy,
+            AVG(PM10) AS PM10,
+            AVG(PM25) AS PM25,
+            AVG(atmos) AS atmos
+        FROM
+            sys_sensor_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startDate} AND #{endDate}
+            AND
+            (
+                (0 &lt;= `hour` AND `hour` &lt;= 6)
+                OR
+                (19 &lt;= `hour` AND `hour` &lt;= 23)
+            )
         GROUP BY
             `date`
         <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">

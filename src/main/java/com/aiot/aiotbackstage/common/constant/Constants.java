@@ -13,5 +13,20 @@ public interface Constants {
          * 默认分页大小
          */
         int PAGE_SIZE = 10;
+
+        /**
+         * 最大分页大小
+         */
+        int MAX_PAGE_SIZE = 1000;
+    }
+
+    /**
+     * 数据库相关
+     */
+    interface Sql {
+        /**
+         * 批量插入最大限制数
+         */
+        int MAX_BATCH_INSERT_SIZE = 1000;
     }
 }
