@@ -28,11 +28,23 @@ public interface SysDustRecStatisMapper extends BaseMapper<SysDustRecStatisEntit
     List<SysDustRecStatisEntity> findAllBySiteId(Map<String, Object> params);
 
     /**
+     * 根据站点ID查询每天平均值计数
+     *
+     * @param siteId    站点ID
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     * @return
+     */
+    int countAllDaily(Map<String, Object> params);
+
+    /**
      * 根据站点ID查询每天平均值
      *
      * @param siteId    站点ID
      * @param startDate 开始日期
      * @param endDate   结束日期
+     * @param pageIndex 页码
+     * @param pageSize  分页大小
      * @return
      */
     List<SysDustRecStatisEntity> findAllDaily(Map<String, Object> params);

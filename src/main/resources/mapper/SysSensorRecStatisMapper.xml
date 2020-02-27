@@ -61,6 +61,16 @@
         atmos = VALUES( atmos )
     </insert>
 
+    <select id="countAllBySiteId" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            sys_sensor_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startDate} AND #{endDate}
+    </select>
+
     <select id="findAllBySiteId" resultMap="BaseResultMap">
         SELECT
             *
@@ -69,6 +79,9 @@
         WHERE
             site_id = #{siteId}
             AND `date` BETWEEN #{startDate} AND #{endDate}
+        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
+            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
+        </if>
     </select>
 
 </mapper>

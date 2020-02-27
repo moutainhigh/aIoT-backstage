@@ -1,8 +1,11 @@
 package com.aiot.aiotbackstage.controller;
 
+import com.aiot.aiotbackstage.common.constant.Constants;
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
+import com.aiot.aiotbackstage.common.util.DateUtils;
 import com.aiot.aiotbackstage.model.dto.YunFeiData;
+import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.server.schedule.DataStatisSchedule;
 import com.aiot.aiotbackstage.service.impl.SensorRecStatisServiceImpl;
 import com.aiot.aiotbackstage.service.impl.SysDustRecStatisServiceImpl;
@@ -11,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -55,98 +60,219 @@ public class DataController {
      */
     @PostMapping("pestNumStat")
     public Result sitesPestNumStat(@RequestBody Map<String, Object> params) {
-        if (!params.containsKey("startDate") || !params.containsKey("endDate")) {
-            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        String startDate;
+        String endDate;
+        startDate = String.valueOf(params.get("startDate"));
+        endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
         }
-        Object startDate = params.get("startDate");
-        Object endDate = params.get("endDate");
-        if (!(startDate instanceof Long) || !(endDate instanceof Long)) {
-            return Result.error(ResultStatusCode.PARAM_IS_INVALID);
-        }
-        return Result.success(sysInsectRecStatisService.getAllSitesPestNumStat((long) startDate, (long) endDate));
+        return Result.success(sysInsectRecStatisService.getAllSitesPestNumStat(startDate, endDate));
     }
 
     /**
      * 单站害虫统计及详情
      *
-     * @param siteId    站点ID
-     * @param startDate 开始日期
-     * @param endDate   结束日期
+     * @param siteId       站点ID
+     * @param startDate    开始日期
+     * @param endDate      结束日期
+     * @param isNearlyWeek 是否是最近一周：1、是；其他：否
+     * @param pageSize     分页大小
+     * @param pageNumber   页码
      * @return
      */
     @PostMapping("site/pestNumStat")
     public Result sitePestNumStat(@RequestBody Map<String, Object> params) {
-        if (!params.containsKey("siteId") || !params.containsKey("startDate") || !params.containsKey("endDate")) {
+        int pageSize;
+        int pageIndex;
+        if (!params.containsKey("pageSize")) {
+            pageSize = Constants.Page.PAGE_SIZE;
+        } else {
+            pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+        }
+        if (!params.containsKey("pageNumber")) {
+            pageIndex = 1;
+        } else {
+            pageIndex = Integer.parseInt(String.valueOf(params.get("pageNumber")));
+            if (pageIndex <= 0) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        if (!params.containsKey("siteId")) {
             return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
         }
         String siteId = String.valueOf(params.get("siteId"));
-        Object startDate = params.get("startDate");
-        Object endDate = params.get("endDate");
-        if (!(startDate instanceof Long) || !(endDate instanceof Long)) {
-            return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+        String startDate;
+        String endDate;
+        if (params.containsKey("isNearlyWeek")
+                && Integer.parseInt(String.valueOf(params.get("isNearlyWeek"))) == 1) {
+            Calendar now = Calendar.getInstance();
+            endDate = DateUtils.format(now.getTime(), "yyyy-MM-dd");
+            now.add(Calendar.DAY_OF_MONTH, -7);
+            startDate = DateUtils.format(now.getTime(), "yyyy-MM-dd");
+        } else {
+            startDate = String.valueOf(params.get("startDate"));
+            endDate = String.valueOf(params.get("endDate"));
+            if (startDate.isEmpty()
+                    || endDate.isEmpty()
+                    || "null".equals(startDate)
+                    || "null".equals(endDate)) {
+                startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+                endDate = startDate;
+            } else {
+                if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                        || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                    return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+                }
+            }
         }
-        return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, (long) startDate, (long) endDate));
+        return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, startDate, endDate, pageSize, pageIndex));
     }
 
     /**
      * 单站土壤信息
      *
-     * @param siteId    站点ID
-     * @param startDate 开始日期
-     * @param endDate   结束日期
-     * @param isMax     是否最大值筛选：1、最大值，0：最小值，不传：不与虫害关联
+     * @param siteId       站点ID
+     * @param startDate    开始日期
+     * @param endDate      结束日期
+     * @param isMax        是否最大值筛选：1、最大值；0：最小值，不传：不与虫害关联
+     * @param isNearlyWeek 是否是最近一周：1、是；其他：否
+     * @param pageSize     分页大小
+     * @param pageNumber   页码
      * @return
      */
     @PostMapping("site/soilInfo")
     public Result soilInfo(@RequestBody Map<String, Object> params) {
-        if (!params.containsKey("siteId") || !params.containsKey("startDate") || !params.containsKey("endDate")) {
+        int pageSize;
+        int pageIndex;
+        if (!params.containsKey("pageSize")) {
+            pageSize = Constants.Page.PAGE_SIZE;
+        } else {
+            pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+        }
+        if (!params.containsKey("pageNumber")) {
+            pageIndex = 1;
+        } else {
+            pageIndex = Integer.parseInt(String.valueOf(params.get("pageNumber")));
+            if (pageIndex <= 0) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        if (!params.containsKey("siteId")) {
             return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
         }
         String siteId = String.valueOf(params.get("siteId"));
-        Object startDate = params.get("startDate");
-        Object endDate = params.get("endDate");
-        if (!(startDate instanceof Long) || !(endDate instanceof Long)) {
-            return Result.error(ResultStatusCode.PARAM_IS_INVALID);
-        }
-        if (params.containsKey("isMax")) {
-            if ((int) params.get("isMax") == 0 || (int) params.get("isMax") == 1) {
-                return Result.success(sysDustRecStatisService.getMaxOrMinPestSoilInfo(siteId, (long) startDate, (long) endDate, (int) params.get("isMax")));
-            } else {
-                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
-            }
+        String startDate;
+        String endDate;
+        if (params.containsKey("isNearlyWeek")
+                && Integer.parseInt(String.valueOf(params.get("isNearlyWeek"))) == 1) {
+            Calendar now = Calendar.getInstance();
+            endDate = DateUtils.format(now.getTime(), "yyyy-MM-dd");
+            now.add(Calendar.DAY_OF_MONTH, -7);
+            startDate = DateUtils.format(now.getTime(), "yyyy-MM-dd");
         } else {
-            return Result.success(sysDustRecStatisService.getPestSoilInfo(siteId, (long) startDate, (long) endDate));
+            startDate = String.valueOf(params.get("startDate"));
+            endDate = String.valueOf(params.get("endDate"));
+            if (startDate.isEmpty()
+                    || endDate.isEmpty()
+                    || "null".equals(startDate)
+                    || "null".equals(endDate)) {
+                startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+                endDate = startDate;
+            } else {
+                if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                        || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                    return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+                }
+            }
+        }
+
+        String isMax = String.valueOf(params.get("isMax"));
+        if (params.containsKey("isMax")
+                && !isMax.isEmpty()
+                && !"null".equals(isMax)
+                && (Integer.parseInt(isMax) == 0 || Integer.parseInt(isMax) == 1)) {
+            return Result.success(sysDustRecStatisService.getMaxOrMinPestSoilInfo(siteId, startDate, endDate, Integer.parseInt(isMax), pageIndex, pageSize));
+        } else {
+            return Result.success(sysDustRecStatisService.getPestSoilInfo(siteId, startDate, endDate));
         }
     }
 
     /**
      * 单站气候信息
      *
-     * @param siteId    站点ID
-     * @param startDate 开始日期
-     * @param endDate   结束日期
-     * @param isMax     是否最大值筛选：1、最大值，0：最小值，不传：不与虫害关联
+     * @param siteId       站点ID
+     * @param startDate    开始日期
+     * @param endDate      结束日期
+     * @param isMax        是否最大值筛选：1、最大值，0：最小值，不传：不与虫害关联
+     * @param isNearlyWeek 是否是最近一周：1、是；其他：否
+     * @param pageSize     分页大小
+     * @param pageNumber   页码
      * @return
      */
     @PostMapping("site/meteInfo")
     public Result meteorologicalInfo(@RequestBody Map<String, Object> params) {
+        int pageSize;
+        int pageIndex;
+        if (!params.containsKey("pageSize")) {
+            pageSize = Constants.Page.PAGE_SIZE;
+        } else {
+            pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+        }
+        if (!params.containsKey("pageNumber")) {
+            pageIndex = 1;
+        } else {
+            pageIndex = Integer.parseInt(String.valueOf(params.get("pageNumber")));
+            if (pageIndex <= 0) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
         if (!params.containsKey("siteId") || !params.containsKey("startDate") || !params.containsKey("endDate")) {
             return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
         }
-        String siteId = String.valueOf(params.get("startDate"));
-        Object startDate = params.get("startDate");
-        Object endDate = params.get("endDate");
-        if (!(startDate instanceof Long) || !(endDate instanceof Long)) {
-            return Result.error(ResultStatusCode.PARAM_IS_INVALID);
-        }
-        if (params.containsKey("isMax")) {
-            if ((int) params.get("isMax") == 0 || (int) params.get("isMax") == 1) {
-                return Result.success(sensorRecStatisService.getMaxOrMinPestMeteInfo(siteId, (long) startDate, (long) endDate, (int) params.get("isMax")));
-            } else {
-                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
-            }
+        String siteId = String.valueOf(params.get("siteId"));
+        String startDate;
+        String endDate;
+        if (params.containsKey("isNearlyWeek")
+                && Integer.parseInt(String.valueOf(params.get("isNearlyWeek"))) == 1) {
+            Calendar now = Calendar.getInstance();
+            endDate = DateUtils.format(now.getTime(), "yyyy-MM-dd");
+            now.add(Calendar.DAY_OF_MONTH, -7);
+            startDate = DateUtils.format(now.getTime(), "yyyy-MM-dd");
         } else {
-            return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, (long) startDate, (long) endDate));
+            startDate = String.valueOf(params.get("startDate"));
+            endDate = String.valueOf(params.get("endDate"));
+            if (startDate.isEmpty()
+                    || endDate.isEmpty()
+                    || "null".equals(startDate)
+                    || "null".equals(endDate)) {
+                startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+                endDate = startDate;
+            } else {
+                if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                        || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                    return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+                }
+            }
+        }
+
+        String isMax = String.valueOf(params.get("isMax"));
+        if (params.containsKey("isMax")
+                && !isMax.isEmpty()
+                && !"null".equals(isMax)
+                && (Integer.parseInt(isMax) == 0 || Integer.parseInt(isMax) == 1)) {
+            return Result.success(sensorRecStatisService.getMaxOrMinPestMeteInfo(siteId, startDate, endDate, Integer.parseInt(isMax), pageIndex, pageSize));
+        } else {
+            return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, startDate, endDate));
         }
     }
 
@@ -155,6 +281,12 @@ public class DataController {
         dataStatisSchedule.manual();
         return Result.success();
     }
+
+    public static void main(String[] args) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 3);
+        System.out.println(DateUtils.format(c.getTime()));
+        c.add(Calendar.DAY_OF_MONTH, -7);
+        System.out.println(DateUtils.format(c.getTime()));
+    }
 }
-
-

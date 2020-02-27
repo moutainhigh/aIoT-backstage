@@ -4,9 +4,9 @@ import com.aiot.aiotbackstage.common.util.DoubleUtils;
 import com.aiot.aiotbackstage.mapper.SysInsectRecStatisMapper;
 import com.aiot.aiotbackstage.mapper.SysSensorRecStatisMapper;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecStatisEntity;
+import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.ISensorRecStatisService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.apache.http.impl.cookie.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,20 +31,16 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
      * @return
      */
     @Override
-    public List<SysSensorRecStatisEntity> getPestMeteInfo(String siteId, long startDate, long endDate) {
-        Date sDate = new Date(startDate);
-        Date eDate = new Date(endDate);
-
+    public List<SysSensorRecStatisEntity> getPestMeteInfo(String siteId, String startDate, String endDate) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
-        params.put("startDate", DateUtils.formatDate(sDate, "yyyy-MM-dd"));
-        params.put("endDate", DateUtils.formatDate(eDate, "yyyy-MM-dd"));
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
 
         List<SysSensorRecStatisEntity> result = sysSensorRecStatisMapper.findAllBySiteId(params);
 
         // 查询当天每小时平均值
-        if (DateUtils.formatDate(sDate, "yyyy-MM-dd")
-                .equals(DateUtils.formatDate(eDate, "yyyy-MM-dd"))) {
+        if (startDate.equals(endDate)) {
             return result;
         }
 
@@ -58,14 +54,16 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
      * @param startDate 开始日期
      * @param endDate   结束日期
      * @param isMax     1：最大，0：最小
+     * @param pageIndex 页码
+     * @param pageSize  分页大小
      * @return
      */
     @Override
-    public List<SysSensorRecStatisEntity> getMaxOrMinPestMeteInfo(String siteId, long startDate, long endDate, int isMax) {
+    public PageResult<SysSensorRecStatisEntity> getMaxOrMinPestMeteInfo(String siteId, String startDate, String endDate, int isMax, int pageIndex, int pageSize) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
-        params.put("startDate", DateUtils.formatDate(new Date(startDate), "yyyy-MM-dd"));
-        params.put("endDate", DateUtils.formatDate(new Date(endDate), "yyyy-MM-dd"));
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
         params.put("isMax", isMax);
         List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
 
@@ -75,7 +73,15 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
             params.put("siteId", siteId);
             params.put("startDate", pestDate);
             params.put("endDate", pestDate);
-            return formatDayOrNight(sysSensorRecStatisMapper.findAllBySiteId(params));
+            int total = sysSensorRecStatisMapper.countAllBySiteId(params);
+            params.put("pageIndex", pageIndex);
+            params.put("pageSize", pageSize);
+            return PageResult.<SysSensorRecStatisEntity>builder()
+                    .total(total)
+                    .pageSize(pageSize)
+                    .pageNumber(pageIndex)
+                    .pageData(formatDayOrNight(sysSensorRecStatisMapper.findAllBySiteId(params)))
+                    .build();
         }
         return null;
     }

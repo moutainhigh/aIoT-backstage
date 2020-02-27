@@ -55,6 +55,25 @@
             AND `date` BETWEEN #{startDate} AND #{endDate}
     </select>
 
+    <select id="countAllDaily" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+        (
+            SELECT
+                depth,
+                `date`
+            FROM
+                sys_dust_rec_statis
+            WHERE
+                site_id = #{siteId}
+                AND `date` BETWEEN #{startDate} AND #{endDate}
+            GROUP BY
+                depth,
+                `date`
+        ) AS a
+    </select>
+
     <select id="findAllDaily" resultMap="BaseResultMap">
         SELECT
             depth,
@@ -73,6 +92,9 @@
         GROUP BY
             depth,
             `date`
+        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
+            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
+        </if>
     </select>
 
 </mapper>

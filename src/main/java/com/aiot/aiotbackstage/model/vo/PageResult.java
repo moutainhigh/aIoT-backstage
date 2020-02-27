@@ -1,5 +1,6 @@
 package com.aiot.aiotbackstage.model.vo;
 
+import com.aiot.aiotbackstage.common.constant.Constants;
 import com.google.common.collect.Lists;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,4 +27,8 @@ public class PageResult<T> {
     private List<T> pageData = Lists.newArrayList();
 
     private int total = 0;
+
+    private int pageSize = Constants.Page.PAGE_SIZE;
+
+    private int pageNumber = 0;
 }

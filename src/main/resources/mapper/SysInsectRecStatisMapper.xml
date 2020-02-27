@@ -43,6 +43,54 @@
             sid.site_id
     </select>
 
+    <select id="countAllBySiteId" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+        (
+            SELECT
+                c.insect_id AS insectId,
+                c.insect_name AS insectName
+            FROM
+            (
+                SELECT
+                    b.insect_id,
+                    b.insect_num,
+                    sii.`name` AS insect_name,
+                    spm.id AS m_id,
+                    spm.`name` AS crop_name,
+                    spm.measures_info
+                FROM
+                (
+                    SELECT
+                        a.insect_id,
+                        SUM( a.num ) AS insect_num
+                    FROM
+                    (
+                        SELECT
+                            device_id,
+                            insect_id,
+                            `date`,
+                            num
+                        FROM
+                            sys_insect_rec_statis
+                        WHERE
+                            `date` BETWEEN #{startDate} AND #{endDate}
+                    ) AS a
+                    LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
+                    WHERE
+                        sid.site_id = #{siteId}
+                    GROUP BY
+                        a.insect_id
+                ) AS b
+                LEFT JOIN sys_insect_info AS sii ON sii.id = b.insect_id
+                LEFT JOIN sys_preventive_measures AS spm ON spm.insect_info_id = b.insect_id
+            ) AS c
+            GROUP BY
+                c.insect_id
+        ) AS d
+    </select>
+
     <select id="findAllBySiteId" resultType="map">
         SELECT
             c.insect_id AS insectId,
@@ -87,6 +135,9 @@
         ) AS c
         GROUP BY
             c.insect_id
+        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
+            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
+        </if>
     </select>
 
     <select id="findMaxOrMinPestDate" resultType="map">

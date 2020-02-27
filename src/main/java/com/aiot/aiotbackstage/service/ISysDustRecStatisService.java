@@ -1,13 +1,14 @@
 package com.aiot.aiotbackstage.service;
 
 import com.aiot.aiotbackstage.model.entity.SysDustRecStatisEntity;
+import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 
 public interface ISysDustRecStatisService extends IService<SysDustRecStatisEntity> {
 
-    List<SysDustRecStatisEntity> getPestSoilInfo(String siteId, long startDate, long endDate);
+    List<SysDustRecStatisEntity> getPestSoilInfo(String siteId, String startDate, String endDate);
 
-    List<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, long startDate, long endDate, int isMax);
+    PageResult<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, String startDate, String endDate, int isMax, int pageIndex, int pageSize);
 }
