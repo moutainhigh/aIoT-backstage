@@ -3,7 +3,6 @@ package com.aiot.aiotbackstage.controller;
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.model.dto.YunFeiData;
-import com.aiot.aiotbackstage.model.entity.SysInsectRecEntity;
 import com.aiot.aiotbackstage.service.impl.SensorRecServiceImpl;
 import com.aiot.aiotbackstage.service.impl.SysDustRecServiceImpl;
 import com.aiot.aiotbackstage.service.impl.SysInsectRecServiceImpl;
@@ -38,7 +37,7 @@ public class DataController {
     }
 
     @RequestMapping(value = "/insects", method = RequestMethod.POST)
-    public Result insects(@RequestBody SysInsectRecEntity data) {
+    public Result insects(@RequestBody YunFeiData data) {
         log.error("time:{}, received:{}", System.currentTimeMillis(), data.toString());
         sysInsectRecService.save(data);
         return Result.success();

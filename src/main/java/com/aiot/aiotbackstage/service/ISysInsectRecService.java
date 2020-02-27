@@ -1,5 +1,6 @@
 package com.aiot.aiotbackstage.service;
 
+import com.aiot.aiotbackstage.model.dto.YunFeiData;
 import com.aiot.aiotbackstage.model.entity.SysInsectRecEntity;
 import com.aiot.aiotbackstage.model.vo.SysInsectInfoVo;
 import com.aiot.aiotbackstage.model.vo.SysSiteVo;
@@ -11,6 +12,12 @@ import java.util.List;
  * @author Avernus
  */
 public interface ISysInsectRecService extends IService<SysInsectRecEntity> {
+
+    /**
+     * 云飞上传图片识别结果入库
+     * @param data
+     */
+    void save(YunFeiData data);
 
     /**
      * 获取全站害虫统计信息
