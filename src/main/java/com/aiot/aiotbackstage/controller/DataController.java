@@ -277,7 +277,7 @@ public class DataController {
                 && (Integer.parseInt(isMax) == 0 || Integer.parseInt(isMax) == 1)) {
             return Result.success(sensorRecStatisService.getMaxOrMinPestMeteInfo(siteId, startDate, endDate, Integer.parseInt(isMax), pageIndex, pageSize));
         } else {
-            return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, startDate, endDate));
+            return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, startDate, endDate, pageIndex, pageSize));
         }
     }
 

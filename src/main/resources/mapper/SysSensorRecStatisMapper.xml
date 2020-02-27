@@ -22,17 +22,17 @@
     <insert id="batchInsert">
         INSERT INTO sys_sensor_rec_statis
         (
-        site_id,
-        `date`,
-        `hour`,
-        wind_speed,
-        wind_direction,
-        humidity,
-        temperature,
-        noisy,
-        PM10,
-        PM25,
-        atmos
+            site_id,
+            `date`,
+            `hour`,
+            wind_speed,
+            wind_direction,
+            humidity,
+            temperature,
+            noisy,
+            PM10,
+            PM25,
+            atmos
         )
         VALUES
         <foreach collection="data" item="item" separator=",">
@@ -51,14 +51,14 @@
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
-        wind_speed = VALUES( wind_speed ),
-        wind_direction = VALUES( wind_direction ),
-        humidity = VALUES( humidity ),
-        temperature = VALUES( temperature ),
-        noisy = VALUES( noisy ),
-        PM10 = VALUES( PM10 ),
-        PM25 = VALUES( PM25 ),
-        atmos = VALUES( atmos )
+            wind_speed = VALUES( wind_speed ),
+            wind_direction = VALUES( wind_direction ),
+            humidity = VALUES( humidity ),
+            temperature = VALUES( temperature ),
+            noisy = VALUES( noisy ),
+            PM10 = VALUES( PM10 ),
+            PM25 = VALUES( PM25 ),
+            atmos = VALUES( atmos )
     </insert>
 
     <select id="countAllBySiteId" resultType="int">
@@ -71,6 +71,23 @@
             AND `date` BETWEEN #{startDate} AND #{endDate}
     </select>
 
+    <select id="countAllBySiteIdDaily" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+        (
+            SELECT
+                `date`
+            FROM
+                sys_sensor_rec_statis
+            WHERE
+                site_id = #{siteId}
+                AND `date` BETWEEN #{startDate} AND #{endDate}
+            GROUP BY
+                `date`
+        ) AS a
+    </select>
+
     <select id="findAllBySiteId" resultMap="BaseResultMap">
         SELECT
             *
@@ -79,6 +96,29 @@
         WHERE
             site_id = #{siteId}
             AND `date` BETWEEN #{startDate} AND #{endDate}
+        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
+            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="findAllBySiteIdDaily" resultMap="BaseResultMap">
+        SELECT
+            `date`,
+            AVG(wind_speed),
+            AVG(wind_direction),
+            AVG(humidity),
+            AVG(temperature),
+            AVG(noisy),
+            AVG(PM10),
+            AVG(PM25),
+            AVG(atmos)
+        FROM
+            sys_sensor_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startDate} AND #{endDate}
+        GROUP BY
+            `date`
         <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
             LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
         </if>
