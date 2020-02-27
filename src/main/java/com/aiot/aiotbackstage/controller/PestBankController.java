@@ -14,10 +14,11 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,7 +61,7 @@ public class PestBankController {
     })
     @ResponseBody
     @PostMapping
-    public Result addPestInfo(@RequestBody AddPestBankParam param
+    public Result addPestInfo(@RequestBody @Validated AddPestBankParam param
     ) {
         pestBankService.addPestInfo(param);
         return Result.success();
@@ -98,14 +99,15 @@ public class PestBankController {
             @ApiResponse(code = 200,message = "成功")
     })
     @GetMapping("/downloadExcel")
-    public void downloadPermMatrix( HttpServletResponse response) {
-        Workbook wb;
+    public void downloadPermMatrix( HttpServletResponse response) throws IOException {
+        Workbook wb = null;
+        ServletOutputStream outputStream = null;
         try {
-            ClassPathResource resource = new ClassPathResource("excel/excel.xlsx");
+            ClassPathResource resource = new ClassPathResource("excel/excel_pest_bank.xlsx");
             InputStream inputStream = resource.getInputStream();
             // 根据不同excel创建不同对象,Excel2003版本-->HSSFWorkbook,Excel2007版本-->XSSFWorkbook
             wb = WorkbookFactory.create(inputStream);
-            response.reset();
+//            response.reset();
             response.setContentType("multipart/form-data");
             if (wb.getClass().getSimpleName() == "HSSFWorkbook") {
                 response.setHeader("Content-Disposition",
@@ -114,26 +116,30 @@ public class PestBankController {
                 response.setHeader("Content-Disposition",
                         "attachment; filename=" + new String("excel-model".getBytes(), "iso8859-1") + ".xlsx");
             }
-            wb.write(response.getOutputStream());
+            outputStream = response.getOutputStream();
+            wb.write(outputStream);
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            outputStream.close();
+            wb.close();
         }
     }
 
     /**
      * 导出虫情库excel
      */
-    @ApiOperation(value = "导出虫情库excel(exportExcel)", notes = "导出虫情库excel(exportExcel)")
-    @ApiResponses({
-            @ApiResponse(code = 200,message = "成功")
-    })
-    @GetMapping("/exportExcel")
-    @ResponseBody
-    public Result exportPermMatrix(@RequestParam(required = false) String pestName, HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        pestBankService.exportExcel(pestName,request,response);
-        return Result.success();
-    }
+//    @ApiOperation(value = "导出虫情库excel(exportExcel)", notes = "导出虫情库excel(exportExcel)")
+//    @ApiResponses({
+//            @ApiResponse(code = 200,message = "成功")
+//    })
+//    @GetMapping("/exportExcel")
+//    @ResponseBody
+//    public Result exportPermMatrix(@RequestParam(required = false) String pestName, HttpServletRequest request, HttpServletResponse response) throws IOException {
+//
+//        pestBankService.exportExcel(pestName,request,response);
+//        return Result.success();
+//    }
 
     /**
      * 批量导入虫情数据
@@ -144,9 +150,9 @@ public class PestBankController {
     })
     @PostMapping("/importExcel")
     @ResponseBody
-    public Result importWatchExcel(@RequestParam("excelFile") MultipartFile xlsFile) {
+    public Result importWatchExcel(@RequestParam("excelFile") MultipartFile excelFile) {
 
-        pestBankService.importWatchExcel(xlsFile);
+        pestBankService.importWatchExcel(excelFile);
 
         return Result.success();
     }

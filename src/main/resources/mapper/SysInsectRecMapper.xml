@@ -55,4 +55,18 @@
             c.fmt_hour
     </select>
 
+    <select id="insectRecGisInfo" resultMap="BaseResultMap">
+        SELECT
+        s.id,s.device_id,s.image,s.result_image,s.result,s.time
+        FROM
+        sys_insect_rec s
+        LEFT JOIN sys_insect_device b ON
+        s.device_id=b.imei
+        WHERE
+        b.site_id = #{site_id,jdbcType=BIGINT}
+        ORDER BY
+        ABS( NOW( ) - s.time ) ASC
+        LIMIT 1
+    </select>
+
 </mapper>

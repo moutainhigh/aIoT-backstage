@@ -24,4 +24,11 @@
     from sys_user
   </select>
 
+  <select id="userPageInfo" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List" />  from sys_user
+    where login_type=2
+    ORDER BY update_time DESC
+    LIMIT #{page.offset},#{page.pageSize}
+  </select>
+
 </mapper>

@@ -1,21 +1,23 @@
 package com.aiot.aiotbackstage.service.impl;
 
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
+import com.aiot.aiotbackstage.common.enums.RtuAddrCode;
+import com.aiot.aiotbackstage.common.enums.SensorType;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.*;
+import com.aiot.aiotbackstage.model.param.DisasterSituationGisParam;
+import com.aiot.aiotbackstage.model.param.SeedlingGrowthGisParam;
 import com.aiot.aiotbackstage.model.vo.SensorInfoVo;
+import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.IGisService;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.annotation.Resource;
+import java.util.*;
 
 @Service
 public class GisServiceImpl implements IGisService {
@@ -30,21 +32,22 @@ public class GisServiceImpl implements IGisService {
     private SysSeedlingGrowthMapper seedlingGrowthMapper;
 
     @Autowired
-    private SysSensorRecMapper sensorRecMapper;
-
-    @Autowired
     private SysInsectRecMapper insectRecMapper;
 
     @Autowired
-    private SysInsectDeviceMapper insectDeviceMapper;
+    private SysInsectInfoMapper insectInfoMapper;
 
-    @Autowired
-    private SysDustRecMapper dustRecMapper;
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    @Resource
+    private IEarlyWarningService earlyWarningService;
+
 
     @Override
     public List<SysSiteEntity> stationInfo() {
 
-        List<SysSiteEntity> gisStationEntities = siteMapper.selectAll();
+        List<SysSiteEntity> gisStationEntities = siteMapper.selectList(null);
         if(CollectionUtils.isEmpty(gisStationEntities)){
             throw new MyException(ResultStatusCode.GIS_NO_EXIT);
         }
@@ -52,72 +55,86 @@ public class GisServiceImpl implements IGisService {
     }
 
     @Override
-    public void seedlingGrowth(JSONObject jsonParam) {
-        String guid = (String)jsonParam.get("ID");
-//        String siteId = (String)jsonParam.get("siteId");   TODO 保留
-        Date date = (Date)jsonParam.get("date");
-        BigDecimal totalArea = (BigDecimal)jsonParam.get("totalArea");
-        BigDecimal good = (BigDecimal)jsonParam.get("good");
-        BigDecimal normal = (BigDecimal)jsonParam.get("normal");
-        BigDecimal subHealth = (BigDecimal)jsonParam.get("subHealth");
-        BigDecimal unhealthy = (BigDecimal)jsonParam.get("unhealthy");
+    public void seedlingGrowth(SeedlingGrowthGisParam param) {
         SysSeedlingGrowthEntity seedlingGrowthEntity=new SysSeedlingGrowthEntity();
-        seedlingGrowthEntity.setGuid(guid);
+        seedlingGrowthEntity.setGuid(param.getID());
 //        seedlingGrowthEntity.setSiteId(siteId);
-        seedlingGrowthEntity.setDate(date);
-        seedlingGrowthEntity.setTotalArea(totalArea);
-        seedlingGrowthEntity.setGood(good);
-        seedlingGrowthEntity.setNormal(normal);
-        seedlingGrowthEntity.setSubHealth(subHealth);
-        seedlingGrowthEntity.setUnhealthy(unhealthy);
+        seedlingGrowthEntity.setDate(param.getDate());
+        seedlingGrowthEntity.setTotalArea(param.getTotalArea());
+        seedlingGrowthEntity.setGood(param.getGood());
+        seedlingGrowthEntity.setNormal(param.getNormal());
+        seedlingGrowthEntity.setSubHealth(param.getSubHealth());
+        seedlingGrowthEntity.setUnhealthy(param.getUnhealthy());
         seedlingGrowthEntity.setCreateTime(new Date());
         seedlingGrowthMapper.insert(seedlingGrowthEntity);
+        try {
+            earlyWarningService.earlyWarningReport("苗情","seedlingGrowth",null,param.getUnhealthy().toString(),null);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 
     @Override
-    public void disasterSituation(JSONObject jsonParam) {
-        String guid = (String)jsonParam.get("ID");
-//        String siteId = (String)jsonParam.get("siteId"); TODO 保留
-        Date date = (Date)jsonParam.get("date");
-        BigDecimal totalArea = (BigDecimal)jsonParam.get("totalArea");
-        BigDecimal serious = (BigDecimal)jsonParam.get("serious");
-        BigDecimal medium = (BigDecimal)jsonParam.get("medium");
-        BigDecimal normal = (BigDecimal)jsonParam.get("normal");
+    public void disasterSituation(DisasterSituationGisParam param) {
         SysDisasterSituationEntity disasterSituationEntity=new SysDisasterSituationEntity();
 //        disasterSituationEntity.setSiteId(siteId);
-        disasterSituationEntity.setGuid(guid);
-        disasterSituationEntity.setDate(date);
-        disasterSituationEntity.setTotalArea(totalArea);
-        disasterSituationEntity.setSerious(serious);
-        disasterSituationEntity.setMedium(medium);
-        disasterSituationEntity.setNormal(normal);
+        disasterSituationEntity.setGuid(param.getID());
+        disasterSituationEntity.setDate(param.getDate());
+        disasterSituationEntity.setTotalArea(param.getTotalArea());
+        disasterSituationEntity.setSerious(param.getSerious());
+        disasterSituationEntity.setMedium(param.getMedium());
+        disasterSituationEntity.setNormal(param.getNormal());
         disasterSituationEntity.setCreateTime(new Date());
         disasterSituationMapper.insert(disasterSituationEntity);
+        try {
+            earlyWarningService.earlyWarningReport("灾情","disasterSituation",null,param.getSerious().toString(),null);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public SensorInfoVo sensorInfo(Long stationId) {
 
+        List<Map<String,String>> sensorRecVos=new ArrayList<>();
+        List<Map<String,String>> dustRecVos=new ArrayList<>();
         //气象数据
-        List<SysSensorRecEntity> sysSensorRecEntities =
-                sensorRecMapper.selectList(Wrappers.<SysSensorRecEntity>lambdaQuery()
-                .eq(SysSensorRecEntity::getSiteId, stationId));
+        Arrays.stream(SensorType.values()).forEach(sensorType -> {
+            Map<String,String> map=new HashMap<>();
+            map.put(sensorType.name(),(String)redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":"+sensorType.name()));
+            sensorRecVos.add(map);
+        });
+
         //虫情数据
-        List<SysInsectDeviceEntity> sysInsectDeviceEntities =
-                insectDeviceMapper.selectList(Wrappers.<SysInsectDeviceEntity>lambdaQuery()
-                .eq(SysInsectDeviceEntity::getSiteId, stationId.intValue()));
-        List<Integer> deviceIds = sysInsectDeviceEntities.stream().map(SysInsectDeviceEntity::getId).collect(Collectors.toList());
-        List<SysInsectRecEntity> sysInsectRecEntities =
-                insectRecMapper.selectBatchIds(deviceIds);
+        List<SysInsectRecEntity> sysInsectRecEntities = insectRecMapper.insectRecGisInfo(stationId);
+        sysInsectRecEntities.forEach(sysInsectRecEntity -> {
+            List<Map<String,Object>> maps=new ArrayList<>();
+            String result = sysInsectRecEntity.getResult();
+            String[] split = result.split("#");
+            Arrays.stream(split).forEach(s -> {
+                String pestId = s.substring(0, s.indexOf(","));
+                SysInsectInfoEntity sysInsectInfoEntity = insectInfoMapper.selectById(pestId);
+                String count = s.substring(s.indexOf(",")+1,s.length());
+                Map<String,Object> map=new HashMap<>();
+                map.put("pestName",sysInsectInfoEntity.getName());
+                map.put("count",count);
+                maps.add(map);
+            });
+            sysInsectRecEntity.setMaps(maps);
+        });
+
         //土壤数据
-        List<SysDustRecEntity> sysDustRecEntities =
-                dustRecMapper.selectList(Wrappers.<SysDustRecEntity>lambdaQuery()
-                .eq(SysDustRecEntity::getSiteId, stationId));
-        SensorInfoVo sensorInfoVo=new SensorInfoVo();
-        sensorInfoVo.setDustRecVos(sysDustRecEntities);
-        sensorInfoVo.setInsectRecVos(sysInsectRecEntities);
-        sensorInfoVo.setSensorRecVos(sysSensorRecEntities);
-        return sensorInfoVo;
+        Arrays.stream(RtuAddrCode.values()).forEach(rtuAddrCode -> {
+            Map<String,String> map=new HashMap<>();
+            map.put(rtuAddrCode.name(),(String)redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":"+rtuAddrCode.name()));
+            dustRecVos.add(map);
+        });
+
+        SensorInfoVo infoVo=new SensorInfoVo();
+        infoVo.setSensorRecVos(sensorRecVos);
+        infoVo.setInsectRecVos(sysInsectRecEntities);
+        infoVo.setDustRecVos(dustRecVos);
+        return infoVo;
     }
 }

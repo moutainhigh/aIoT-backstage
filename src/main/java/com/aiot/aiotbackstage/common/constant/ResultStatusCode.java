@@ -43,7 +43,15 @@ public enum ResultStatusCode {
     SYSSENSORREC_NO_EXIT(512, "该站点气象信息暂不存在！"),
     IMPORT_IS_NULL(513, "导入文件为空！"),
     PEST_BANK_NO_EXIT(514, "害虫标识不存在！"),
-    NO_RESULT(515, "查询无结果"),
+    INSECT_REC_NO_EXIT(515, "虫情动态上报数据暂未录入！"),
+    USER_HAS_EXISTED(516,"用户已存在"),
+    USER_HAS_NO_EXISTED(517,"用户不存在"),
+    EARLY_WARNING_NO_EXIT(518,"预警规则信息不存在"),
+    UPDATE_NO_EXIT(519,"虫情动态标识不存在"),
+    PEST_BANK_INFO_NO_EXIT(520, "害虫信息不存在！"),
+    EARLY_WARNING_IS_EXIT(521, "预警对象已存在！"),
+    EARLY_WARNING_ID_IS_EXIT(522, "预警标识存在！"),
+    NO_RESULT(523, "查询无结果"),
 
 
 

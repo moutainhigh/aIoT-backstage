@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysWarnRuleMapper">
+  <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysWarnRuleEntity">
+    <!--@mbg.generated-->
+    <!--@Table sys_warn_rule-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="early_type" jdbcType="VARCHAR" property="earlyType" />
+    <result column="early_name" jdbcType="VARCHAR" property="earlyName" />
+    <result column="early_depth" jdbcType="VARCHAR" property="earlyDepth" />
+    <result column="early_threshold" jdbcType="VARCHAR" property="earlyThreshold" />
+    <result column="early_degree" jdbcType="VARCHAR" property="earlyDegree" />
+    <result column="early_content" jdbcType="LONGVARCHAR" property="earlyContent" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, early_type, early_name,early_depth,early_threshold, early_degree, early_content, create_time, update_time
+  </sql>
+
+  <select id="warnRulePage" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List" />  from sys_warn_rule
+    <where>
+      <if test="earlyType != null">
+        and early_type = #{earlyType,jdbcType=INTEGER}
+      </if>
+    </where>
+    ORDER BY create_time DESC
+    LIMIT #{pageParam.offset},#{pageParam.pageSize}
+  </select>
+</mapper>

@@ -1,7 +1,11 @@
 package com.aiot.aiotbackstage.service;
 
 
+import com.aiot.aiotbackstage.model.entity.SysUserEntity;
+import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.UserLoginParam;
+import com.aiot.aiotbackstage.model.param.UserParam;
+import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.model.vo.TokenVo;
 
 /**
@@ -25,5 +29,17 @@ public interface IUserService {
     TokenVo userLogin(UserLoginParam userLoginParam);
 
     void loginOut(String token);
+
+    void test();
+
+    void saveUser(UserParam userParam);
+
+    void updateUser(UserParam userParam);
+
+    PageResult<SysUserEntity> userPage(PageParam param);
+
+    void delUser(UserParam userParam);
+
+    void isToken(String token);
 
 }
