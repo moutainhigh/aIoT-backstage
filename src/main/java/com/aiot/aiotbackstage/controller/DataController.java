@@ -48,6 +48,7 @@ public class DataController {
     @RequestMapping(value = "/insects", method = RequestMethod.POST)
     public Result insects(@RequestBody YunFeiData data) {
         log.error("time:{}, received:{}", System.currentTimeMillis(), data.toString());
+        sysInsectRecService.save(data);
         return Result.success();
     }
 
