@@ -21,7 +21,7 @@ public class RtuReadSchedule {
      * *  * 错误校验 = 2字节 （16 位 CRC 码）
      * 每5分钟调用一次
      */
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "* 0/5 * * * ?")
     public void read() throws InterruptedException {
         //风速，从寄存器地址0000开始查询，查询1个寄存器地址
         broadcast("010300000001840A");
@@ -43,7 +43,7 @@ public class RtuReadSchedule {
         for (Channel channel : TcpServer.channels.values()) {
             channel.writeAndFlush(frame);
         }
-        Thread.currentThread();
+        Thread.sleep(2000);
     }
 
 }
