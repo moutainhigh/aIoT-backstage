@@ -95,11 +95,11 @@
         GROUP BY
             depth,
             `date`
+        ORDER BY
+            `date`
         <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
             LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
         </if>
-        ORDER BY
-            `date`
     </select>
 
 </mapper>

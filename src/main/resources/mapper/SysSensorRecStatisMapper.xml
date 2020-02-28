@@ -86,11 +86,11 @@
         WHERE
             site_id = #{siteId}
             AND `date` BETWEEN #{startDate} AND #{endDate}
+        ORDER BY
+            `date`
         <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
             LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
         </if>
-        ORDER BY
-            `date`
     </select>
 
     <select id="findAllBySiteIdDaily" resultMap="BaseResultMap">

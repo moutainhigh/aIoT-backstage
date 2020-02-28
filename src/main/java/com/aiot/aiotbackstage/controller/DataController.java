@@ -365,7 +365,7 @@ public class DataController {
     }
 
     /**
-     * 单站气候信息
+     * 单站气候统计信息
      *
      * @param siteId    站点ID
      * @param startDate 开始日期

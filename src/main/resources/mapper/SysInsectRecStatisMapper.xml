@@ -171,4 +171,27 @@
         </choose>
     </select>
 
+    <select id="findAllGroupByInsectId" resultType="map">
+        SELECT
+            sii.`name`,
+            a.num AS `value`
+        FROM
+        (
+            SELECT
+                insect_id,
+                SUM( num ) AS num
+            FROM
+                sys_insect_rec_statis
+            <where>
+                <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                    `date` BETWEEN #{startDate} AND #{endDate}
+                </if>
+            </where>
+            GROUP BY insect_id
+        ) AS a
+            LEFT JOIN sys_insect_info AS sii ON sii.id = a.insect_id
+        ORDER BY
+	        sii.`name`
+    </select>
+
 </mapper>

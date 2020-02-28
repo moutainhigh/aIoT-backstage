@@ -35,11 +35,6 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-
-        // 查询当天每小时平均值
-        if (startDate.equals(endDate)) {
-            return sysSensorRecStatisMapper.findAllBySiteId(params);
-        }
         return getDayOrNightAverage(siteId, startDate, endDate);
     }
 

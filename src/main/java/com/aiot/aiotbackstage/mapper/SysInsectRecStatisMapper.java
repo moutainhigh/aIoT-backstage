@@ -59,4 +59,12 @@ public interface SysInsectRecStatisMapper extends BaseMapper<SysInsectRecStatisE
      * @return
      */
     List<Map<String, Object>> findMaxOrMinPestDate(Map<String, Object> params);
+
+    /**
+     *
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     * @return
+     */
+    List<Map<String, Object>> findAllGroupByInsectId(Map<String, Object> params);
 }

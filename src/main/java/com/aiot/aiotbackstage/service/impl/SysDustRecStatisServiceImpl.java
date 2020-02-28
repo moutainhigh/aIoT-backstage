@@ -35,11 +35,6 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
         params.put("startDate", startDate);
         params.put("endDate", endDate);
 
-        // 查询当天每小时平均值
-        if (startDate.equals(endDate)) {
-            return sysDustRecStatisMapper.findAllBySiteId(params);
-        }
-
         List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily(params);
         Map<Integer, Map<String, List<Object>>> map = new HashMap<>();
 
