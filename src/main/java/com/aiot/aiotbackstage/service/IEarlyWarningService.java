@@ -7,6 +7,9 @@ import com.aiot.aiotbackstage.model.param.WarnInfoParam;
 import com.aiot.aiotbackstage.model.param.WarnRuleParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @Description TODO
  * @Author xiaowenhui
@@ -30,7 +33,7 @@ public interface IEarlyWarningService {
 
     void earlyInfoExamine(Long id);
 
-    String earlyContent(String earlyType, String earlyDegree, String earlyName);
+    List<Map<String,Object>> earlyContent(String earlyType);
 
     Integer earlyCount();
 
@@ -38,4 +41,6 @@ public interface IEarlyWarningService {
      * 自动预警
      */
     void earlyWarningReport(String type, String typeName, String depth, String value, Integer siteId);
+
+    List<Map<String,Object>> earlyData(Integer type);
 }

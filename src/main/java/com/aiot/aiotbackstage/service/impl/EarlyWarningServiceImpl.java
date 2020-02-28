@@ -19,8 +19,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Description TODO
@@ -38,8 +38,6 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
 
     @Autowired
     private SysSiteMapper siteMapper;
-
-
 
 
     @Override
@@ -63,8 +61,10 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
             return "灾情";
         }else if(earlyType.equals("3")){
             return "气象";
-        }else {
+        }else if(earlyType.equals("4")){
             return "土壤";
+        }else{
+            return "虫情";
         }
     }
 
@@ -176,16 +176,30 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
     }
 
     @Override
-    public String earlyContent(String earlyType, String earlyDegree,String earlyName) {
-        SysWarnRuleEntity warnRuleEntity = warnRuleMapper
-                .selectOne(Wrappers.<SysWarnRuleEntity>lambdaQuery()
-                        .eq(SysWarnRuleEntity::getEarlyType, earlyType)
-                        .eq(SysWarnRuleEntity::getEarlyName, earlyName)
-                        .eq(SysWarnRuleEntity::getEarlyDegree, earlyDegree));
+    public List<Map<String,Object>> earlyContent(String earlyType) {
+
+        List<Map<String,Object>> mapList=new ArrayList<>();
+        List<SysWarnRuleEntity> warnRuleEntity = warnRuleMapper
+                .selectList(Wrappers.<SysWarnRuleEntity>lambdaQuery()
+                        .eq(SysWarnRuleEntity::getEarlyType, earlyType));
         if(ObjectUtils.isEmpty(warnRuleEntity)){
             throw new MyException(ResultStatusCode.EARLY_WARNING_NO_EXIT);
         }
-        return warnRuleEntity.getEarlyContent();
+        Map<String, List<SysWarnRuleEntity>> collect = warnRuleEntity.stream()
+                .collect(Collectors.groupingBy(SysWarnRuleEntity::getEarlyName, Collectors.toList()));
+        Set<String> strings = collect.keySet();
+        strings.forEach(s -> {
+            Map<String,Object> map=new HashMap<>();
+            map.put("earlyName",s);
+            List<String> list=new ArrayList<>();
+            List<SysWarnRuleEntity> ruleEntityList = collect.get(s);
+            ruleEntityList.forEach(sysWarnRuleEntity -> {
+                list.add(sysWarnRuleEntity.getEarlyContent());
+            });
+            map.put("earlyContent",list);
+            mapList.add(map);
+        });
+        return mapList;
     }
 
     @Override
@@ -245,5 +259,38 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                 warnInfoMapper.insert(warnInfoEntity);
             }
         }
+    }
+
+    @Override
+    public List<Map<String,Object>> earlyData(Integer type) {
+
+        List<Map<String,Object>> list=new ArrayList();
+        if(type == 3){  //3-气象
+            Map resultMap=new HashMap();
+            resultMap.put("wind_speed","风速");
+            resultMap.put("wind_direction","风向");
+            resultMap.put("humidity","湿度");
+            resultMap.put("temperature","温度");
+            resultMap.put("noise","噪音");
+            resultMap.put("PM25","PM25");
+            resultMap.put("PM10","PM10");
+            resultMap.put("atmos","大气压");
+            list.add(resultMap);
+        }else{
+            Map resultMap=new HashMap();
+            resultMap.put("10cm","深度");
+            resultMap.put("20cm","深度");
+            resultMap.put("40cm","深度");
+            list.add(resultMap);
+            Map resultMap1=new HashMap();
+            resultMap1.put("wc","含水率");
+            resultMap1.put("temperature","温度");
+            resultMap1.put("ec","导电率");
+            resultMap1.put("salinity","盐度");
+            resultMap1.put("tds","总溶解固体");
+            resultMap1.put("epsilon","介电常数");
+            list.add(resultMap1);
+        }
+        return list;
     }
 }

@@ -62,13 +62,13 @@ public class UserController {
         return Result.error(ResultStatusCode.TOKEN_ERR);
     }
 
-//    @ResponseBody
-//    @PostMapping("/test")
-//    public Result test(){
-//
-//        iUserService.test();
-//        return Result.success();
-//    }
+    @ResponseBody
+    @PostMapping("/test")
+    public Result test(){
+
+        iUserService.test();
+        return Result.success();
+    }
 
     @ApiOperation(value = "新增用户", notes = "新增用户(saveUser)")
     @ApiResponses({
