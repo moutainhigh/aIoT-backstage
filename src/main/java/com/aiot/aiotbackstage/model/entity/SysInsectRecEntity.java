@@ -1,12 +1,13 @@
 package com.aiot.aiotbackstage.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Avernus
@@ -16,7 +17,6 @@ import java.util.Date;
 @Accessors(chain = true)
 public class SysInsectRecEntity {
 
-    @TableId(type = IdType.AUTO)
     private Integer id;
 
     private Integer deviceId;
@@ -33,6 +33,9 @@ public class SysInsectRecEntity {
      * 种类参照昆虫对照表
      */
     private String result;
+
+    @TableField(exist = false)
+    private List<Map<String,Object>> maps;
 
     private Date time;
 }

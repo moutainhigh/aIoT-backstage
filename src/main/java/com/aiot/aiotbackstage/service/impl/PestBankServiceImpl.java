@@ -11,6 +11,7 @@ import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.PestBankParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.IPestBankService;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.poi.hssf.usermodel.*;
@@ -54,7 +55,7 @@ public class PestBankServiceImpl implements IPestBankService {
         PageParam pageQuery=new PageParam();
         pageQuery.setPageSize(param.getPageSize());
         pageQuery.setPageNumber(param.getPageNumber());
-        if(param.getPestName() == null){
+        if(param.getPestName() == null || param.getPestName().equals("")){
              sysPestBankEntities =
                     pestBankMapper.pestBankInfoByNamePage(null,pageQuery);
              total = pestBankMapper.selectCount(null);
@@ -64,7 +65,14 @@ public class PestBankServiceImpl implements IPestBankService {
              total = pestBankMapper.selectCount(Wrappers.<SysPestBankEntity>lambdaQuery()
                     .like(SysPestBankEntity::getPestName,param.getPestName()));
         }
-        return PageResult.<SysPestBankEntity>builder().total(total).pageData(sysPestBankEntities).build();
+        if(CollectionUtils.isEmpty(sysPestBankEntities)){
+            throw new MyException(ResultStatusCode.USER_NAME_NO_EXIT);
+        }
+        return PageResult.<SysPestBankEntity>builder().total(total)
+                .pageData(sysPestBankEntities)
+                .pageNumber(param.getPageNumber())
+                .pageSize(param.getPageSize())
+                .build();
     }
 
     @Override
@@ -83,8 +91,12 @@ public class PestBankServiceImpl implements IPestBankService {
     @Override
     public void modifyPestInfo(ModifyPestBankParam param) {
 
+        SysPestBankEntity pestBankEntityResult = pestBankMapper.selectById(param.getId());
+        if(ObjectUtils.isEmpty(pestBankEntityResult)){
+            throw new MyException(ResultStatusCode.PEST_BANK_NO_EXIT);
+        }
         SysPestBankEntity pestBankEntity=new SysPestBankEntity();
-        pestBankEntity.setId(param.getPestBankId());
+        pestBankEntity.setId(param.getId());
         pestBankEntity.setPestName(param.getPestName());
         pestBankEntity.setPestType(param.getPestType());
         pestBankEntity.setPestIntroduce(param.getPestIntroduce());
@@ -116,7 +128,6 @@ public class PestBankServiceImpl implements IPestBankService {
                 pestBankEntity.setPestName(row.getCell(0).toString());
                 pestBankEntity.setPestType(row.getCell(1).toString());
                 pestBankEntity.setPestIntroduce(row.getCell(2).toString());
-                pestBankEntity.setPestImg(row.getCell(3).toString());
                 pestBankEntity.setCreateTime(new Date());
                 pestBankEntity.setUpdateTime(new Date());
                 pestBankMapper.insert(pestBankEntity);

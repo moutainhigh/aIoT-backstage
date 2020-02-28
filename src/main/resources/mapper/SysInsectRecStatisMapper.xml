@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysInsectRecStatisMapper">
+
+    <insert id="batchInsert">
+        INSERT INTO sys_insect_rec_statis ( device_id, insect_id, `date`, `hour`, num )
+        VALUES
+        <foreach collection="data" item="item" separator=",">
+            (
+            #{item.deviceId},
+            #{item.insectId},
+            #{item.date},
+            #{item.hour},
+            #{item.num}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        num = VALUES( num )
+    </insert>
+
+    <select id="findAllGroupBySiteId" resultType="map">
+        SELECT
+            sid.site_id AS siteId,
+            ss.`name` AS siteName,
+            SUM( a.num ) AS `number`
+        FROM
+        (
+            SELECT
+                device_id,
+                insect_id,
+                `date`,
+                num
+            FROM
+                sys_insect_rec_statis
+            WHERE
+                `date` BETWEEN #{startDate} AND #{endDate}
+        ) AS a
+        LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
+        LEFT JOIN sys_site AS ss ON ss.id = sid.site_id
+        WHERE
+            sid.site_id IS NOT NULL
+        GROUP BY
+            sid.site_id
+    </select>
+
+    <select id="countAllBySiteId" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+        (
+            SELECT
+                c.insect_id AS insectId,
+                c.insect_name AS insectName
+            FROM
+            (
+                SELECT
+                    b.insect_id,
+                    b.insect_num,
+                    sii.`name` AS insect_name,
+                    spm.id AS m_id,
+                    spm.`name` AS crop_name,
+                    spm.measures_info
+                FROM
+                (
+                    SELECT
+                        a.insect_id,
+                        SUM( a.num ) AS insect_num
+                    FROM
+                    (
+                        SELECT
+                            device_id,
+                            insect_id,
+                            `date`,
+                            num
+                        FROM
+                            sys_insect_rec_statis
+                        WHERE
+                            `date` BETWEEN #{startDate} AND #{endDate}
+                    ) AS a
+                    LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
+                    WHERE
+                        sid.site_id = #{siteId}
+                    GROUP BY
+                        a.insect_id
+                ) AS b
+                LEFT JOIN sys_insect_info AS sii ON sii.id = b.insect_id
+                LEFT JOIN sys_preventive_measures AS spm ON spm.insect_info_id = b.insect_id
+            ) AS c
+            GROUP BY
+                c.insect_id
+        ) AS d
+    </select>
+
+    <select id="findAllBySiteId" resultType="map">
+        SELECT
+            c.insect_id AS insectId,
+            c.insect_name AS insectName,
+            SUM( c.insect_num ) AS insectNumber,
+            GROUP_CONCAT( c.crop_name SEPARATOR ',' ) AS cropName,
+            GROUP_CONCAT( c.measures_info SEPARATOR '***' ) AS measures
+        FROM
+        (
+            SELECT
+                b.insect_id,
+                b.insect_num,
+                sii.`name` AS insect_name,
+                spm.id AS m_id,
+                spm.`name` AS crop_name,
+                spm.measures_info
+            FROM
+            (
+                SELECT
+                    a.insect_id,
+                    SUM( a.num ) AS insect_num
+                FROM
+                (
+                    SELECT
+                        device_id,
+                        insect_id,
+                        `date`,
+                        num
+                    FROM
+                        sys_insect_rec_statis
+                    WHERE
+                        `date` BETWEEN #{startDate} AND #{endDate}
+                ) AS a
+                LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
+                WHERE
+                    sid.site_id = #{siteId}
+                GROUP BY
+                    a.insect_id
+            ) AS b
+            LEFT JOIN sys_insect_info AS sii ON sii.id = b.insect_id
+            LEFT JOIN sys_preventive_measures AS spm ON spm.insect_info_id = b.insect_id
+        ) AS c
+        GROUP BY
+            c.insect_id
+        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
+            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="findMaxOrMinPestDate" resultType="map">
+        SELECT
+            a.date,
+            SUM( a.num ) AS insect_num
+        FROM
+        (
+            SELECT
+                device_id,
+                insect_id,
+                `date`,
+                num
+            FROM
+                sys_insect_rec_statis
+            WHERE
+                `date` BETWEEN #{startDate} AND #{endDate}
+        ) AS a
+        LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
+        WHERE
+            sid.site_id = #{siteId}
+        GROUP BY
+            a.date
+        <choose>
+            <when test="isMax == 0">
+                ORDER BY insect_num ASC LIMIT 1
+            </when>
+            <when test="isMax == 1">
+                ORDER BY insect_num DESC LIMIT 1
+            </when>
+        </choose>
+    </select>
+
+</mapper>

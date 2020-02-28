@@ -15,18 +15,18 @@
         <result column="time" jdbcType="TIMESTAMP" property="time"/>
     </resultMap>
 
-    <resultMap id="ResultFormatDate" extends="BaseResultMap" type="com.aiot.aiotbackstage.model.vo.SysDustRecVo">
-        <result column="fmt_date" jdbcType="TIMESTAMP" javaType="String" property="date"/>
-    </resultMap>
-
     <sql id="Base_Column_List">
         id, site_id siteId, depth, wc, temperature, ec, salinity, tds, epsilon, `time`
     </sql>
 
-    <select id="findAllDepthAverageByDay" parameterType="map" resultMap="ResultFormatDate">
+    <select id="findAllAverageHourly"
+            parameterType="map"
+            resultType="com.aiot.aiotbackstage.model.entity.SysDustRecStatisEntity">
         SELECT
+            a.site_id,
             a.depth,
-            a.fmt_date,
+            a.fmt_date AS `date`,
+            a.fmt_hour AS `hour`,
             AVG( a.wc ) AS wc,
             AVG( a.temperature ) AS temperature,
             AVG( a.ec ) AS ec,
@@ -37,16 +37,21 @@
             (
                 SELECT
                     *,
-                    DATE_FORMAT( time, '%Y-%m-%d' ) AS fmt_date
+                    DATE_FORMAT( `time`, '%Y-%m-%d' ) AS fmt_date,
+                    DATE_FORMAT( `time`, '%H' ) AS fmt_hour
                 FROM
                     sys_dust_rec
+                <where>
+                    <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+                        `time` BETWEEN #{startTime} AND #{endTime}
+                    </if>
+                </where>
             ) AS a
-        WHERE
-            a.time &gt;= #{startTime}
-            AND a.time &lt;= #{endTime}
-            AND a.site_id = #{siteId}
         GROUP BY
+            a.site_id,
             a.depth,
-            a.fmt_date
+            a.fmt_date,
+            a.fmt_hour
     </select>
+
 </mapper>

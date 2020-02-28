@@ -17,6 +17,7 @@ import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 /**
  * xiaowenhui
  * shrio配置类
@@ -28,23 +29,24 @@ public class ShiroConfig {
      */
     @Bean
     public ShiroFilterFactoryBean factory(SecurityManager securityManager) {
-        ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
-
+        ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        shiroFilterFactoryBean.setSecurityManager(securityManager);
+        //拦截器
+        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+        // 配置不会被拦截的链接 顺序判断
+        filterChainDefinitionMap.put("/login/**", "anon");
+        filterChainDefinitionMap.put("/loginOut/**", "anon");
+        filterChainDefinitionMap.put("/unauthorized/**", "anon");
+        filterChainDefinitionMap.put("/unauthorized403/**", "anon");
         // 添加自己的过滤器并且取名为jwt
-        Map<String, Filter> filterMap = new LinkedHashMap<>();
-        //设置我们自定义的JWT过滤器
+        Map<String, Filter> filterMap = new HashMap<String, Filter>();
         filterMap.put("jwt", new JWTFilter());
-        factoryBean.setFilters(filterMap);
-        factoryBean.setSecurityManager((SecurityManager) securityManager);
-        // 设置无权限时跳转的 url;
-        factoryBean.setUnauthorizedUrl("/unauthorized/无权限");
-        Map<String, String> filterRuleMap = new HashMap<>();
-        // 所有请求通过我们自己的JWT Filter
-        filterRuleMap.put("/**", "jwt");
-        // 访问 /unauthorized/** 不通过JWTFilter
-        filterRuleMap.put("/unauthorized/**", "anon");
-        factoryBean.setFilterChainDefinitionMap(filterRuleMap);
-        return factoryBean;
+        shiroFilterFactoryBean.setFilters(filterMap);
+        //<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边
+        filterChainDefinitionMap.put("/**", "jwt");
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+
+        return shiroFilterFactoryBean;
     }
 
     /**

@@ -4,11 +4,16 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import lombok.*;
 
 import java.util.Date;
 
-@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @TableName(value = "sys_user")
 public class SysUserEntity {
     /**
@@ -58,4 +63,17 @@ public class SysUserEntity {
      */
     @TableField(value = "update_time")
     private Date updateTime;
+
+    /**
+     * 角色名称
+     */
+    @TableField(exist = false)
+    private String roleName;
+
+    /**
+     * 角色id
+     */
+    @TableField(exist = false)
+    private Long roleId;
+
 }

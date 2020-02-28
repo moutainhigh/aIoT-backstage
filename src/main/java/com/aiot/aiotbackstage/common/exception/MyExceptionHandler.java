@@ -56,7 +56,7 @@ public class MyExceptionHandler {
     @ResponseBody
     public Result handleException(Exception e, HttpServletRequest request) {
         log.error(request.getRequestURI() + ":服务运行异常",e);
-        return new Result(HttpStatus.INTERNAL_SERVER_ERROR.value(),ResultStatusCode.SYSTEM_ERR.getMessage());
+        return new Result(HttpStatus.INTERNAL_SERVER_ERROR.value(), ResultStatusCode.SYSTEM_ERR.getMessage());
     }
 
     /**
@@ -83,17 +83,5 @@ public class MyExceptionHandler {
         return new Result(ResultStatusCode.NO_ROLE_NO_EXIT);
     }
 
-    /**
-     * 处理访问方法时权限不足问题
-     * @param req
-     * @param e
-     * @return
-     */
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(value = ArithmeticException.class)
-    @ResponseBody
-    public Result arithmeticException(HttpServletRequest req, Exception e)  {
-        return new Result(ResultStatusCode.TOKEN_NO_EXIT);
-    }
 
 }

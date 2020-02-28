@@ -11,102 +11,19 @@
         <result column="time" jdbcType="TIMESTAMP" property="time"/>
     </resultMap>
 
-    <resultMap id="ResultSitesPestNumStat" type="com.aiot.aiotbackstage.model.vo.SysSiteVo">
-        <result column="site_id" jdbcType="VARCHAR" property="id"/>
-        <result column="site_name" jdbcType="VARCHAR" property="name"/>
-        <result column="insect_num" jdbcType="NUMERIC" property="insectNumber"/>
-    </resultMap>
-
-    <resultMap id="ResultSitePestNumStat" type="com.aiot.aiotbackstage.model.vo.SysInsectInfoVo">
-        <result column="insect_id" jdbcType="VARCHAR" property="insectId"/>
-        <result column="insect_name" jdbcType="VARCHAR" property="insectName"/>
-        <result column="insect_num" jdbcType="NUMERIC" property="insectNumber"/>
-        <result column="crop_name" jdbcType="VARCHAR" property="cropName"/>
-        <result column="measures_info" jdbcType="VARCHAR" property="measuresInfo"/>
-    </resultMap>
-
     <sql id="Base_Column_List">
         id, device_id deviceId, image, result_image resultImage, result, `time`
     </sql>
 
-    <sql id="AllWithPestNum">
+    <select id="findAllPestNumHourly"
+            parameterType="map"
+            resultType="com.aiot.aiotbackstage.model.entity.SysInsectRecStatisEntity">
         SELECT
-            b.*,
-            SUBSTRING_INDEX( b.temp_result, ',', 1 ) AS insect_id,
-            SUBSTRING_INDEX( b.temp_result, ',',- 1 ) AS insect_num
-        FROM
-            (
-                SELECT
-                    a.*,
-                    sid.site_id,
-                    ss.`name` AS site_name,
-                    SUBSTRING_INDEX( SUBSTRING_INDEX( a.result, '#', b.help_topic_id + 1 ), '#',- 1 ) AS temp_result
-                FROM
-                    sys_insect_rec AS a
-                    LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
-                    LEFT JOIN sys_site AS ss ON ss.id = sid.site_id
-                    JOIN mysql.help_topic AS b ON b.help_topic_id &lt; ( length( a.result ) - length( REPLACE ( a.result, '#', '' ) ) + 1 )
-                WHERE
-                    a.time &gt;= #{startTime}
-                    AND a.time &lt;= #{endTime}
-            ) AS b
-    </sql>
-
-    <select id="findSitesPestNumStat" parameterType="map" resultMap="ResultSitesPestNumStat">
-        SELECT
-            c.site_id,
-            c.site_name,
-            SUM( c.insect_num ) AS insect_num
-        FROM
-            (
-                <include refid="AllWithPestNum"></include>
-            ) AS c
-        GROUP BY
-            c.site_id
-        ORDER BY
-            c.site_id
-    </select>
-
-    <select id="findPestNumStatBySiteId" parameterType="map" resultMap="ResultSitePestNumStat">
-        SELECT
-            e.insect_id,
-            e.insect_name,
-            SUM( e.insect_num ) AS insect_num,
-            GROUP_CONCAT( e.crop_name SEPARATOR ',' ) AS crop_name,
-            GROUP_CONCAT( e.measures_info SEPARATOR '***' ) AS measures_info
-        FROM
-            (
-            SELECT
-                d.*,
-                sii.`name` AS insect_name,
-                spm.id AS m_id,
-                spm.`name` AS crop_name,
-                spm.measures_info
-            FROM
-                (
-                    SELECT
-                        c.insect_id,
-                        SUM( c.insect_num ) AS insect_num
-                    FROM
-                        (
-                            <include refid="AllWithPestNum"></include>
-                        ) AS c
-                    WHERE
-                        c.site_id = #{siteId}
-                    GROUP BY
-                        c.insect_id
-                ) AS d
-                LEFT JOIN sys_insect_info AS sii ON sii.id = d.insect_id
-                LEFT JOIN sys_preventive_measures AS spm ON spm.insect_info_id = d.insect_id
-            ) AS e
-        GROUP BY
-            e.insect_id
-    </select>
-
-    <select id="findPestStatByDay" parameterType="map" resultType="map">
-        SELECT
+            c.device_id,
+            c.insect_id,
             c.fmt_date AS `date`,
-            SUM( c.insect_num ) AS insect_num
+            c.fmt_hour AS `hour`,
+            SUM( c.insect_num ) AS num
         FROM
             (
                 SELECT
@@ -114,23 +31,42 @@
                     SUBSTRING_INDEX( b.temp_result, ',', 1 ) AS insect_id,
                     SUBSTRING_INDEX( b.temp_result, ',',- 1 ) AS insect_num
                 FROM
-                    (
-                        SELECT
-                            a.*,
-                            DATE_FORMAT( a.time, '%Y-%m-%d' ) AS fmt_date,
-                            SUBSTRING_INDEX( SUBSTRING_INDEX( a.result, '#', b.help_topic_id + 1 ), '#',- 1 ) AS temp_result
-                        FROM
-                            sys_insect_rec AS a
-                            LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
-                            JOIN mysql.help_topic AS b ON b.help_topic_id &lt; ( length( a.result ) - length( REPLACE ( a.result, '#', '' ) ) + 1 )
-                        WHERE
-                            sid.site_id = 1
-                            AND a.time &gt;= #{startTime}
-                            AND a.time &lt;= #{endTime}
-                    ) AS b
+                (
+                    SELECT
+                        a.*,
+                        DATE_FORMAT( a.time, '%Y-%m-%d' ) AS fmt_date,
+                        DATE_FORMAT( a.time, '%H' ) AS fmt_hour,
+                        SUBSTRING_INDEX( SUBSTRING_INDEX( a.result, '#', b.help_topic_id + 1 ), '#',- 1 ) AS temp_result
+                    FROM
+                        sys_insect_rec AS a
+                    LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
+                    JOIN mysql.help_topic AS b ON b.help_topic_id &lt; ( length( a.result ) - length( REPLACE ( a.result, '#', '' ) ) + 1 )
+                    <where>
+                        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+                            a.time BETWEEN #{startTime} AND #{endTime}
+                        </if>
+                    </where>
+                ) AS b
             ) AS c
         GROUP BY
-            c.fmt_date
+            c.device_id,
+            c.insect_id,
+            c.fmt_date,
+            c.fmt_hour
     </select>
-    
+
+    <select id="insectRecGisInfo" resultMap="BaseResultMap">
+        SELECT
+        s.id,s.device_id,s.image,s.result_image,s.result,s.time
+        FROM
+        sys_insect_rec s
+        LEFT JOIN sys_insect_device b ON
+        s.device_id=b.imei
+        WHERE
+        b.site_id = #{site_id,jdbcType=BIGINT}
+        ORDER BY
+        ABS( NOW( ) - s.time ) ASC
+        LIMIT 1
+    </select>
+
 </mapper>

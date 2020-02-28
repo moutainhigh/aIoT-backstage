@@ -1,6 +1,7 @@
 package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
+import com.aiot.aiotbackstage.common.util.JWTUtil;
 import com.aiot.aiotbackstage.service.IImageRecognitionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,6 +27,8 @@ public class ImageRecognitionController {
     @Autowired
     private IImageRecognitionService iImageRecognitionService;
 
+    @Autowired
+    private JWTUtil jwtUtil;
 
     @ApiOperation(value = "用户图片识别(形色)", notes = "用户图片识别(形色)")
     @ApiResponses({
@@ -36,7 +39,7 @@ public class ImageRecognitionController {
     public Result fileUpload(@RequestParam(value = "file", required = false) MultipartFile multipartFile,
                              @RequestHeader String token
     ) {
-        Long userId=1L;
+        Long userId = jwtUtil.getUserIdByToken(token);
         return Result.success(iImageRecognitionService.fileUpload(multipartFile,userId));
     }
 

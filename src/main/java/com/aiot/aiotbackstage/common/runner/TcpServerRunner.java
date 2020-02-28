@@ -11,7 +11,7 @@ import javax.annotation.Resource;
  * @author Avernus
  */
 @Component
-public class TcpServerRunner  implements ApplicationRunner {
+public class TcpServerRunner implements ApplicationRunner {
 
     @Resource
     private TcpServer tcpServer;

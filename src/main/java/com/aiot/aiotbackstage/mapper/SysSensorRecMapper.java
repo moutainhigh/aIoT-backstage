@@ -8,5 +8,11 @@ import java.util.Map;
 
 public interface SysSensorRecMapper extends BaseMapper<SysSensorRecEntity> {
 
-    List<Map<String, Object>> findAllAverageByDay(Map<String, Object> params);
+    /**
+     * 每天气候平均值
+     *
+     * @return
+     * @param params
+     */
+    List<Map<String, Object>> findAllAverageHourly(Map<String, Object> params);
 }
