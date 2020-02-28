@@ -5,12 +5,15 @@ import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.util.DateUtils;
 import com.aiot.aiotbackstage.model.dto.YunFeiData;
-import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.server.schedule.DataStatisSchedule;
 import com.aiot.aiotbackstage.service.impl.SensorRecStatisServiceImpl;
 import com.aiot.aiotbackstage.service.impl.SysDustRecStatisServiceImpl;
 import com.aiot.aiotbackstage.service.impl.SysInsectRecServiceImpl;
 import com.aiot.aiotbackstage.service.impl.SysInsectRecStatisServiceImpl;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,7 @@ import java.util.Map;
  * @author Avernus
  */
 @Slf4j
+@Api(tags = "数据API", description = "Data Controller")
 @RestController
 @RequestMapping(value = "/data")
 public class DataController {
@@ -63,6 +67,11 @@ public class DataController {
      * @param endDate   结束日期
      * @return
      */
+    @ApiOperation(value = "全站害虫统计")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate")
+    })
     @PostMapping("pestNumStat")
     public Result sitesPestNumStat(@RequestBody Map<String, Object> params) {
         String startDate;
@@ -95,6 +104,15 @@ public class DataController {
      * @param pageNumber   页码
      * @return
      */
+    @ApiOperation(value = "单站害虫统计及详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "站点ID", value = "siteId", required = true),
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate"),
+            @ApiImplicitParam(name = "是否是最近一周", value = "isNearlyWeek"),
+            @ApiImplicitParam(name = "分页大小", value = "pageSize"),
+            @ApiImplicitParam(name = "页码", value = "pageNumber")
+    })
     @PostMapping("site/pestNumStat")
     public Result sitePestNumStat(@RequestBody Map<String, Object> params) {
         int pageSize;
@@ -158,6 +176,15 @@ public class DataController {
      * @param pageNumber   页码
      * @return
      */
+    @ApiOperation(value = "单站土壤信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "站点ID", value = "siteId", required = true),
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate"),
+            @ApiImplicitParam(name = "是否是最近一周", value = "isNearlyWeek"),
+            @ApiImplicitParam(name = "分页大小", value = "pageSize"),
+            @ApiImplicitParam(name = "页码", value = "pageNumber")
+    })
     @PostMapping("site/soilInfo")
     public Result soilInfo(@RequestBody Map<String, Object> params) {
         int pageSize;
@@ -230,6 +257,15 @@ public class DataController {
      * @param pageNumber   页码
      * @return
      */
+    @ApiOperation(value = "单站气候信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "站点ID", value = "siteId", required = true),
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate"),
+            @ApiImplicitParam(name = "是否是最近一周", value = "isNearlyWeek"),
+            @ApiImplicitParam(name = "分页大小", value = "pageSize"),
+            @ApiImplicitParam(name = "页码", value = "pageNumber")
+    })
     @PostMapping("site/meteInfo")
     public Result meteorologicalInfo(@RequestBody Map<String, Object> params) {
         int pageSize;
