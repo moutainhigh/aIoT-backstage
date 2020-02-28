@@ -27,7 +27,7 @@ public class DeviceStatusReadSchedule {
     /**
      *
      */
-    @Scheduled(cron = "* 0/30 * * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ? ")
     public void read() throws InterruptedException {
         //通过rtu通道集合检测rtu连接状态
         List<SysSiteEntity> sites = sysSiteMapper.selectAll();
@@ -41,9 +41,9 @@ public class DeviceStatusReadSchedule {
                 }
             }
             if (online) {
-                sysDeviceErrorRecService.refreshRec(site.getId(), DeviceType.RTU.name(), "");
+                sysDeviceErrorRecService.refreshRec(site.getId(), DeviceType.RTU.name(), "zhan-wei");
             } else {
-                sysDeviceErrorRecService.newRec(site.getId(), DeviceType.RTU.name(), "");
+                sysDeviceErrorRecService.newRec(site.getId(), DeviceType.RTU.name(), "zhan-wei");
             }
         }
 
