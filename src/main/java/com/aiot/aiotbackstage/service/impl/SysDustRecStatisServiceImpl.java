@@ -31,7 +31,7 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
      * @return
      */
     @Override
-    public List<SysDustRecStatisEntity> getPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
+    public PageResult<SysDustRecStatisEntity> getPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
         params.put("startDate", startDate);
@@ -42,13 +42,25 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
             int total = sysDustRecStatisMapper.countAllBySiteId(params);
             params.put("pageIndex", pageIndex);
             params.put("pageSize", pageSize);
-            return sysDustRecStatisMapper.findAllBySiteId(params);
-            // TODO
-//            return PageResult
+            List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllBySiteId(params);
+            return PageResult.<SysDustRecStatisEntity>builder()
+                    .total(total)
+                    .pageNumber(pageIndex)
+                    .pageSize(pageSize)
+                    .pageData(result)
+                    .build();
         }
+
+        int total = sysDustRecStatisMapper.countAllDaily(params);
         params.put("pageIndex", pageIndex);
         params.put("pageSize", pageSize);
-        return sysDustRecStatisMapper.findAllDaily(params);
+        List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily(params);
+        return PageResult.<SysDustRecStatisEntity>builder()
+                .total(total)
+                .pageNumber(pageIndex)
+                .pageSize(pageSize)
+                .pageData(result)
+                .build();
     }
 
     /**
@@ -77,7 +89,7 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
             params.put("siteId", siteId);
             params.put("startDate", pestDate);
             params.put("endDate", pestDate);
-            int total =  sysDustRecStatisMapper.countAllDaily(params);
+            int total = sysDustRecStatisMapper.countAllDaily(params);
             params.put("pageIndex", pageIndex);
             params.put("pageSize", pageSize);
             List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily(params);

@@ -103,6 +103,9 @@ public class DataController {
             pageSize = Constants.Page.PAGE_SIZE;
         } else {
             pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+            if (pageSize > Constants.Page.MAX_PAGE_SIZE) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
         }
         if (!params.containsKey("pageNumber")) {
             pageIndex = 1;
@@ -163,6 +166,9 @@ public class DataController {
             pageSize = Constants.Page.PAGE_SIZE;
         } else {
             pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+            if (pageSize > Constants.Page.MAX_PAGE_SIZE) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
         }
         if (!params.containsKey("pageNumber")) {
             pageIndex = 1;
@@ -232,6 +238,9 @@ public class DataController {
             pageSize = Constants.Page.PAGE_SIZE;
         } else {
             pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+            if (pageSize > Constants.Page.MAX_PAGE_SIZE) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
         }
         if (!params.containsKey("pageNumber")) {
             pageIndex = 1;
@@ -277,7 +286,7 @@ public class DataController {
                 && (Integer.parseInt(isMax) == 0 || Integer.parseInt(isMax) == 1)) {
             return Result.success(sensorRecStatisService.getMaxOrMinPestMeteInfo(siteId, startDate, endDate, Integer.parseInt(isMax), pageIndex, pageSize));
         } else {
-            return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, startDate, endDate));
+            return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, startDate, endDate, pageIndex, pageSize));
         }
     }
 
