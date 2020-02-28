@@ -19,4 +19,15 @@
     <!--@mbg.generated-->
     id, guid, `date`, total_area, good, normal, sub_health, unhealthy, create_time
   </sql>
+
+  <select id="seedingGrowthPage" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List" />  from sys_seedling_growth
+<!--    <where>-->
+<!--      <if test="whetherExamine != null">-->
+<!--        and whether_examine = #{whetherExamine,jdbcType=INTEGER}-->
+<!--      </if>-->
+<!--    </where>-->
+    ORDER BY create_time DESC
+    LIMIT #{page.offset},#{page.pageSize}
+  </select>
 </mapper>

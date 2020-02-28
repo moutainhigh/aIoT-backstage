@@ -1,8 +1,12 @@
 package com.aiot.aiotbackstage.service;
 
+import com.aiot.aiotbackstage.model.entity.SysDisasterSituationEntity;
+import com.aiot.aiotbackstage.model.entity.SysSeedlingGrowthEntity;
 import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
 import com.aiot.aiotbackstage.model.param.DisasterSituationGisParam;
+import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.SeedlingGrowthGisParam;
+import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.model.vo.SensorInfoVo;
 
 import java.util.List;
@@ -16,4 +20,8 @@ public interface IGisService {
     void disasterSituation(DisasterSituationGisParam param);
 
     SensorInfoVo sensorInfo(Long stationId);
+
+    PageResult<SysSeedlingGrowthEntity> getSeedlingGrowth(PageParam pageParam);
+
+    PageResult<SysDisasterSituationEntity> getDisasterSituation(PageParam pageParam);
 }

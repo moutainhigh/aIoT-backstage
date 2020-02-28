@@ -18,4 +18,15 @@
     <!--@mbg.generated-->
     id, guid, `date`, total_area, serious, medium, normal, create_time
   </sql>
+
+  <select id="disasterSituationPage" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List" />  from sys_disaster_situation
+    <!--    <where>-->
+    <!--      <if test="whetherExamine != null">-->
+    <!--        and whether_examine = #{whetherExamine,jdbcType=INTEGER}-->
+    <!--      </if>-->
+    <!--    </where>-->
+    ORDER BY create_time DESC
+    LIMIT #{page.offset},#{page.pageSize}
+  </select>
 </mapper>

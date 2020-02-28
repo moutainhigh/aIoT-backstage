@@ -2,6 +2,7 @@ package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.model.param.DisasterSituationGisParam;
+import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.SeedlingGrowthGisParam;
 import com.aiot.aiotbackstage.service.IGisService;
 import com.aiot.aiotbackstage.service.impl.SysInsectRecStatisServiceImpl;
@@ -42,7 +43,7 @@ public class GisController {
         return Result.success(iGisService.stationInfo());
     }
 
-    @ApiOperation(value = "苗情(seedlingGrowth)注意：该接口只用于GIS", notes = "苗情(seedlingGrowth)")
+    @ApiOperation(value = "苗情入库(seedlingGrowth)注意：该接口只用于GIS", notes = "苗情(seedlingGrowth)")
     @ResponseBody
     @PostMapping("/seedlingGrowth")
     public Result seedlingGrowth(@RequestBody SeedlingGrowthGisParam param
@@ -51,7 +52,7 @@ public class GisController {
         return Result.success();
     }
 
-    @ApiOperation(value = "灾情(disasterSituation)注意：该接口只用于GIS", notes = "灾情(disasterSituation)")
+    @ApiOperation(value = "灾情入库(disasterSituation)注意：该接口只用于GIS", notes = "灾情(disasterSituation)")
     @ResponseBody
     @PostMapping("/disasterSituation")
     public Result disasterSituation(@RequestBody DisasterSituationGisParam param
@@ -89,5 +90,27 @@ public class GisController {
     @PostMapping("pestNumStat/all")
     public Result allPestNumStat() {
         return Result.success(sysInsectRecStatisService.getAllPestNumStat());
+    }
+
+    @ApiOperation(value = "获取苗情数据", notes = "获取苗情数据")
+    @ResponseBody
+    @GetMapping("/getSeedlingGrowth")
+    public Result getSeedlingGrowth(@RequestParam Integer pageNumber,@RequestParam Integer pageSize
+    ) {
+        PageParam pageParam=new PageParam();
+        pageParam.setPageNumber(pageNumber);
+        pageParam.setPageSize(pageSize);
+        return Result.success(iGisService.getSeedlingGrowth(pageParam));
+    }
+
+    @ApiOperation(value = "获取灾情数据", notes = "获取灾情数据")
+    @ResponseBody
+    @GetMapping("/getDisasterSituation")
+    public Result getDisasterSituation(@RequestParam Integer pageNumber,@RequestParam Integer pageSize
+    ) {
+        PageParam pageParam=new PageParam();
+        pageParam.setPageNumber(pageNumber);
+        pageParam.setPageSize(pageSize);
+        return Result.success(iGisService.getDisasterSituation(pageParam));
     }
 }

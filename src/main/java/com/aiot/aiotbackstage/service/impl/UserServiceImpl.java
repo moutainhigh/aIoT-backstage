@@ -290,23 +290,65 @@ public class UserServiceImpl implements IUserService {
                                 .eq(SysRoleMenuEntity::getRoleId, role.getRoleId()));
                 List<Long> menuIds = sysRoleMenuEntities.stream()
                         .map(SysRoleMenuEntity::getMenuId).collect(Collectors.toList());
-                List<SysMenuEntity> sysMenuEntities = sysMenuMapper.selectBatchIds(menuIds);
-                List<Map<String,Object>> list=new ArrayList<>();
-                if(sysMenuEntities.size()>0) {
-                    for(SysMenuEntity module : sysMenuEntities) {
-                        Map<String,Object> map1=new HashMap<>();
-                        map1.put("name",module.getName());
-                        map1.put("url",module.getUrl());
-                        list.add(map1);
-                    }
-                }
-                map.put("perms",list);
+                List<SysMenuEntity> sysMenuEntities = sysMenuMapper.selectList(Wrappers.<SysMenuEntity>lambdaQuery()
+                        .eq(SysMenuEntity::getType, "menu")
+                        .in(SysMenuEntity::getId, menuIds));
+                //此处构建树
+                map.put("perms",getTree(sysMenuEntities));
                 permissions.add(map);
             }
         }
         return permissions;
 
     }
+
+    private List<SysMenuEntity> getTree(List<SysMenuEntity> list) {
+
+        List<SysMenuEntity> baseLists = new ArrayList<>();
+
+        // 总菜单，出一级菜单，一级菜单没有父id
+        for (SysMenuEntity e: list) {
+            if( e.getParentId().equals(0L) ){
+                baseLists.add( e );
+            }
+        }
+        // 遍历一级菜单
+        for (SysMenuEntity e: baseLists) {
+            // 将子元素 set进一级菜单里面
+            e.setChildren( getChild(e.getId(),list) );
+        }
+        return baseLists;
+    }
+
+    /**
+     * 获取子节点
+     * @param pid
+     * @param elements
+     * @return
+     */
+    private List<SysMenuEntity> getChild(Long  pid , List<SysMenuEntity> elements){
+        List<SysMenuEntity> childs = new ArrayList<>();
+        for (SysMenuEntity e: elements) {
+            if(!e.getParentId().equals(0L)){
+                if(e.getParentId().equals( pid )){
+                    // 子菜单的下级菜单
+                    childs.add( e );
+                }
+            }
+        }
+        // 把子菜单的子菜单再循环一遍
+        for (SysMenuEntity e: childs) {
+            // 继续添加子元素
+            e.setChildren( getChild( e.getId() , elements ) );
+        }
+        //停下来的条件，如果 没有子元素了，则停下来
+        if( childs.size()==0 ){
+            return null;
+        }
+        return childs;
+    }
+
+
 
     public Date parseDate (String text) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
