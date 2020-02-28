@@ -109,11 +109,9 @@ public class EarlyWarningController {
     @ApiOperation(value = "预警规则内容获取(earlyContent)", notes = "预警内容获取(earlyContent)")
     @ResponseBody
     @GetMapping("/earlyContent")
-    public Result earlyContent(@RequestParam String earlyType,
-                               @RequestParam String earlyDegree,
-                               @RequestParam String earlyName
+    public Result earlyContent(@RequestParam String earlyType
     ) {
-        return Result.success(iEarlyWarningService.earlyContent(earlyType,earlyDegree,earlyName));
+        return Result.success(iEarlyWarningService.earlyContent(earlyType));
     }
 
     @ApiOperation(value = "预警数量提示(earlyCount)", notes = "预警数量提示(earlyCount)")
@@ -123,4 +121,13 @@ public class EarlyWarningController {
     ) {
         return Result.success(iEarlyWarningService.earlyCount());
     }
+
+    @ApiOperation(value = "预警规则下拉框数据(earlyData)", notes = "预警规则下拉框数据(earlyData)")
+    @ResponseBody
+    @GetMapping("/earlyData")
+    public Result earlyData(@RequestParam Integer type
+    ) {
+        return Result.success(iEarlyWarningService.earlyData(type));
+    }
+
 }
