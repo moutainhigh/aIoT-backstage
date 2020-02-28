@@ -45,16 +45,6 @@
         epsilon = VALUES( epsilon )
     </insert>
 
-    <select id="countAllBySiteId" resultType="int">
-        SELECT
-            COUNT(*)
-        FROM
-            sys_dust_rec_statis
-        WHERE
-            site_id = #{siteId}
-            AND `date` BETWEEN #{startDate} AND #{endDate}
-    </select>
-
     <select id="findAllBySiteId" resultMap="BaseResultMap">
         SELECT
             *
@@ -108,6 +98,8 @@
         <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
             LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
         </if>
+        ORDER BY
+            `date`
     </select>
 
 </mapper>

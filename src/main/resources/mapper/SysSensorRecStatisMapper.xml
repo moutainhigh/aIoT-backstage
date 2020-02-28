@@ -61,16 +61,6 @@
             atmos = VALUES( atmos )
     </insert>
 
-    <select id="countAllBySiteId" resultType="int">
-        SELECT
-            COUNT(*)
-        FROM
-            sys_sensor_rec_statis
-        WHERE
-            site_id = #{siteId}
-            AND `date` BETWEEN #{startDate} AND #{endDate}
-    </select>
-
     <select id="countAllBySiteIdDaily" resultType="int">
         SELECT
             COUNT(*)
@@ -99,6 +89,8 @@
         <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
             LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
         </if>
+        ORDER BY
+            `date`
     </select>
 
     <select id="findAllBySiteIdDaily" resultMap="BaseResultMap">

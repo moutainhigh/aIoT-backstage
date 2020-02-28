@@ -23,16 +23,6 @@ public interface SysDustRecStatisMapper extends BaseMapper<SysDustRecStatisEntit
      * @param siteId    站点ID
      * @param startDate 开始日期
      * @param endDate   结束日期
-     * @return
-     */
-    int countAllBySiteId(Map<String, Object> params);
-
-    /**
-     * 根据站点ID查询
-     *
-     * @param siteId    站点ID
-     * @param startDate 开始日期
-     * @param endDate   结束日期
      * @param pageIndex 页码
      * @param pageSize  分页大小
      * @return

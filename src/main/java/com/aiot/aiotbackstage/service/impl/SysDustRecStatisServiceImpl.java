@@ -26,12 +26,10 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
      * @param siteId    站点ID
      * @param startDate 开始日期
      * @param endDate   结束日期
-     * @param pageIndex 页码
-     * @param pageSize  分页大小
      * @return
      */
     @Override
-    public PageResult<SysDustRecStatisEntity> getPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
+    public Object getPestSoilInfo(String siteId, String startDate, String endDate) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
         params.put("startDate", startDate);
@@ -39,28 +37,88 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
 
         // 查询当天每小时平均值
         if (startDate.equals(endDate)) {
-            int total = sysDustRecStatisMapper.countAllBySiteId(params);
-            params.put("pageIndex", pageIndex);
-            params.put("pageSize", pageSize);
-            List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllBySiteId(params);
-            return PageResult.<SysDustRecStatisEntity>builder()
-                    .total(total)
-                    .pageNumber(pageIndex)
-                    .pageSize(pageSize)
-                    .pageData(result)
-                    .build();
+            return sysDustRecStatisMapper.findAllBySiteId(params);
         }
 
-        int total = sysDustRecStatisMapper.countAllDaily(params);
-        params.put("pageIndex", pageIndex);
-        params.put("pageSize", pageSize);
         List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily(params);
-        return PageResult.<SysDustRecStatisEntity>builder()
-                .total(total)
-                .pageNumber(pageIndex)
-                .pageSize(pageSize)
-                .pageData(result)
-                .build();
+        Map<Integer, Map<String, List<Object>>> map = new HashMap<>();
+
+        Map<String, List<Object>> tempMap;
+        for (int i = 0; i < result.size(); i++) {
+            SysDustRecStatisEntity entity = result.get(i);
+
+            if (!map.containsKey(entity.getDepth())) {
+                tempMap = new HashMap<>();
+                map.put(entity.getDepth(), tempMap);
+            } else {
+                tempMap = map.get(entity.getDepth());
+            }
+
+            List<Object> date;
+            List<Object> wc;
+            List<Object> temperature;
+            List<Object> ec;
+            List<Object> salinity;
+            List<Object> tds;
+            List<Object> epsilon;
+
+            if (!tempMap.containsKey("date")) {
+                date = new ArrayList<>();
+                tempMap.put("date", date);
+            } else {
+                date = tempMap.get("date");
+            }
+            date.add(entity.getDate());
+
+            if (!tempMap.containsKey("wc")) {
+                wc = new ArrayList<>();
+                tempMap.put("wc", wc);
+            } else {
+                wc = tempMap.get("wc");
+            }
+            wc.add(entity.getWc());
+
+            if (!tempMap.containsKey("temperature")) {
+                temperature = new ArrayList<>();
+                tempMap.put("temperature", temperature);
+            } else {
+                temperature = tempMap.get("temperature");
+            }
+            temperature.add(entity.getTemperature());
+
+            if (!tempMap.containsKey("ec")) {
+                ec = new ArrayList<>();
+                tempMap.put("ec", ec);
+            } else {
+                ec = tempMap.get("ec");
+            }
+            ec.add(entity.getEc());
+
+            if (!tempMap.containsKey("salinity")) {
+                salinity = new ArrayList<>();
+                tempMap.put("salinity", salinity);
+            } else {
+                salinity = tempMap.get("salinity");
+            }
+            salinity.add(entity.getSalinity());
+
+            if (!tempMap.containsKey("tds")) {
+                tds = new ArrayList<>();
+                tempMap.put("tds", tds);
+            } else {
+                tds = tempMap.get("tds");
+            }
+            tds.add(entity.getTds());
+
+            if (!tempMap.containsKey("epsilon")) {
+                epsilon = new ArrayList<>();
+                tempMap.put("epsilon", epsilon);
+            } else {
+                epsilon = tempMap.get("epsilon");
+            }
+            epsilon.add(entity.getEpsilon());
+        }
+        return map;
     }
 
     /**
