@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysInsectRecReportMapper">
+  <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysInsectRecReportEntity">
+    <!--@mbg.generated-->
+    <!--@Table sys_insect_rec_report-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="whether_examine" jdbcType="INTEGER" property="whetherExamine" />
+    <result column="category" jdbcType="VARCHAR" property="category" />
+    <result column="forecast_object" jdbcType="VARCHAR" property="forecastObject" />
+    <result column="survey_time" jdbcType="TIMESTAMP" property="surveyTime" />
+    <result column="info_level" jdbcType="INTEGER" property="infoLevel" />
+    <result column="new_or_not" jdbcType="INTEGER" property="newOrNot" />
+    <result column="report_name" jdbcType="VARCHAR" property="reportName" />
+    <result column="info_title" jdbcType="VARCHAR" property="infoTitle" />
+    <result column="remarks" jdbcType="LONGVARCHAR" property="remarks" />
+    <result column="picture_url" jdbcType="VARCHAR" property="pictureUrl" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, whether_examine, category, forecast_object, survey_time, info_level, new_or_not,
+    report_name, info_title, remarks, picture_url, create_time, update_time
+  </sql>
+
+  <select id="insectRecReportInfo" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List" />  from sys_insect_rec_report
+    <where>
+      <if test="whetherExamine != null">
+        and whether_examine = #{whetherExamine,jdbcType=INTEGER}
+      </if>
+    </where>
+    ORDER BY create_time DESC
+    LIMIT #{page.offset},#{page.pageSize}
+  </select>
+
+  <select id="insectRecReportCount" resultType="java.lang.Integer">
+    select  count(1) from sys_insect_rec_report
+    <where>
+      <if test="whetherExamine != null">
+        and whether_examine = #{whetherExamine,jdbcType=INTEGER}
+      </if>
+    </where>
+  </select>
+</mapper>

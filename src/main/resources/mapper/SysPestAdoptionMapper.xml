@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysPestAdoptionMapper">
+  <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysPestAdoptionEntity">
+    <!--@mbg.generated-->
+    <!--@Table sys_pest_adoption-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="distribution_situation" jdbcType="VARCHAR" property="distributionSituation" />
+    <result column="distribution_area" jdbcType="VARCHAR" property="distributionArea" />
+    <result column="distribution_address" jdbcType="VARCHAR" property="distributionAddress" />
+    <result column="area" jdbcType="VARCHAR" property="area" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="pest_bank_name" jdbcType="VARCHAR" property="pestBankName" />
+    <result column="cause_disease" jdbcType="LONGVARCHAR" property="causeDisease" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, distribution_situation, distribution_area, distribution_address, area, `count`, 
+    pest_bank_name, cause_disease, `source`, create_time
+  </sql>
+</mapper>
