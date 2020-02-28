@@ -8,6 +8,9 @@ import com.aiot.aiotbackstage.model.param.UserParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.model.vo.TokenVo;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @ClassName UserManageService
  * @Description 用户管理接口
@@ -42,4 +45,5 @@ public interface IUserService {
 
     void isToken(String token);
 
+    List<Map<String,Object>> permissionInfo();
 }

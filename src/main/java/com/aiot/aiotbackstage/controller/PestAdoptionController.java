@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
@@ -73,6 +74,7 @@ public class PestAdoptionController {
     })
     @PostMapping("/importExcel")
     @ResponseBody
+    @RequiresPermissions("importExcel:add")
     public Result importWatchExcel(@RequestParam("excelFile") MultipartFile xlsFile) {
 
         pestAdoptionService.importWatchExcel(xlsFile);

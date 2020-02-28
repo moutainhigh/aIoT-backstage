@@ -8,10 +8,7 @@ import com.aiot.aiotbackstage.common.util.JsonUtils;
 import com.aiot.aiotbackstage.common.util.MD5Utils;
 import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.mapper.*;
-import com.aiot.aiotbackstage.model.entity.SysInsectRecEntity;
-import com.aiot.aiotbackstage.model.entity.SysRoleEntity;
-import com.aiot.aiotbackstage.model.entity.SysUserEntity;
-import com.aiot.aiotbackstage.model.entity.SysUserRoleEntity;
+import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.UserLoginParam;
 import com.aiot.aiotbackstage.model.param.UserParam;
@@ -31,11 +28,10 @@ import org.springframework.web.client.RestTemplate;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName UserManageServiceImpl
@@ -59,11 +55,13 @@ public class UserServiceImpl implements IUserService {
     private SysRoleMapper roleMapper;
 
     @Autowired
-    private SysRoleMenuMapper roleMenuMapper;
+    private SysUserRoleMapper roleUserMapper;
 
     @Autowired
-    private SysMenuMapper menuMapper;
+    private SysMenuMapper sysMenuMapper;
 
+    @Autowired
+    private SysRoleMenuMapper sysRoleMenuMapper;
 
     @Autowired
     private WeChatConfig weChatConfig;
@@ -109,8 +107,7 @@ public class UserServiceImpl implements IUserService {
             if(ObjectUtils.isEmpty(sysUserEntity)){
                 throw new MyException(ResultStatusCode.USER_NAME_NO_EXIT);
             }
-            String passWord = MD5Utils.encrypt(userLoginParam.getPassword());
-            if(!sysUserEntity.getPassword().equals(passWord)){
+            if(!sysUserEntity.getPassword().equals(userLoginParam.getPassword())){
                 throw new MyException(ResultStatusCode.USER_PASSWORD_NO_EXIT);
             }
             //5 . JWT 返回自定义登陆态 Token
@@ -278,6 +275,37 @@ public class UserServiceImpl implements IUserService {
         if(b == null || b.equals("")){
             throw new MyException(ResultStatusCode.TOKEN_NO_EXIT);
         }
+    }
+
+    @Override
+    public List<Map<String,Object>> permissionInfo(){
+        List<Map<String,Object>> permissions=new ArrayList<>();
+        List<SysRoleEntity> roles = roleMapper.selectList(null);
+        if(roles.size()>0) {
+            for(SysRoleEntity role : roles) {
+                Map<String,Object> map=new HashMap<>();
+                map.put("roleId",role.getRoleId());
+                List<SysRoleMenuEntity> sysRoleMenuEntities = sysRoleMenuMapper
+                        .selectList(Wrappers.<SysRoleMenuEntity>lambdaQuery()
+                                .eq(SysRoleMenuEntity::getRoleId, role.getRoleId()));
+                List<Long> menuIds = sysRoleMenuEntities.stream()
+                        .map(SysRoleMenuEntity::getMenuId).collect(Collectors.toList());
+                List<SysMenuEntity> sysMenuEntities = sysMenuMapper.selectBatchIds(menuIds);
+                List<Map<String,Object>> list=new ArrayList<>();
+                if(sysMenuEntities.size()>0) {
+                    for(SysMenuEntity module : sysMenuEntities) {
+                        Map<String,Object> map1=new HashMap<>();
+                        map1.put("name",module.getName());
+                        map1.put("url",module.getUrl());
+                        list.add(map1);
+                    }
+                }
+                map.put("perms",list);
+                permissions.add(map);
+            }
+        }
+        return permissions;
+
     }
 
     public Date parseDate (String text) {

@@ -7,6 +7,7 @@ import com.aiot.aiotbackstage.model.param.WarnRuleParam;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -42,6 +43,7 @@ public class EarlyWarningController {
     @ApiOperation(value = "新增预警库数据(warnRuleAdd)", notes = "新增预警库信息(warnRuleAdd)")
     @ResponseBody
     @PostMapping("/warnRule")
+    @RequiresPermissions("warnRule:add")
     public Result earlyInfoAdd(@RequestBody @Validated WarnRuleParam param
     ) {
         iEarlyWarningService.earlyInfoAdd(param);
@@ -51,6 +53,7 @@ public class EarlyWarningController {
     @ApiOperation(value = "修改预警库数据(warnRuleAdd)", notes = "新增预警库信息(warnRuleAdd)")
     @ResponseBody
     @PutMapping("/warnRule")
+    @RequiresPermissions("warnRule:update")
     public Result earlyInfoModify(@RequestBody @Validated WarnRuleParam param
     ) {
         iEarlyWarningService.earlyInfoModify(param);
@@ -60,6 +63,7 @@ public class EarlyWarningController {
     @ApiOperation(value = "删除预警库数据(warnRuleAdd)", notes = "新增预警库信息(warnRuleAdd)")
     @ResponseBody
     @DeleteMapping("/warnRule/{id}")
+    @RequiresPermissions("warnRule:delete")
     public Result earlyInfoDelete(@PathVariable  Long  id
     ) {
         iEarlyWarningService.earlyInfoDelete(id);
@@ -70,6 +74,7 @@ public class EarlyWarningController {
     @ApiOperation(value = "预警信息上报(earlyInfoReport)", notes = "预警信息上报(earlyInfoReport)")
     @ResponseBody
     @PostMapping("/earlyInfoReport")
+    @RequiresPermissions("earlyInfoReport")
     public Result earlyInfoReport(@RequestBody @Validated WarnInfoParam param
     ) {
         iEarlyWarningService.earlyInfoReport(param);
@@ -91,6 +96,7 @@ public class EarlyWarningController {
     @ApiOperation(value = "关闭预警信息(earlyClosed)", notes = "关闭预警信息(earlyClosed)")
     @ResponseBody
     @PutMapping("/earlyInfoClosed")
+    @RequiresPermissions("earlyInfoClosed")
     public Result earlyClosed(@RequestParam Long id
     ) {
         iEarlyWarningService.earlyClosed(id);
@@ -100,6 +106,7 @@ public class EarlyWarningController {
     @ApiOperation(value = "预警上报信息审核(earlyInfoExamine)", notes = "预警上报信息审核(earlyInfoExamine)")
     @ResponseBody
     @PutMapping("/earlyInfoExamine")
+    @RequiresPermissions("earlyInfoExamine")
     public Result earlyInfoExamine(@RequestParam Long id
     ) {
         iEarlyWarningService.earlyInfoExamine(id);
