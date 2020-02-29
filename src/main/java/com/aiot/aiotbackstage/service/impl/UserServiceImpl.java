@@ -8,10 +8,7 @@ import com.aiot.aiotbackstage.common.util.JsonUtils;
 import com.aiot.aiotbackstage.common.util.MD5Utils;
 import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.mapper.*;
-import com.aiot.aiotbackstage.model.entity.SysInsectRecEntity;
-import com.aiot.aiotbackstage.model.entity.SysRoleEntity;
-import com.aiot.aiotbackstage.model.entity.SysUserEntity;
-import com.aiot.aiotbackstage.model.entity.SysUserRoleEntity;
+import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.UserLoginParam;
 import com.aiot.aiotbackstage.model.param.UserParam;
@@ -28,14 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName UserManageServiceImpl
@@ -59,11 +56,16 @@ public class UserServiceImpl implements IUserService {
     private SysRoleMapper roleMapper;
 
     @Autowired
-    private SysRoleMenuMapper roleMenuMapper;
+    private SysUserRoleMapper roleUserMapper;
 
     @Autowired
-    private SysMenuMapper menuMapper;
+    private SysDustRecMapper dustRecMapper;
 
+    @Autowired
+    private SysMenuMapper sysMenuMapper;
+
+    @Autowired
+    private SysRoleMenuMapper sysRoleMenuMapper;
 
     @Autowired
     private WeChatConfig weChatConfig;
@@ -109,8 +111,7 @@ public class UserServiceImpl implements IUserService {
             if(ObjectUtils.isEmpty(sysUserEntity)){
                 throw new MyException(ResultStatusCode.USER_NAME_NO_EXIT);
             }
-            String passWord = MD5Utils.encrypt(userLoginParam.getPassword());
-            if(!sysUserEntity.getPassword().equals(passWord)){
+            if(!sysUserEntity.getPassword().equals(userLoginParam.getPassword())){
                 throw new MyException(ResultStatusCode.USER_PASSWORD_NO_EXIT);
             }
             //5 . JWT 返回自定义登陆态 Token
@@ -203,8 +204,7 @@ public class UserServiceImpl implements IUserService {
         checkUserInfo(userParam);
         SysUserEntity userEntity=new SysUserEntity();
         userEntity.setUserName(userParam.getUserName());
-        String encryptedPassword = MD5Utils.encrypt(userParam.getPassword());
-        userEntity.setPassword(encryptedPassword);
+        userEntity.setPassword(userParam.getPassword());
         userEntity.setLoginType(2);
         userEntity.setCreateTime(new Date());
         userEntity.setUpdateTime(new Date());
@@ -259,16 +259,16 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void delUser(UserParam userParam) {
-        SysUserEntity phoneEntity = SysUserEntity.builder().userId(userParam.getUserId()).build();
+    public void delUser(Long id) {
+        SysUserEntity phoneEntity = SysUserEntity.builder().userId(id).build();
         if (ObjectUtils.isEmpty(phoneEntity)) {
             throw new MyException(ResultStatusCode.USER_HAS_NO_EXISTED);
         }
         //删除该用户
-        userMapper.deleteById(userParam.getUserId());
+        userMapper.deleteById(id);
         //删除该用户对应的角色数据
         userRoleMapper.delete(Wrappers.<SysUserRoleEntity>lambdaQuery()
-                .eq(SysUserRoleEntity::getUserId,userParam.getUserId()));
+                .eq(SysUserRoleEntity::getUserId,id));
     }
 
     @Override
@@ -279,6 +279,79 @@ public class UserServiceImpl implements IUserService {
             throw new MyException(ResultStatusCode.TOKEN_NO_EXIT);
         }
     }
+
+    @Override
+    public List<Map<String,Object>> permissionInfo(){
+        List<Map<String,Object>> permissions=new ArrayList<>();
+        List<SysRoleEntity> roles = roleMapper.selectList(null);
+        if(roles.size()>0) {
+            for(SysRoleEntity role : roles) {
+                Map<String,Object> map=new HashMap<>();
+                map.put("roleId",role.getRoleId());
+                List<SysRoleMenuEntity> sysRoleMenuEntities = sysRoleMenuMapper
+                        .selectList(Wrappers.<SysRoleMenuEntity>lambdaQuery()
+                                .eq(SysRoleMenuEntity::getRoleId, role.getRoleId()));
+                List<Long> menuIds = sysRoleMenuEntities.stream()
+                        .map(SysRoleMenuEntity::getMenuId).collect(Collectors.toList());
+                List<SysMenuEntity> sysMenuEntities = sysMenuMapper.selectList(Wrappers.<SysMenuEntity>lambdaQuery()
+                        .eq(SysMenuEntity::getType, "menu")
+                        .in(SysMenuEntity::getId, menuIds));
+                //此处构建树
+                map.put("perms",getTree(sysMenuEntities));
+                permissions.add(map);
+            }
+        }
+        return permissions;
+
+    }
+
+    private List<SysMenuEntity> getTree(List<SysMenuEntity> list) {
+
+        List<SysMenuEntity> baseLists = new ArrayList<>();
+
+        // 总菜单，出一级菜单，一级菜单没有父id
+        for (SysMenuEntity e: list) {
+            if( e.getParentId().equals(0L) ){
+                baseLists.add( e );
+            }
+        }
+        // 遍历一级菜单
+        for (SysMenuEntity e: baseLists) {
+            // 将子元素 set进一级菜单里面
+            e.setChildren( getChild(e.getId(),list) );
+        }
+        return baseLists;
+    }
+
+    /**
+     * 获取子节点
+     * @param pid
+     * @param elements
+     * @return
+     */
+    private List<SysMenuEntity> getChild(Long  pid , List<SysMenuEntity> elements){
+        List<SysMenuEntity> childs = new ArrayList<>();
+        for (SysMenuEntity e: elements) {
+            if(!e.getParentId().equals(0L)){
+                if(e.getParentId().equals( pid )){
+                    // 子菜单的下级菜单
+                    childs.add( e );
+                }
+            }
+        }
+        // 把子菜单的子菜单再循环一遍
+        for (SysMenuEntity e: childs) {
+            // 继续添加子元素
+            e.setChildren( getChild( e.getId() , elements ) );
+        }
+        //停下来的条件，如果 没有子元素了，则停下来
+        if( childs.size()==0 ){
+            return null;
+        }
+        return childs;
+    }
+
+
 
     public Date parseDate (String text) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -332,23 +405,59 @@ public class UserServiceImpl implements IUserService {
 //            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //            log.info("1---------{}",formatter.format(sdate));
             while (sdate.before(edate)) {
-//                DecimalFormat df = new DecimalFormat( "0.00" );
+                DecimalFormat df = new DecimalFormat( "0.00" );
                 // sdate=每加五分钟的值
                 // sdate = +5m
                 // 执行插入语句，建议批量提交事物
-                SysInsectRecEntity insectRecEntity=new SysInsectRecEntity();
-                insectRecEntity.setDeviceId((int)(Math.random()*14)+1);
-                insectRecEntity.setImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
-                insectRecEntity.setResultImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
-                insectRecEntity.setResult(((int)(Math.random()*262))+","+((int)(Math.random()*100))
-                        +"#"+((int)(Math.random()*262))+","+((int)(Math.random()*100)));
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(sdate);
-                cal.add(Calendar.HOUR, 1);
-                Date time = cal.getTime();
-                insectRecEntity.setTime(time);
-                sdate=time;
-                insectRecMapper.insert(insectRecEntity);
+//                SysInsectRecEntity insectRecEntity=new SysInsectRecEntity();
+//                insectRecEntity.setDeviceId((int)(Math.random()*14)+1);
+//                insectRecEntity.setImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
+//                insectRecEntity.setResultImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
+//                insectRecEntity.setResult(((int)(Math.random()*262))+","+((int)(Math.random()*100))
+//                        +"#"+((int)(Math.random()*262))+","+((int)(Math.random()*100)));
+//
+//                insectRecMapper.insert(insectRecEntity);
+
+                SysDustRecEntity dustRecEntity=new SysDustRecEntity();
+//                dustRecEntity.setDepth(10);
+//                dustRecEntity.setEc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setSalinity(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setSiteId((int)(Math.random()*8)+1);
+//                Calendar cal = Calendar.getInstance();
+//                cal.setTime(sdate);
+//                cal.add(Calendar.HOUR, 1);
+//                Date time = cal.getTime();
+//                sdate=time;
+//                dustRecEntity.setTime(sdate);
+//                dustRecEntity.setTds(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setWc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecMapper.insert(dustRecEntity);
+//
+//                SysDustRecEntity dustRecEntity1=new SysDustRecEntity();
+//                dustRecEntity1.setDepth(20);
+//                dustRecEntity1.setEc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setSalinity(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setSiteId((int)(Math.random()*8)+1);
+//                dustRecEntity1.setTime(sdate);
+//                dustRecEntity1.setTds(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setWc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecMapper.insert(dustRecEntity1);
+//
+//                SysDustRecEntity dustRecEntity2=new SysDustRecEntity();
+//                dustRecEntity2.setDepth(40);
+//                dustRecEntity2.setEc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setSalinity(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setSiteId((int)(Math.random()*8)+1);
+//                dustRecEntity2.setTime(sdate);
+//                dustRecEntity2.setTds(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setWc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecMapper.insert(dustRecEntity2);
 
 //                SysSensorRecEntity dustRec=new SysSensorRecEntity();
 //                dustRec.setSiteId((int)(Math.random()*8)+1);

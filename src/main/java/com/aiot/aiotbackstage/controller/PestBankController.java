@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
@@ -61,6 +62,7 @@ public class PestBankController {
     })
     @ResponseBody
     @PostMapping
+    @RequiresPermissions("pestBank:add")
     public Result addPestInfo(@RequestBody @Validated AddPestBankParam param
     ) {
         pestBankService.addPestInfo(param);
@@ -73,6 +75,7 @@ public class PestBankController {
     })
     @ResponseBody
     @PutMapping
+    @RequiresPermissions("pestBank:update")
     public Result modifyPestInfo(@RequestBody ModifyPestBankParam param
     ) {
         pestBankService.modifyPestInfo(param);
@@ -85,6 +88,7 @@ public class PestBankController {
     })
     @ResponseBody
     @DeleteMapping("/{id}")
+    @RequiresPermissions("pestBank:delete")
     public Result deletePestInfo(@PathVariable Long id
     ) {
         pestBankService.deletePestInfo(id);

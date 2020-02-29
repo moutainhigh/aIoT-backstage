@@ -7,7 +7,9 @@ import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.DisasterSituationGisParam;
+import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.SeedlingGrowthGisParam;
+import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.model.vo.SensorInfoVo;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.IGisService;
@@ -136,5 +138,39 @@ public class GisServiceImpl implements IGisService {
         infoVo.setInsectRecVos(sysInsectRecEntities);
         infoVo.setDustRecVos(dustRecVos);
         return infoVo;
+    }
+
+    @Override
+    public PageResult<SysSeedlingGrowthEntity> getSeedlingGrowth(PageParam pageParam) {
+        List<SysSeedlingGrowthEntity> sysSeedlingGrowthEntities = seedlingGrowthMapper.seedingGrowthPage(pageParam);
+        Integer total = seedlingGrowthMapper.selectCount(null);
+
+        if(CollectionUtils.isEmpty(sysSeedlingGrowthEntities)){
+            throw new MyException(ResultStatusCode.NO_RESULT);
+        }
+
+        return PageResult.<SysSeedlingGrowthEntity>builder()
+                .total(total)
+                .pageData(sysSeedlingGrowthEntities)
+                .pageNumber(pageParam.getPageNumber())
+                .pageSize(pageParam.getPageSize())
+                .build();
+    }
+
+    @Override
+    public PageResult<SysDisasterSituationEntity> getDisasterSituation(PageParam pageParam) {
+        List<SysDisasterSituationEntity> disasterSituationEntities = disasterSituationMapper.disasterSituationPage(pageParam);
+        Integer total = disasterSituationMapper.selectCount(null);
+
+        if(CollectionUtils.isEmpty(disasterSituationEntities)){
+            throw new MyException(ResultStatusCode.NO_RESULT);
+        }
+
+        return PageResult.<SysDisasterSituationEntity>builder()
+                .total(total)
+                .pageData(disasterSituationEntities)
+                .pageNumber(pageParam.getPageNumber())
+                .pageSize(pageParam.getPageSize())
+                .build();
     }
 }

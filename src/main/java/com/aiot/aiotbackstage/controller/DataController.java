@@ -241,12 +241,50 @@ public class DataController {
                 && (Integer.parseInt(isMax) == 0 || Integer.parseInt(isMax) == 1)) {
             return Result.success(sysDustRecStatisService.getMaxOrMinPestSoilInfo(siteId, startDate, endDate, Integer.parseInt(isMax), pageIndex, pageSize));
         } else {
-            return Result.success(sysDustRecStatisService.getPestSoilInfo(siteId, startDate, endDate, pageIndex, pageSize));
+            return Result.error(ResultStatusCode.PARAM_IS_INVALID);
         }
     }
 
     /**
-     * 单站气候信息
+     * 单站土壤统计信息
+     *
+     * @param siteId    站点ID
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     * @return
+     */
+    @ApiOperation(value = "单站土壤统计信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "站点ID", value = "siteId", required = true),
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate")
+    })
+    @PostMapping("stat/site/soilInfo")
+    public Result soilStatisInfo(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("siteId")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        String siteId = String.valueOf(params.get("siteId"));
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+
+        return Result.success(sysDustRecStatisService.getPestSoilInfo(siteId, startDate, endDate));
+    }
+
+    /**
+     * 单站气候信息分页
      *
      * @param siteId       站点ID
      * @param startDate    开始日期
@@ -322,21 +360,51 @@ public class DataController {
                 && (Integer.parseInt(isMax) == 0 || Integer.parseInt(isMax) == 1)) {
             return Result.success(sensorRecStatisService.getMaxOrMinPestMeteInfo(siteId, startDate, endDate, Integer.parseInt(isMax), pageIndex, pageSize));
         } else {
-            return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, startDate, endDate, pageIndex, pageSize));
+            return Result.error(ResultStatusCode.PARAM_IS_INVALID);
         }
+    }
+
+    /**
+     * 单站气候统计信息
+     *
+     * @param siteId    站点ID
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     * @return
+     */
+    @ApiOperation(value = "单站气候统计信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "站点ID", value = "siteId", required = true),
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate")
+    })
+    @PostMapping("stat/site/meteInfo")
+    public Result meteorologicalStatInfo(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("siteId") || !params.containsKey("startDate") || !params.containsKey("endDate")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        String siteId = String.valueOf(params.get("siteId"));
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+
+        return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, startDate, endDate));
     }
 
     @PostMapping("statis")
     public Result statis() {
         dataStatisSchedule.manual();
         return Result.success();
-    }
-
-    public static void main(String[] args) {
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.DAY_OF_MONTH, 3);
-        System.out.println(DateUtils.format(c.getTime()));
-        c.add(Calendar.DAY_OF_MONTH, -7);
-        System.out.println(DateUtils.format(c.getTime()));
     }
 }

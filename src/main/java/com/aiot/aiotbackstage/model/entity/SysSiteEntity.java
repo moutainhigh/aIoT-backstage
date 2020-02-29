@@ -23,4 +23,9 @@ public class SysSiteEntity {
      * 腾讯地图地址url
      */
     private String locationUrl;
+
+    /**
+     * 基座大小
+     */
+    private String coordinate;
 }

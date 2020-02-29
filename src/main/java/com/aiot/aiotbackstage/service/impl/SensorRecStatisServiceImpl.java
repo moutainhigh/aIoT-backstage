@@ -1,6 +1,5 @@
 package com.aiot.aiotbackstage.service.impl;
 
-import com.aiot.aiotbackstage.common.util.DoubleUtils;
 import com.aiot.aiotbackstage.mapper.SysInsectRecStatisMapper;
 import com.aiot.aiotbackstage.mapper.SysSensorRecStatisMapper;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecStatisEntity;
@@ -28,31 +27,15 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
      * @param siteId    站点ID
      * @param startDate 开始日期
      * @param endDate   结束日期
-     * @param pageIndex
-     * @param pageSize
      * @return
      */
     @Override
-    public PageResult<SysSensorRecStatisEntity> getPestMeteInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
+    public Object getPestMeteInfo(String siteId, String startDate, String endDate) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-
-        // 查询当天每小时平均值
-        if (startDate.equals(endDate)) {
-            int total = sysSensorRecStatisMapper.countAllBySiteId(params);
-            params.put("pageIndex", pageIndex);
-            params.put("pageSize", pageSize);
-            List<SysSensorRecStatisEntity> result = sysSensorRecStatisMapper.findAllBySiteId(params);
-            return PageResult.<SysSensorRecStatisEntity>builder()
-                    .total(total)
-                    .pageNumber(pageIndex)
-                    .pageSize(pageSize)
-                    .pageData(result)
-                    .build();
-        }
-        return getDayOrNightAverage(siteId, startDate, endDate, pageIndex, pageSize);
+        return getDayOrNightAverage(siteId, startDate, endDate);
     }
 
 
@@ -78,12 +61,79 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
 
         if (pestResult != null && pestResult.size() == 1) {
             String pestDate = String.valueOf(pestResult.get(0).get("date"));
-            return getDayOrNightAverage(siteId, pestDate, pestDate, pageIndex, pageSize);
+            return getDayOrNightAveragePageable(siteId, pestDate, pestDate, pageIndex, pageSize);
         }
         return null;
     }
 
-    private PageResult<SysSensorRecStatisEntity> getDayOrNightAverage(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
+    private Map<String, Object> getDayOrNightAverage(String siteId, String startDate, String endDate) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("siteId", siteId);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+
+        List<SysSensorRecStatisEntity> result = sysSensorRecStatisMapper.findAllBySiteIdDaily(params);
+
+        List<SysSensorRecStatisEntity> tempList;
+
+        Map<String, Object> map = new HashMap<>();
+
+        String[] date = new String[result.size()];
+        double[] windSpeed = new double[result.size()];
+        double[] windDirection = new double[result.size()];
+        double[] humidityDay = new double[result.size()];
+        double[] humidityNight = new double[result.size()];
+        double[] temperatureDay = new double[result.size()];
+        double[] temperatureNight = new double[result.size()];
+        double[] noisy = new double[result.size()];
+        double[] PM10 = new double[result.size()];
+        double[] PM25 = new double[result.size()];
+        double[] atmos = new double[result.size()];
+
+        map.put("date", date);
+        map.put("windSpeed", windSpeed);
+        map.put("windDirection", windDirection);
+        map.put("humidityDay", humidityDay);
+        map.put("humidityNight", humidityNight);
+        map.put("temperatureDay", temperatureDay);
+        map.put("temperatureNight", temperatureNight);
+        map.put("noisy", noisy);
+        map.put("PM10", PM10);
+        map.put("PM25", PM25);
+        map.put("atmos", atmos);
+
+        for (int i = 0; i < result.size(); i++) {
+            SysSensorRecStatisEntity entity = result.get(i);
+
+            params.clear();
+            params.put("siteId", siteId);
+            params.put("startDate", entity.getDate());
+            params.put("endDate", entity.getDate());
+
+            date[i] = entity.getDate();
+            windSpeed[i] = entity.getWindSpeed();
+            windDirection[i] = entity.getWindDirection();
+            noisy[i] = entity.getHumidity();
+            PM10[i] = entity.getHumidity();
+            PM25[i] = entity.getHumidity();
+            atmos[i] = entity.getHumidity();
+
+            tempList = sysSensorRecStatisMapper.findAllBySiteIdDailyDay(params);
+            if (!tempList.isEmpty()) {
+                humidityDay[i] = tempList.get(0).getHumidity();
+                temperatureDay[i] = tempList.get(0).getTemperature();
+            }
+
+            tempList = sysSensorRecStatisMapper.findAllBySiteIdDailyNight(params);
+            if (!tempList.isEmpty()) {
+                humidityNight[i] = tempList.get(0).getHumidity();
+                temperatureNight[i] = tempList.get(0).getTemperature();
+            }
+        }
+        return map;
+    }
+
+    private PageResult<SysSensorRecStatisEntity> getDayOrNightAveragePageable(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
         params.put("startDate", startDate);

@@ -7,6 +7,7 @@ import com.aiot.aiotbackstage.service.IFourQingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -43,6 +44,7 @@ public class FourQingController {
     @ApiOperation(value = "虫情动态上报(新增insectRecReport)", notes = "虫情动态上报(insectRecReport)")
     @ResponseBody
     @PostMapping("/insectRecReport")
+    @RequiresPermissions("insectRecReport:add")
     public Result insectRecReport(@RequestBody @Validated InsectRecReportParam recReportParam
                                   ) {
         fourQingService.insectRecReport(recReportParam);
@@ -55,6 +57,7 @@ public class FourQingController {
     @ApiOperation(value = "虫情动态上报(修改insectRecReport)", notes = "虫情动态上报(insectRecReport)")
     @ResponseBody
     @PutMapping("/insectRecReport")
+    @RequiresPermissions("insectRecReport:update")
     public Result insectRecReportModify(@RequestBody @Validated InsectRecReportParam recReportParam
     ) {
         fourQingService.insectRecReportModify(recReportParam);
@@ -67,6 +70,7 @@ public class FourQingController {
     @ApiOperation(value = "虫情动态上报审核", notes = "虫情动态上报审核")
     @ResponseBody
     @PutMapping("/examine")
+    @RequiresPermissions("insectRecReport:examine")
     public Result examine(@RequestParam Long id
     ) {
         fourQingService.examine(id);
