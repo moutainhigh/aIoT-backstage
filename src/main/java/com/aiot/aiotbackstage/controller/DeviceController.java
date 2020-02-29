@@ -3,6 +3,7 @@ package com.aiot.aiotbackstage.controller;
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.util.DateUtils;
+import com.aiot.aiotbackstage.model.param.DeviceInfoNewParam;
 import com.aiot.aiotbackstage.model.param.DeviceInfoOldParam;
 import com.aiot.aiotbackstage.model.param.DeviceInfoParam;
 import com.aiot.aiotbackstage.service.IDeviceService;
@@ -41,12 +42,10 @@ public class DeviceController {
             @ApiResponse(code = 200,message = "成功")
     })
     @ResponseBody
-    @GetMapping("/deviceInfoNew")
-    public Result deviceInfoNew(@RequestParam Integer pageNumber,
-                                @RequestParam Integer pageSize,
-                                @RequestParam(required = false) Integer dimension
-    ) {
-        return Result.success(deviceService.deviceInfoNew(pageNumber,pageSize,dimension));
+    @PostMapping("/deviceInfoNew")
+    public Result deviceInfoNew(@RequestBody DeviceInfoNewParam param
+                                ) {
+        return Result.success(deviceService.deviceInfoNew(param));
     }
 
     @ApiOperation(value = "实时设备编辑", notes = "实时设备编辑")

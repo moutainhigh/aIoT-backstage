@@ -33,7 +33,7 @@ public interface IEarlyWarningService {
 
     void earlyInfoExamine(Long id);
 
-    List<Map<String,Object>> earlyContent(String earlyType);
+    Map<String,Object> earlyContent(String earlyType,String earlyDegree);
 
     Integer earlyCount();
 

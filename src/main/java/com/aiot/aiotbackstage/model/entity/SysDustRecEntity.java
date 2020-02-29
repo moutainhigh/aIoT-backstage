@@ -60,15 +60,15 @@ public class SysDustRecEntity {
      */
     private Date time;
 
-    public SysDustRecEntity(Integer siteId, Integer depth, int[] datum, Date time) {
-        this.siteId = siteId;
-        this.depth = depth;
-        this.wc = Double.valueOf(datum[0]) / 100;
-        this.temperature = Double.valueOf(datum[1]) / 100;
-        this.ec = Double.valueOf(datum[2]);
-        this.salinity = Double.valueOf(datum[3]);
-        this.tds = Double.valueOf(datum[4]);
-        this.epsilon = Double.valueOf(datum[5]) / 100;
-        this.time = time;
-    }
+//    public SysDustRecEntity(Integer siteId, Integer depth, int[] datum, Date time) {
+//        this.siteId = siteId;
+//        this.depth = depth;
+//        this.wc = Double.valueOf(datum[0]) / 100;
+//        this.temperature = Double.valueOf(datum[1]) / 100;
+//        this.ec = Double.valueOf(datum[2]);
+//        this.salinity = Double.valueOf(datum[3]);
+//        this.tds = Double.valueOf(datum[4]);
+//        this.epsilon = Double.valueOf(datum[5]) / 100;
+//        this.time = time;
+//    }
 }

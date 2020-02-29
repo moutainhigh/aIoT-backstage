@@ -33,7 +33,17 @@ public class SysDeviceErrorRecEntity  {
     private Date startTime;
 
     private Date endTime;
+    private Date createTime;
+
+
 
     @TableField(exist = false)
     private String duration;
+
+    @TableField(exist = false)
+    private String siteName;
+
+    @TableField(exist = false)
+    private String deviceName;
+
 }

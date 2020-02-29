@@ -3,7 +3,12 @@ package com.aiot.aiotbackstage.service.impl;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.mapper.SysDeviceErrorRecMapper;
+import com.aiot.aiotbackstage.mapper.SysInsectInfoMapper;
+import com.aiot.aiotbackstage.mapper.SysSiteMapper;
 import com.aiot.aiotbackstage.model.entity.SysDeviceErrorRecEntity;
+import com.aiot.aiotbackstage.model.entity.SysInsectInfoEntity;
+import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
+import com.aiot.aiotbackstage.model.param.DeviceInfoNewParam;
 import com.aiot.aiotbackstage.model.param.DeviceInfoOldParam;
 import com.aiot.aiotbackstage.model.param.DeviceInfoParam;
 import com.aiot.aiotbackstage.model.param.PageParam;
@@ -31,34 +36,50 @@ public class DeviceServiceImpl implements IDeviceService {
     @Autowired
     private SysDeviceErrorRecMapper errorRecMapper;
 
+    @Autowired
+    private SysSiteMapper siteMapper;
+
     @Override
-    public PageResult<SysDeviceErrorRecEntity> deviceInfoNew(Integer pageNumber, Integer pageSize, Integer dimension) {
+    public PageResult<SysDeviceErrorRecEntity> deviceInfoNew(DeviceInfoNewParam param) {
 
         PageParam pageParam=new PageParam();
-        pageParam.setPageNumber(pageNumber);
-        pageParam.setPageSize(pageSize);
+        pageParam.setPageNumber(param.getPageNumber());
+        pageParam.setPageSize(param.getPageSize());
 
         List<SysDeviceErrorRecEntity> sysDeviceErrorRecEntities;
         Integer total;
-        if(dimension == 1){
-            sysDeviceErrorRecEntities = errorRecMapper.deviceErrorRecNewYearPage(pageParam);
-            total= errorRecMapper.countYear();
+        if(param.getDimension() == 1){
+            sysDeviceErrorRecEntities = errorRecMapper.deviceErrorRecNewYearPage(param);
+            total= errorRecMapper.countYear(param);
         }else{
-            sysDeviceErrorRecEntities = errorRecMapper.deviceErrorRecNewYuePage(pageParam);
-            total= errorRecMapper.countYue();
+            sysDeviceErrorRecEntities = errorRecMapper.deviceErrorRecNewYuePage(param);
+            total= errorRecMapper.countYue(param);
         }
         if(CollectionUtils.isEmpty(sysDeviceErrorRecEntities)){
             throw new MyException(ResultStatusCode.NO_RESULT);
         }
         sysDeviceErrorRecEntities.stream().forEach(sysDeviceErrorRecEntity -> {
             long startTime = sysDeviceErrorRecEntity.getStartTime().getTime();
-            if(sysDeviceErrorRecEntity.getEndTime() == null){
+            if(sysDeviceErrorRecEntity.getEndTime() != null ){
                 long endTime = sysDeviceErrorRecEntity.getEndTime().getTime();
                 long ss=(startTime-endTime)/(1000); //共计秒数
                 int MM = (int)ss/60;   //共计分钟数
                 int hh=(int)ss/3600;  //共计小时数
                 int dd=(int)hh/24;   //共计天数
-                sysDeviceErrorRecEntity.setDuration(dd+"天 "+hh+" 小时 "+MM+" 分钟"+ss+" 秒");
+                if(hh == 0){
+                    sysDeviceErrorRecEntity.setDuration(MM+" 分钟");
+                }else{
+                    sysDeviceErrorRecEntity.setDuration(hh+" 小时 "+MM+" 分钟");
+                }
+            }
+            SysSiteEntity siteEntity = siteMapper.selectById(sysDeviceErrorRecEntity.getSiteId());
+            sysDeviceErrorRecEntity.setSiteName(siteEntity.getName());
+            if(sysDeviceErrorRecEntity.getDeviceType().equals("RTU")){
+                sysDeviceErrorRecEntity.setDeviceName("RTU");
+            }else if(sysDeviceErrorRecEntity.getDeviceType().equals("CAMERA")){
+                sysDeviceErrorRecEntity.setDeviceName("摄像头");
+            }else{
+                sysDeviceErrorRecEntity.setDeviceName("虫情测报灯");
             }
         });
         return PageResult.<SysDeviceErrorRecEntity>builder()
@@ -85,12 +106,24 @@ public class DeviceServiceImpl implements IDeviceService {
         PageParam pageParam=new PageParam();
         pageParam.setPageNumber(param.getPageNumber());
         pageParam.setPageSize(param.getPageSize());
-        List<SysDeviceErrorRecEntity> sysDeviceErrorRecEntities = errorRecMapper.deviceErrorRecOldPage(param.getStartDate(), param.getEndDate(), pageParam);
-        Integer total = errorRecMapper.countOld(param.getStartDate(), param.getEndDate());
+        List<SysDeviceErrorRecEntity> sysDeviceErrorRecEntities = errorRecMapper.deviceErrorRecOldPage(param);
+        Integer total = errorRecMapper.countOld(param);
 
         if(CollectionUtils.isEmpty(sysDeviceErrorRecEntities)){
             throw new MyException(ResultStatusCode.NO_RESULT);
         }
+
+        sysDeviceErrorRecEntities.stream().forEach(sysDeviceErrorRecEntity -> {
+            SysSiteEntity siteEntity = siteMapper.selectById(sysDeviceErrorRecEntity.getSiteId());
+            sysDeviceErrorRecEntity.setSiteName(siteEntity.getName());
+            if(sysDeviceErrorRecEntity.getDeviceType().equals("RTU")){
+                sysDeviceErrorRecEntity.setDeviceName("RTU");
+            }else if(sysDeviceErrorRecEntity.getDeviceType().equals("CAMERA")){
+                sysDeviceErrorRecEntity.setDeviceName("摄像头");
+            }else{
+                sysDeviceErrorRecEntity.setDeviceName("虫情测报灯");
+            }
+        });
         return PageResult.<SysDeviceErrorRecEntity>builder()
                 .total(total)
                 .pageData(sysDeviceErrorRecEntities)
@@ -113,6 +146,7 @@ public class DeviceServiceImpl implements IDeviceService {
         errorRecEntity.setSubType(null);
         errorRecEntity.setStartTime(param.getStartTime());
         errorRecEntity.setEndTime(param.getEndTime());
+        errorRecEntity.setCreateTime(new Date());
         errorRecMapper.updateById(errorRecEntity);
 
     }
