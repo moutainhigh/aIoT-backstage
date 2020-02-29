@@ -47,6 +47,9 @@ public class DataController {
     @Autowired
     private SysDisasterSituationServiceImpl sysDisasterSituationService;
 
+    @Autowired
+    private SysSeedlingGrowthServiceImpl sysSeedlingGrowthService;
+
     @RequestMapping(value = "/insectDevice", method = RequestMethod.POST)
     public Result insectDevice(@RequestBody Map data) {
         log.error("time:{}, received:{}", System.currentTimeMillis(), data);
@@ -445,6 +448,51 @@ public class DataController {
             }
         }
         return Result.success(sysDisasterSituationService.getAll(startDate, endDate, pageIndex, pageSize));
+    }
+
+    @ApiOperation(value = "苗情查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate"),
+            @ApiImplicitParam(name = "页码", value = "pageNumber"),
+            @ApiImplicitParam(name = "分页大小", value = "pageSize"),
+    })
+    @PostMapping("seed")
+    public Result seed(@RequestBody Map<String, Object> params) {
+        int pageSize;
+        int pageIndex;
+        if (!params.containsKey("pageSize")) {
+            pageSize = Constants.Page.PAGE_SIZE;
+        } else {
+            pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+            if (pageSize > Constants.Page.MAX_PAGE_SIZE) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        if (!params.containsKey("pageNumber")) {
+            pageIndex = 1;
+        } else {
+            pageIndex = Integer.parseInt(String.valueOf(params.get("pageNumber")));
+            if (pageIndex <= 0) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        return Result.success(sysSeedlingGrowthService.getAll(startDate, endDate, pageIndex, pageSize));
     }
 
     @PostMapping("statis")
