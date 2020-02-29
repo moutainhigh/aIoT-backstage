@@ -116,9 +116,9 @@ public class EarlyWarningController {
     @ApiOperation(value = "预警规则内容获取(earlyContent)", notes = "预警内容获取(earlyContent)")
     @ResponseBody
     @GetMapping("/earlyContent")
-    public Result earlyContent(@RequestParam String earlyType
+    public Result earlyContent(@RequestParam String earlyType,@RequestParam String earlyDegree
     ) {
-        return Result.success(iEarlyWarningService.earlyContent(earlyType));
+        return Result.success(iEarlyWarningService.earlyContent(earlyType,earlyDegree));
     }
 
     @ApiOperation(value = "预警数量提示(earlyCount)", notes = "预警数量提示(earlyCount)")

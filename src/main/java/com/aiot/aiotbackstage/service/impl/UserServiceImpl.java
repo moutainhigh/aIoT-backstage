@@ -435,12 +435,15 @@ public class UserServiceImpl implements IUserService {
                 cal.add(Calendar.DATE, 1);
                 Date time = cal.getTime();
                 sdate=time;
-                deviceErrorRecEntity.setStartTime(sdate);
+                deviceErrorRecEntity.setEndTime(sdate);
                 cal.setTime(sdate);
                 cal.add(Calendar.MINUTE,(int)(Math.random()*60));
                 Date time1 = cal.getTime();
-                deviceErrorRecEntity.setEndTime(time1);
+                deviceErrorRecEntity.setStartTime(time1);
+                deviceErrorRecEntity.setCreateTime(new Date());
                 deviceErrorRecMapper.insert(deviceErrorRecEntity);
+
+
 //                SysDustRecEntity dustRecEntity=new SysDustRecEntity();
 //                dustRecEntity.setDepth(10);
 //                dustRecEntity.setEc(Double.parseDouble(df.format( Math.random()*40)));
@@ -449,7 +452,7 @@ public class UserServiceImpl implements IUserService {
 //                dustRecEntity.setSiteId((int)(Math.random()*8)+1);
 //                Calendar cal = Calendar.getInstance();
 //                cal.setTime(sdate);
-//                cal.add(Calendar.HOUR, 1);
+//                cal.add(Calendar.MINUTE, 5);
 //                Date time = cal.getTime();
 //                sdate=time;
 //                dustRecEntity.setTime(sdate);
@@ -457,7 +460,7 @@ public class UserServiceImpl implements IUserService {
 //                dustRecEntity.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
 //                dustRecEntity.setWc(Double.parseDouble(df.format( Math.random()*40)));
 //                dustRecMapper.insert(dustRecEntity);
-//
+////
 //                SysDustRecEntity dustRecEntity1=new SysDustRecEntity();
 //                dustRecEntity1.setDepth(20);
 //                dustRecEntity1.setEc(Double.parseDouble(df.format( Math.random()*40)));
@@ -469,7 +472,7 @@ public class UserServiceImpl implements IUserService {
 //                dustRecEntity1.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
 //                dustRecEntity1.setWc(Double.parseDouble(df.format( Math.random()*40)));
 //                dustRecMapper.insert(dustRecEntity1);
-//
+////
 //                SysDustRecEntity dustRecEntity2=new SysDustRecEntity();
 //                dustRecEntity2.setDepth(40);
 //                dustRecEntity2.setEc(Double.parseDouble(df.format( Math.random()*40)));

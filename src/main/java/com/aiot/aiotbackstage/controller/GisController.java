@@ -32,7 +32,7 @@ public class GisController {
     @Autowired
     private SysInsectRecStatisServiceImpl sysInsectRecStatisService;
 
-    @ApiOperation(value = "站点数据接口(stationInfo)", notes = "站点数据接口(stationInfo)")
+    @ApiOperation(value = "站点数据接口GIS(stationInfo)", notes = "站点数据接口(stationInfo)")
     @ApiResponses({
             @ApiResponse(code = 200, message = "成功")
     })
@@ -41,6 +41,17 @@ public class GisController {
     public Result stationInfo(
     ) {
         return Result.success(iGisService.stationInfo());
+    }
+
+    @ApiOperation(value = "站点数据接口(stationData)", notes = "站点数据接口(stationData)")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "成功")
+    })
+    @ResponseBody
+    @GetMapping("/stationData")
+    public Result stationData(
+    ) {
+        return Result.success(iGisService.stationData());
     }
 
     @ApiOperation(value = "苗情(seedlingGrowth)注意：该接口只用于GIS", notes = "苗情(seedlingGrowth)")

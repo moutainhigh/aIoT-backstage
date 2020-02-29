@@ -24,4 +24,6 @@ public interface IGisService {
     PageResult<SysSeedlingGrowthEntity> getSeedlingGrowth(PageParam pageParam);
 
     PageResult<SysDisasterSituationEntity> getDisasterSituation(PageParam pageParam);
+
+    List<SysSiteEntity> stationData();
 }

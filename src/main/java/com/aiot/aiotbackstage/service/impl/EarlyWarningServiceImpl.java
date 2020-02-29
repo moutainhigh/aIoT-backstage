@@ -176,30 +176,34 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
     }
 
     @Override
-    public List<Map<String,Object>> earlyContent(String earlyType) {
+    public  Map<String,Object> earlyContent(String earlyType , String earlyDegree) {
 
-        List<Map<String,Object>> mapList=new ArrayList<>();
+//        List<Map<String,Object>> mapList=new ArrayList<>();
         List<SysWarnRuleEntity> warnRuleEntity = warnRuleMapper
                 .selectList(Wrappers.<SysWarnRuleEntity>lambdaQuery()
-                        .eq(SysWarnRuleEntity::getEarlyType, earlyType));
+                        .eq(SysWarnRuleEntity::getEarlyType, earlyType)
+                        .eq(SysWarnRuleEntity::getEarlyDegree,earlyDegree));
         if(ObjectUtils.isEmpty(warnRuleEntity)){
             throw new MyException(ResultStatusCode.EARLY_WARNING_NO_EXIT);
         }
-        Map<String, List<SysWarnRuleEntity>> collect = warnRuleEntity.stream()
-                .collect(Collectors.groupingBy(SysWarnRuleEntity::getEarlyName, Collectors.toList()));
-        Set<String> strings = collect.keySet();
-        strings.forEach(s -> {
-            Map<String,Object> map=new HashMap<>();
-            map.put("earlyName",s);
-            List<String> list=new ArrayList<>();
-            List<SysWarnRuleEntity> ruleEntityList = collect.get(s);
-            ruleEntityList.forEach(sysWarnRuleEntity -> {
-                list.add(sysWarnRuleEntity.getEarlyContent());
-            });
-            map.put("earlyContent",list);
-            mapList.add(map);
-        });
-        return mapList;
+//        Map<String, List<SysWarnRuleEntity>> collect = warnRuleEntity.stream()
+//                .collect(Collectors.groupingBy(SysWarnRuleEntity::getEarlyName, Collectors.toList()));
+//        Set<String> strings = collect.keySet();
+//        strings.forEach(s -> {
+//            Map<String,Object> map=new HashMap<>();
+//            map.put("earlyName",s);
+//            List<String> list=new ArrayList<>();
+//            List<SysWarnRuleEntity> ruleEntityList = collect.get(s);
+//            ruleEntityList.forEach(sysWarnRuleEntity -> {
+//                list.add(sysWarnRuleEntity.getEarlyContent());
+//            });
+//            map.put("earlyContent",list);
+//            mapList.add(map);
+//        });
+        Map<String,Object> map=new HashMap<>();
+        map.put("earlyName",warnRuleEntity.get(0).getEarlyName());
+        map.put("earlyContent",warnRuleEntity.get(0).getEarlyContent());
+        return map;
     }
 
     @Override
@@ -276,11 +280,11 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
             resultMap.put("PM10","PM10");
             resultMap.put("atmos","大气压");
             list.add(resultMap);
-        }else{
+        }else if(type == 4){
             Map resultMap=new HashMap();
-            resultMap.put("10cm","深度");
-            resultMap.put("20cm","深度");
-            resultMap.put("40cm","深度");
+            resultMap.put("deep1","10cm");
+            resultMap.put("deep2","20cm");
+            resultMap.put("deep3","40cm");
             list.add(resultMap);
             Map resultMap1=new HashMap();
             resultMap1.put("wc","含水率");

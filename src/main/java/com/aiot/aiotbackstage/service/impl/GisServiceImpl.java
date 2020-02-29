@@ -179,4 +179,13 @@ public class GisServiceImpl implements IGisService {
                 .pageSize(pageParam.getPageSize())
                 .build();
     }
+
+    @Override
+    public List<SysSiteEntity> stationData() {
+        List<SysSiteEntity> gisStationEntities = siteMapper.selectList(null);
+        if(CollectionUtils.isEmpty(gisStationEntities)){
+            throw new MyException(ResultStatusCode.GIS_NO_EXIT);
+        }
+        return gisStationEntities;
+    }
 }
