@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -56,6 +57,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private SysUserRoleMapper roleUserMapper;
+
+    @Autowired
+    private SysDustRecMapper dustRecMapper;
 
     @Autowired
     private SysMenuMapper sysMenuMapper;
@@ -200,8 +204,7 @@ public class UserServiceImpl implements IUserService {
         checkUserInfo(userParam);
         SysUserEntity userEntity=new SysUserEntity();
         userEntity.setUserName(userParam.getUserName());
-        String encryptedPassword = MD5Utils.encrypt(userParam.getPassword());
-        userEntity.setPassword(encryptedPassword);
+        userEntity.setPassword(userParam.getPassword());
         userEntity.setLoginType(2);
         userEntity.setCreateTime(new Date());
         userEntity.setUpdateTime(new Date());
@@ -256,16 +259,16 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void delUser(UserParam userParam) {
-        SysUserEntity phoneEntity = SysUserEntity.builder().userId(userParam.getUserId()).build();
+    public void delUser(Long id) {
+        SysUserEntity phoneEntity = SysUserEntity.builder().userId(id).build();
         if (ObjectUtils.isEmpty(phoneEntity)) {
             throw new MyException(ResultStatusCode.USER_HAS_NO_EXISTED);
         }
         //删除该用户
-        userMapper.deleteById(userParam.getUserId());
+        userMapper.deleteById(id);
         //删除该用户对应的角色数据
         userRoleMapper.delete(Wrappers.<SysUserRoleEntity>lambdaQuery()
-                .eq(SysUserRoleEntity::getUserId,userParam.getUserId()));
+                .eq(SysUserRoleEntity::getUserId,id));
     }
 
     @Override
@@ -402,23 +405,59 @@ public class UserServiceImpl implements IUserService {
 //            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //            log.info("1---------{}",formatter.format(sdate));
             while (sdate.before(edate)) {
-//                DecimalFormat df = new DecimalFormat( "0.00" );
+                DecimalFormat df = new DecimalFormat( "0.00" );
                 // sdate=每加五分钟的值
                 // sdate = +5m
                 // 执行插入语句，建议批量提交事物
-                SysInsectRecEntity insectRecEntity=new SysInsectRecEntity();
-                insectRecEntity.setDeviceId((int)(Math.random()*14)+1);
-                insectRecEntity.setImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
-                insectRecEntity.setResultImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
-                insectRecEntity.setResult(((int)(Math.random()*262))+","+((int)(Math.random()*100))
-                        +"#"+((int)(Math.random()*262))+","+((int)(Math.random()*100)));
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(sdate);
-                cal.add(Calendar.HOUR, 1);
-                Date time = cal.getTime();
-                insectRecEntity.setTime(time);
-                sdate=time;
-                insectRecMapper.insert(insectRecEntity);
+//                SysInsectRecEntity insectRecEntity=new SysInsectRecEntity();
+//                insectRecEntity.setDeviceId((int)(Math.random()*14)+1);
+//                insectRecEntity.setImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
+//                insectRecEntity.setResultImage("https://aiot-obs.obs.cn-north-4.myhuaweicloud.com/菜青虫.jpg");
+//                insectRecEntity.setResult(((int)(Math.random()*262))+","+((int)(Math.random()*100))
+//                        +"#"+((int)(Math.random()*262))+","+((int)(Math.random()*100)));
+//
+//                insectRecMapper.insert(insectRecEntity);
+
+                SysDustRecEntity dustRecEntity=new SysDustRecEntity();
+//                dustRecEntity.setDepth(10);
+//                dustRecEntity.setEc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setSalinity(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setSiteId((int)(Math.random()*8)+1);
+//                Calendar cal = Calendar.getInstance();
+//                cal.setTime(sdate);
+//                cal.add(Calendar.HOUR, 1);
+//                Date time = cal.getTime();
+//                sdate=time;
+//                dustRecEntity.setTime(sdate);
+//                dustRecEntity.setTds(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setWc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecMapper.insert(dustRecEntity);
+//
+//                SysDustRecEntity dustRecEntity1=new SysDustRecEntity();
+//                dustRecEntity1.setDepth(20);
+//                dustRecEntity1.setEc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setSalinity(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setSiteId((int)(Math.random()*8)+1);
+//                dustRecEntity1.setTime(sdate);
+//                dustRecEntity1.setTds(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setWc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecMapper.insert(dustRecEntity1);
+//
+//                SysDustRecEntity dustRecEntity2=new SysDustRecEntity();
+//                dustRecEntity2.setDepth(40);
+//                dustRecEntity2.setEc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setSalinity(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setSiteId((int)(Math.random()*8)+1);
+//                dustRecEntity2.setTime(sdate);
+//                dustRecEntity2.setTds(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setWc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecMapper.insert(dustRecEntity2);
 
 //                SysSensorRecEntity dustRec=new SysSensorRecEntity();
 //                dustRec.setSiteId((int)(Math.random()*8)+1);

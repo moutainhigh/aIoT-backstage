@@ -41,7 +41,7 @@ public interface IUserService {
 
     PageResult<SysUserEntity> userPage(PageParam param);
 
-    void delUser(UserParam userParam);
+    void delUser(Long id);
 
     void isToken(String token);
 

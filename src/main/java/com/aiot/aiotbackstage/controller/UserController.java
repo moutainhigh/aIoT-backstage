@@ -119,13 +119,12 @@ public class UserController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "成功")
     })
-    @DeleteMapping("/delUser")
+    @DeleteMapping("/delUser/{id}")
     @ResponseBody
     @RequiresPermissions("saveUser:delete")
-    public Result delUser(@RequestBody @ApiParam(name="修改用户数据",value="传入json格式",required=true)
-                              @Validated        UserParam userParam){
+    public Result delUser(@PathVariable Long id){
 
-        iUserService.delUser(userParam);
+        iUserService.delUser(id);
         return Result.success();
     }
 
