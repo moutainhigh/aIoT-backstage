@@ -180,6 +180,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private SysInsectRecMapper insectRecMapper;
+
+    @Autowired
+    private SysDeviceErrorRecMapper deviceErrorRecMapper;
 //    private SysSensorRecMapper sensorRecMapper;
     @Override
     public void test() {
@@ -281,9 +284,15 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public List<Map<String,Object>> permissionInfo(){
+    public List<Map<String,Object>> permissionInfo(String token){
+
+        Long userId = jwtUtil.getUserIdByToken(token);
+        List<SysUserRoleEntity> sysUserRoleEntities = roleUserMapper
+                .selectList(Wrappers.<SysUserRoleEntity>lambdaQuery()
+                        .eq(SysUserRoleEntity::getUserId, userId));
+        List<Long> rootIds = sysUserRoleEntities.stream().map(SysUserRoleEntity::getRoleId).collect(Collectors.toList());
+        List<SysRoleEntity> roles = roleMapper.selectBatchIds(rootIds);
         List<Map<String,Object>> permissions=new ArrayList<>();
-        List<SysRoleEntity> roles = roleMapper.selectList(null);
         if(roles.size()>0) {
             for(SysRoleEntity role : roles) {
                 Map<String,Object> map=new HashMap<>();
@@ -417,8 +426,22 @@ public class UserServiceImpl implements IUserService {
 //                        +"#"+((int)(Math.random()*262))+","+((int)(Math.random()*100)));
 //
 //                insectRecMapper.insert(insectRecEntity);
-
-                SysDustRecEntity dustRecEntity=new SysDustRecEntity();
+                SysDeviceErrorRecEntity deviceErrorRecEntity=new SysDeviceErrorRecEntity();
+                deviceErrorRecEntity.setSiteId((int)(Math.random()*8)+1);
+                deviceErrorRecEntity.setDeviceType("InsectDevice");
+                deviceErrorRecEntity.setSubType("zhan-wei");
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(sdate);
+                cal.add(Calendar.DATE, 1);
+                Date time = cal.getTime();
+                sdate=time;
+                deviceErrorRecEntity.setStartTime(sdate);
+                cal.setTime(sdate);
+                cal.add(Calendar.MINUTE,(int)(Math.random()*60));
+                Date time1 = cal.getTime();
+                deviceErrorRecEntity.setEndTime(time1);
+                deviceErrorRecMapper.insert(deviceErrorRecEntity);
+//                SysDustRecEntity dustRecEntity=new SysDustRecEntity();
 //                dustRecEntity.setDepth(10);
 //                dustRecEntity.setEc(Double.parseDouble(df.format( Math.random()*40)));
 //                dustRecEntity.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));

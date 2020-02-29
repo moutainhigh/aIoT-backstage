@@ -29,6 +29,9 @@ public class SysSeedlingGrowthEntity {
     @TableField(value = "guid")
     private String guid;
 
+    @TableField(value = "url")
+    private String url;
+
     /**
      * 多光谱分析日期
      */

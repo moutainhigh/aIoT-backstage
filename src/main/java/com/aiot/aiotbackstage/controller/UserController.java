@@ -145,8 +145,8 @@ public class UserController {
     })
     @ResponseBody
     @GetMapping("/permissionInfo")
-    public Result permissionInfo(){
-        return Result.success(iUserService.permissionInfo());
+    public Result permissionInfo(@RequestHeader String token){
+        return Result.success(iUserService.permissionInfo(token));
     }
 
 }

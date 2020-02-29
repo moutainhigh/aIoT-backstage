@@ -64,7 +64,7 @@ public class GisController {
     @ApiOperation(value = "传感器数据接口：该接口只用于GIS", notes = "传感器数据接口")
     @ResponseBody
     @PostMapping("/sensorInfo")
-    public Result sensorInfo(@RequestParam Long stationId
+    public Result sensorInfo(@RequestParam Integer stationId
     ) {
         return Result.success(iGisService.sensorInfo(stationId));
     }

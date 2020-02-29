@@ -53,6 +53,10 @@ public class GisServiceImpl implements IGisService {
         if(CollectionUtils.isEmpty(gisStationEntities)){
             throw new MyException(ResultStatusCode.GIS_NO_EXIT);
         }
+        gisStationEntities.forEach(sysSiteEntity -> {
+            SensorInfoVo sensorInfoVo = sensorInfo(sysSiteEntity.getId());
+            sysSiteEntity.setInfoVo(sensorInfoVo);
+        });
         return gisStationEntities;
     }
 
@@ -62,6 +66,7 @@ public class GisServiceImpl implements IGisService {
         seedlingGrowthEntity.setGuid(param.getID());
 //        seedlingGrowthEntity.setSiteId(siteId);
         seedlingGrowthEntity.setDate(param.getDate());
+        seedlingGrowthEntity.setUrl(param.getImage());
         seedlingGrowthEntity.setTotalArea(param.getTotalArea());
         seedlingGrowthEntity.setGood(param.getGood());
         seedlingGrowthEntity.setNormal(param.getNormal());
@@ -82,6 +87,7 @@ public class GisServiceImpl implements IGisService {
         SysDisasterSituationEntity disasterSituationEntity=new SysDisasterSituationEntity();
 //        disasterSituationEntity.setSiteId(siteId);
         disasterSituationEntity.setGuid(param.getID());
+        disasterSituationEntity.setUrl(param.getImage());
         disasterSituationEntity.setDate(param.getDate());
         disasterSituationEntity.setTotalArea(param.getTotalArea());
         disasterSituationEntity.setSerious(param.getSerious());
@@ -97,7 +103,7 @@ public class GisServiceImpl implements IGisService {
     }
 
     @Override
-    public SensorInfoVo sensorInfo(Long stationId) {
+    public SensorInfoVo sensorInfo(Integer stationId) {
 
         List<Map<String,String>> sensorRecVos=new ArrayList<>();
         List<Map<String,String>> dustRecVos=new ArrayList<>();

@@ -1,6 +1,8 @@
 package com.aiot.aiotbackstage.model.entity;
 
+import com.aiot.aiotbackstage.model.vo.SensorInfoVo;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -28,4 +30,7 @@ public class SysSiteEntity {
      * 基座大小
      */
     private String coordinate;
+
+    @TableField(exist = false)
+    private SensorInfoVo infoVo;
 }

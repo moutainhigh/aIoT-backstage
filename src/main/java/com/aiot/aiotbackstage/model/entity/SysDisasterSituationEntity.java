@@ -27,6 +27,9 @@ public class SysDisasterSituationEntity {
     @TableField(value = "guid")
     private String guid;
 
+    @TableField(value = "url")
+    private String url;
+
     /**
      * 多光谱分析日期
      */

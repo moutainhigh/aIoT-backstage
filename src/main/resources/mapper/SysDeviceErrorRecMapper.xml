@@ -12,4 +12,51 @@
     <sql id="Base_Column_List">
         id, site_id siteId, device_type deviceType, sub_type subType, start_time startTime, end_time endTime
     </sql>
+
+    <select id="deviceErrorRecOldPage" resultMap="BaseResultMap">
+        select  *  from sys_device_error_rec
+        <where>
+            <if test="startDate != null">AND start_time <![CDATA[>=]]> #{startDate}</if>
+            <if test="endDate != null">AND end_time <![CDATA[<=]]>#{endDate}</if>
+        </where>
+        ORDER BY start_time DESC
+        LIMIT #{pageParam.offset},#{pageParam.pageSize}
+    </select>
+
+    <select id="countOld" resultType="java.lang.Integer">
+        select  count(*)  from sys_device_error_rec
+        <where>
+            <if test="startDate != null">AND start_time <![CDATA[>=]]> #{startDate}</if>
+            <if test="endDate != null">AND end_time <![CDATA[<=]]>#{endDate}</if>
+        </where>
+    </select>
+
+    <select id="deviceErrorRecNewYearPage" resultMap="BaseResultMap">
+        select *
+        from sys_device_error_rec
+        where start_time > date_sub(curdate(), interval 12 month)
+        ORDER BY start_time DESC
+        LIMIT #{pageParam.offset},#{pageParam.pageSize}
+    </select>
+
+    <select id="countYear" resultType="java.lang.Integer">
+        select count(*)
+        from sys_device_error_rec
+        where start_time > date_sub(curdate(), interval 12 month)
+    </select>
+
+    <select id="countYue" resultType="java.lang.Integer">
+        select count(*)
+        from sys_device_error_rec
+        where start_time > date_sub(curdate(), interval 1 month)
+    </select>
+
+
+    <select id="deviceErrorRecNewYuePage" resultMap="BaseResultMap">
+        select *
+        from sys_device_error_rec
+        where start_time > date_sub(curdate(), interval 1 month)
+        ORDER BY start_time DESC
+        LIMIT #{pageParam.offset},#{pageParam.pageSize}
+    </select>
 </mapper>

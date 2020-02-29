@@ -63,7 +63,7 @@
         LEFT JOIN sys_insect_device b ON
         s.device_id=b.imei
         WHERE
-        b.site_id = #{site_id,jdbcType=BIGINT}
+        b.site_id = #{site_id,jdbcType=INTEGER}
         ORDER BY
         ABS( NOW( ) - s.time ) ASC
         LIMIT 1

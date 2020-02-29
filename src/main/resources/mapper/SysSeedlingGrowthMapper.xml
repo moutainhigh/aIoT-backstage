@@ -7,6 +7,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="site_id" jdbcType="BIGINT" property="siteId" />
     <result column="guid" jdbcType="VARCHAR" property="guid" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
     <result column="date" jdbcType="TIMESTAMP" property="date" />
     <result column="total_area" jdbcType="DECIMAL" property="totalArea" />
     <result column="good" jdbcType="DECIMAL" property="good" />
@@ -17,7 +18,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, guid, `date`, total_area, good, normal, sub_health, unhealthy, create_time
+    id, guid, `date`,url, total_area, good, normal, sub_health, unhealthy, create_time
   </sql>
 
   <select id="seedingGrowthPage" resultMap="BaseResultMap">

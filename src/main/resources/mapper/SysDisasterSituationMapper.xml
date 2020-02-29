@@ -7,6 +7,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="site_id" jdbcType="BIGINT" property="siteId" />
     <result column="guid" jdbcType="VARCHAR" property="guid" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
     <result column="date" jdbcType="TIMESTAMP" property="date" />
     <result column="total_area" jdbcType="DECIMAL" property="totalArea" />
     <result column="serious" jdbcType="DECIMAL" property="serious" />
@@ -16,7 +17,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, guid, `date`, total_area, serious, medium, normal, create_time
+    id, guid, `date`, url,total_area, serious, medium, normal, create_time
   </sql>
 
   <select id="disasterSituationPage" resultMap="BaseResultMap">
