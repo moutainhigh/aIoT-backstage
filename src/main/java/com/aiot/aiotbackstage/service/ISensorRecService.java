@@ -15,5 +15,6 @@ public interface ISensorRecService extends IService<SysSensorRecEntity> {
      */
     void receive(RtuData rtuData);
 
+    Object getStatByTime(String time);
 }
 

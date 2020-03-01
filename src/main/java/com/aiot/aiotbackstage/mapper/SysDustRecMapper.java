@@ -2,6 +2,7 @@ package com.aiot.aiotbackstage.mapper;
 
 import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysDustRecStatisEntity;
+import com.aiot.aiotbackstage.model.vo.SysDustRecVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,5 +22,5 @@ public interface SysDustRecMapper extends BaseMapper<SysDustRecEntity> {
      */
     List<SysDustRecStatisEntity> findAllAverageHourly(Map<String, Object> params);
 
-    List<SysDustRecEntity> findByTimeGroupByDepth(@Param("siteId") String siteId, @Param("time") String time);
+    List<SysDustRecVo> findByTimeGroupByDepth(String time);
 }

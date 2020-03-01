@@ -12,17 +12,19 @@ import java.util.Date;
 @Data
 public class SysSensorRecVo {
 
-    private Date  time;
+    private Date time;
 
-    private  String  humidity;
+    private String humidity;
 
-    private  String  temperature;
+    private String temperature;
 
-    private  String  noisy;
+    private String noisy;
 
-    private  String  PM10;
+    private String PM10;
 
-    private  String  PM25;
+    private String PM25;
 
-    private  String  atmos;
+    private String atmos;
+
+    private String siteName;
 }

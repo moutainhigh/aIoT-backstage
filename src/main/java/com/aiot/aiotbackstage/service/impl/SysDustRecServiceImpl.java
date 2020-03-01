@@ -2,10 +2,12 @@ package com.aiot.aiotbackstage.service.impl;
 
 import com.aiot.aiotbackstage.mapper.SysDustRecMapper;
 import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
+import com.aiot.aiotbackstage.model.vo.SysDustRecVo;
 import com.aiot.aiotbackstage.service.ISysDustRecService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,38 +17,56 @@ public class SysDustRecServiceImpl extends ServiceImpl<SysDustRecMapper, SysDust
         implements ISysDustRecService {
 
     @Override
-    public Map<Integer, Object> getStatByTime(String siteId, String time) {
-        List<SysDustRecEntity> result = baseMapper.findByTimeGroupByDepth(siteId, time);
+    public Map<Integer, Map<String, Object>> getStatByTime(String time) {
+        List<SysDustRecVo> result = baseMapper.findByTimeGroupByDepth(time);
 
-        Map<Integer, Object> map = new HashMap<>();
+        Map<Integer, List<SysDustRecVo>> tempMap = new HashMap<>();
 
-        Map<String, Object> tempMap;
-        for (int i = 0; i < result.size(); i++) {
-            SysDustRecEntity item = result.get(i);
-
-            String[] x = new String[6];
-            Double[] y = new Double[6];
-
-            x[0] = "含水率";
-            x[1] = "温度";
-            x[2] = "导电率";
-            x[3] = "盐度";
-            x[4] = "总溶解固体";
-            x[5] = "介电常数";
-
-            y[0] = item.getWc();
-            y[1] = item.getTemperature();
-            y[2] = item.getEc();
-            y[3] = item.getSalinity();
-            y[4] = item.getTds();
-            y[5] = item.getEpsilon();
-
-            tempMap = new HashMap<>();
-            tempMap.put("x", x);
-            tempMap.put("y", y);
-
-            map.put(item.getDepth(), tempMap);
+        List<SysDustRecVo> tempList;
+        for (SysDustRecVo item : result) {
+            if (!tempMap.containsKey(item.getDepth())) {
+                tempList = new ArrayList<>();
+                tempMap.put(item.getDepth(), tempList);
+            } else {
+                tempList = tempMap.get(item.getDepth());
+            }
+            tempList.add(item);
         }
+
+        Map<Integer, Map<String, Object>> map = new HashMap<>();
+
+        Map<String, Object> tempMap2;
+        for (Map.Entry<Integer, List<SysDustRecVo>> entry : tempMap.entrySet()) {
+            tempMap2 = new HashMap<>();
+            map.put(entry.getKey(), tempMap2);
+
+            List<String> siteNameList = new ArrayList<>();
+            List<Double> wcList = new ArrayList<>();
+            List<Double> temperatureList = new ArrayList<>();
+            List<Double> ecList = new ArrayList<>();
+            List<Double> salinityList = new ArrayList<>();
+            List<Double> tdsList = new ArrayList<>();
+            List<Double> epsilonList = new ArrayList<>();
+
+            tempMap2.put("siteName", siteNameList);
+            tempMap2.put("wc", wcList);
+            tempMap2.put("temperature", temperatureList);
+            tempMap2.put("ec", ecList);
+            tempMap2.put("salinity", salinityList);
+            tempMap2.put("tds", tdsList);
+            tempMap2.put("epsilon", epsilonList);
+
+            for (SysDustRecVo item : entry.getValue()) {
+                siteNameList.add(item.getSiteName());
+                wcList.add(item.getWc());
+                temperatureList.add(item.getTemperature());
+                ecList.add(item.getEc());
+                salinityList.add(item.getSalinity());
+                tdsList.add(item.getTds());
+                epsilonList.add(item.getEpsilon());
+            }
+        }
+
         return map;
     }
 }

@@ -10,6 +10,7 @@ import java.util.Date;
 
 /**
  * 风速/风向/百叶箱传感器数值记录实体
+ *
  * @author Avernus
  */
 @Data
@@ -37,6 +38,9 @@ public class SysSensorRecEntity {
      * 时间
      */
     private Date time;
+
+    public SysSensorRecEntity() {
+    }
 
     public SysSensorRecEntity(Integer siteId, String sensor, String value, Date time) {
         this.siteId = siteId;

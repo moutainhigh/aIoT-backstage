@@ -10,15 +10,19 @@ import com.aiot.aiotbackstage.model.dto.RtuData;
 import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
+import com.aiot.aiotbackstage.model.vo.SysSensorRecVo;
+import com.aiot.aiotbackstage.model.vo.SysSensorRecVo2;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.ISensorRecService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net.sf.jsqlparser.expression.operators.relational.OldOracleJoinBinaryExpression;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 /**
@@ -112,39 +116,28 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         }
     }
 
-    public Object getStatByTime(String siteId, String time) {
-        List<SysSensorRecEntity> result = baseMapper.findByTimeGroupBySensor(siteId, time);
+    @Override
+    public Object getStatByTime(String time) {
+        List<SysSensorRecVo2> result = baseMapper.findByTimeGroupBySensor(time);
 
-        Map<String, Object> map = new HashMap<>();
+        Map<String, List<SysSensorRecVo2>> collect = result.stream().collect(Collectors.groupingBy(SysSensorRecEntity::getSensor));
 
-        String[] x = new String[result.size()];
-        String[] y = new String[result.size()];
+        Map<String, Map<String, Object>> map = new HashMap<>();
+        Map<String, Object> tempMap;
+        for (Map.Entry<String, List<SysSensorRecVo2>> entry : collect.entrySet()) {
+            tempMap = new HashMap<>();
+            map.put(entry.getKey(), tempMap);
 
-        map.put("x", x);
-        map.put("y", y);
+            List<String> x = new ArrayList<>();
+            List<String> y = new ArrayList<>();
 
-        for (int i = 0; i < result.size(); i++) {
-            SysSensorRecEntity item = result.get(i);
+            tempMap.put("x", x);
+            tempMap.put("y", y);
 
-            if (SensorType.wind_speed.name().equals(item.getSensor())) {
-                x[i] = "风速";
-            } else if (SensorType.wind_direction.name().equals(item.getSensor())) {
-                x[i] = "风向";
-            } else if (SensorType.humidity.name().equals(item.getSensor())) {
-                x[i] = "湿度";
-            } else if (SensorType.temperature.name().equals(item.getSensor())) {
-                x[i] = "温度";
-            } else if (SensorType.noise.name().equals(item.getSensor())) {
-                x[i] = "noise";
-            } else if (SensorType.PM10.name().equals(item.getSensor())) {
-                x[i] = "PM10";
-            } else if (SensorType.PM25.name().equals(item.getSensor())) {
-                x[i] = "PM25";
-            } else if (SensorType.atmos.name().equals(item.getSensor())) {
-                x[i] = "atmos";
+            for (SysSensorRecVo2 item : entry.getValue()) {
+                x.add(item.getSiteName());
+                y.add(item.getValue());
             }
-
-            y[i] = item.getValue();
         }
         return map;
     }
