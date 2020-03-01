@@ -20,4 +20,10 @@
     id, distribution_situation, distribution_area, distribution_address, area, `count`, 
     pest_bank_name, cause_disease, `source`, create_time
   </sql>
+
+  <select id="pestAdoptionPage" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List" />  from sys_pest_adoption
+    ORDER BY create_time DESC
+    LIMIT #{page.offset},#{page.pageSize}
+  </select>
 </mapper>

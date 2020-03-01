@@ -3,8 +3,12 @@ package com.aiot.aiotbackstage.service.impl;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.mapper.SysPestAdoptionMapper;
+import com.aiot.aiotbackstage.model.entity.SysInsectRecReportEntity;
 import com.aiot.aiotbackstage.model.entity.SysPestAdoptionEntity;
+import com.aiot.aiotbackstage.model.param.PageParam;
+import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.IPestAdoptionService;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -18,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Description TODO
@@ -74,5 +79,20 @@ public class PestAdoptionServiceImpl implements IPestAdoptionService {
                 e2.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public PageResult<SysPestAdoptionEntity> pestAdoption(PageParam pageParam) {
+
+        List<SysPestAdoptionEntity> sysPestAdoptionEntities = pestAdoptionMapper.pestAdoptionPage(pageParam);
+        Integer total = pestAdoptionMapper.selectCount(null);
+        if(CollectionUtils.isEmpty(sysPestAdoptionEntities)){
+            throw new MyException(ResultStatusCode.DB_ERR);
+        }
+        return PageResult.<SysPestAdoptionEntity>builder().total(total)
+                .pageData(sysPestAdoptionEntities)
+                .pageNumber(pageParam.getPageNumber())
+                .pageSize(pageParam.getPageSize())
+                .build();
     }
 }
