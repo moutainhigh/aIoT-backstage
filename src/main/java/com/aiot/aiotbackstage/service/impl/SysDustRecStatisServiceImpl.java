@@ -155,4 +155,17 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
         }
         return null;
     }
+
+    @Override
+    public List<SysDustRecStatisEntity> getStatByTime(String siteId, String time) {
+        List<SysDustRecStatisEntity> result = baseMapper.findByTimeGroupByDepth(siteId, time);
+//
+//        Map<String, Object> map = new HashMap<>();
+//        Map<String, Object> tempMap;
+//        for (SysDustRecStatisEntity item : result) {
+//            tempMap = new HashMap<>();
+//            tempMap.put("")
+//            map.put(String.valueOf(item.getDepth()), tempMap);
+//        }
+    }
 }

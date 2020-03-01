@@ -57,16 +57,57 @@
 
     <select id="insectRecGisInfo" resultMap="BaseResultMap">
         SELECT
-        s.id,s.device_id,s.image,s.result_image,s.result,s.time
+            s.id,s.device_id,s.image,s.result_image,s.result,s.time
         FROM
-        sys_insect_rec s
+            sys_insect_rec s
         LEFT JOIN sys_insect_device b ON
-        s.device_id=b.imei
+            s.device_id=b.imei
         WHERE
-        b.site_id = #{site_id,jdbcType=INTEGER}
+            b.site_id = #{site_id,jdbcType=INTEGER}
         ORDER BY
-        ABS( NOW( ) - s.time ) ASC
+            ABS( NOW( ) - s.time ) ASC
         LIMIT 1
+    </select>
+
+    <select id="findByTimeGroupBySiteId" resultType="map">
+        SELECT
+            ss.`name`,
+            SUM( temp_result ) AS num
+        FROM
+        (
+            SELECT
+                a.*,
+                SUBSTRING_INDEX( SUBSTRING_INDEX( a.result, '#', b.help_topic_id + 1 ), '#',- 1 ) AS temp_result
+            FROM
+            (
+                SELECT
+                    sic.*
+                FROM
+                    sys_insect_rec AS sic
+                    LEFT JOIN sys_insect_device AS sid ON sid.id = sic.device_id
+                WHERE
+                    ( sid.site_id, sic.time ) IN (
+                    SELECT
+                        sid.site_id,
+                        MAX( sic.time )
+                    FROM
+                        sys_insect_rec AS sic
+                        LEFT JOIN sys_insect_device AS sid ON sid.id = sic.device_id
+                    WHERE
+                        sic.time &lt;= #{time}
+                    GROUP BY
+                        sid.site_id
+                    )
+            ) AS a
+            LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
+            JOIN mysql.help_topic AS b ON b.help_topic_id &lt; ( length( a.result ) - length( REPLACE ( a.result, '#', '' ) ) + 1 )
+        ) AS b
+            LEFT JOIN sys_insect_device AS sid ON sid.id = b.device_id
+            LEFT JOIN sys_site AS ss ON ss.id = sid.site_id
+        GROUP BY
+            sid.site_id
+        ORDER BY
+            ss.`name`
     </select>
 
 </mapper>

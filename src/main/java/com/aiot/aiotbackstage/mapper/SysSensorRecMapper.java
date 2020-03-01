@@ -15,4 +15,6 @@ public interface SysSensorRecMapper extends BaseMapper<SysSensorRecEntity> {
      * @param params
      */
     List<Map<String, Object>> findAllAverageHourly(Map<String, Object> params);
+
+    List<SysSensorRecEntity> findByTimeGroupBySensor(String siteId, String time);
 }

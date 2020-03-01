@@ -39,6 +39,9 @@ public class DataController {
     private SysDustRecStatisServiceImpl sysDustRecStatisService;
 
     @Autowired
+    private SensorRecServiceImpl sensorRecService;
+
+    @Autowired
     private SensorRecStatisServiceImpl sensorRecStatisService;
 
     @Autowired
@@ -49,6 +52,8 @@ public class DataController {
 
     @Autowired
     private SysSeedlingGrowthServiceImpl sysSeedlingGrowthService;
+
+    @Autowired
 
     @RequestMapping(value = "/insectDevice", method = RequestMethod.POST)
     public Result insectDevice(@RequestBody Map data) {
@@ -541,6 +546,65 @@ public class DataController {
             }
         }
         return Result.success(sysSeedlingGrowthService.getStat(startDate, endDate));
+    }
+
+    @ApiOperation(value = "根据时间点查询虫情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "时间", value = "time")
+    })
+    @PostMapping("pestNumStatByTime")
+    public Result pestNumStatByTime(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("time")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        if (params.get("time") == null) {
+            return Result.error(ResultStatusCode.PARAM_IS_BLANK);
+        }
+        return Result.success(sysInsectRecService.getStatByTime(String.valueOf(params.get("time"))));
+    }
+
+    @ApiOperation(value = "根据时间点查询土壤墒情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "站点ID", value = "siteId"),
+            @ApiImplicitParam(name = "时间", value = "time")
+    })
+    @PostMapping("soilStatByTime")
+    public Result soilStatByTime(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("siteId")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        if (params.get("siteId") == null) {
+            return Result.error(ResultStatusCode.PARAM_IS_BLANK);
+        }
+        if (!params.containsKey("time")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        if (params.get("time") == null) {
+            return Result.error(ResultStatusCode.PARAM_IS_BLANK);
+        }
+        return Result.success(sysDustRecStatisService.getStatByTime(String.valueOf(params.get("siteId")), String.valueOf(params.get("time"))));
+    }
+
+    @ApiOperation(value = "根据时间点查询气象数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "站点ID", value = "siteId"),
+            @ApiImplicitParam(name = "时间", value = "time")
+    })
+    @PostMapping("meteStatByTime")
+    public Result meteStatByTime(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("siteId")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        if (params.get("siteId") == null) {
+            return Result.error(ResultStatusCode.PARAM_IS_BLANK);
+        }
+        if (!params.containsKey("time")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        if (params.get("time") == null) {
+            return Result.error(ResultStatusCode.PARAM_IS_BLANK);
+        }
+        return Result.success(sensorRecService.getStatByTime(String.valueOf(params.get("siteId")),String.valueOf(params.get("time"))));
     }
 
     @PostMapping("statis")

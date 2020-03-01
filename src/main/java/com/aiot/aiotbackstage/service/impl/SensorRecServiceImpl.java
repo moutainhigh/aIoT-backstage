@@ -89,8 +89,8 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         for (SysSensorRecEntity entity : list) {
             redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getSensor(), entity.getValue(), 60, TimeUnit.SECONDS);
             try {
-                earlyWarningService.earlyWarningReport("气象",entity.getSensor(),null,entity.getValue(),entity.getSiteId());
-            }catch (Exception e){
+                earlyWarningService.earlyWarningReport("气象", entity.getSensor(), null, entity.getValue(), entity.getSiteId());
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -101,14 +101,18 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getDepth(), entity, 60, TimeUnit.SECONDS);
         sysDustRecMapper.insert(entity);
         try {
-            earlyWarningService.earlyWarningReport("土壤","ec",entity.getDepth()+"cm",entity.getEc().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","epsilon",entity.getDepth()+"cm",entity.getEpsilon().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","salinity",entity.getDepth()+"cm",entity.getSalinity().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","temperature",entity.getDepth()+"cm",entity.getTemperature().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","wc",entity.getDepth()+"cm",entity.getWc().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","tds",entity.getDepth()+"cm",entity.getTds().toString(),entity.getSiteId());
-        }catch (Exception e){
+            earlyWarningService.earlyWarningReport("土壤", "ec", entity.getDepth() + "cm", entity.getEc().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "epsilon", entity.getDepth() + "cm", entity.getEpsilon().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "salinity", entity.getDepth() + "cm", entity.getSalinity().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "temperature", entity.getDepth() + "cm", entity.getTemperature().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "wc", entity.getDepth() + "cm", entity.getWc().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "tds", entity.getDepth() + "cm", entity.getTds().toString(), entity.getSiteId());
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Object getStatByTime(String siteId, String time) {
+        return baseMapper.findByTimeGroupBySensor(siteId, time);
     }
 }

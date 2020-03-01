@@ -52,4 +52,24 @@
             a.fmt_hour
     </select>
 
+    <select id="findByTimeGroupBySensor" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM
+            sys_sensor_rec
+        WHERE
+            ( sensor, time ) IN (
+            SELECT
+                sensor,
+                MAX( time )
+            FROM
+                sys_sensor_rec
+            WHERE
+                site_id = #{siteId}
+                AND time &lt;= #{time}
+            GROUP BY
+                sensor
+            )
+    </select>
+
 </mapper>

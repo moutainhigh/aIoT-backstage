@@ -36,15 +36,15 @@ public class SysSeedlingGrowthServiceImpl extends ServiceImpl<SysSeedlingGrowthM
         Object[] x = new Object[4];
         Object[] y = new Object[4];
         if (result.size() == 1) {
-            x[0] = "good";
-            x[1] = "normal";
-            x[2] = "sub_health";
-            x[3] = "unhealthy";
+            x[0] = "优质";
+            x[1] = "正常";
+            x[2] = "亚健康";
+            x[3] = "不健康";
 
-            y[0] = result.get(0).get("good");
-            y[1] = result.get(0).get("normal");
-            y[2] = result.get(0).get("sub_health");
-            y[3] = result.get(0).get("unhealthy");
+            y[0] = result.get(0).get("good") == null ? 0 : result.get(0).get("good");
+            y[1] = result.get(0).get("normal") == null ? 0 : result.get(0).get("normal");
+            y[2] = result.get(0).get("sub_health") == null ? 0 : result.get(0).get("sub_health");
+            y[3] = result.get(0).get("unhealthy") == null ? 0 : result.get(0).get("unhealthy");
         }
 
         Map<String, Object> map = new HashMap<>();
