@@ -55,9 +55,15 @@ public class WarnRuleParam {
     private String earlyContent;
 
     /**
-     * 预警阈值
+     * 预警阈值最大值
      */
-    @ApiModelProperty(value="预警阈值",name="earlyThreshold",example="预警阈值")
-    private String earlyThreshold;
+    @ApiModelProperty(value="预警阈值最大值",name="earlyMax",example="预警阈值")
+    private String earlyMax;
+
+    /**
+     * 预警阈值最小值
+     */
+    @ApiModelProperty(value="预警阈值最小值",name="earlyMin",example="预警阈值")
+    private String earlyMin;
 
 }

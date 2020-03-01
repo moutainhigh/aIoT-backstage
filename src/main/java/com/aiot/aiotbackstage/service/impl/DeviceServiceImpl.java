@@ -1,6 +1,7 @@
 package com.aiot.aiotbackstage.service.impl;
 
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
+import com.aiot.aiotbackstage.common.enums.DeviceType;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.mapper.SysDeviceErrorRecMapper;
 import com.aiot.aiotbackstage.mapper.SysInsectInfoMapper;
@@ -12,8 +13,10 @@ import com.aiot.aiotbackstage.model.param.DeviceInfoNewParam;
 import com.aiot.aiotbackstage.model.param.DeviceInfoOldParam;
 import com.aiot.aiotbackstage.model.param.DeviceInfoParam;
 import com.aiot.aiotbackstage.model.param.PageParam;
+import com.aiot.aiotbackstage.model.vo.DeviceVo;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.IDeviceService;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,8 +24,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Description TODO
@@ -40,9 +43,39 @@ public class DeviceServiceImpl implements IDeviceService {
     private SysSiteMapper siteMapper;
 
     @Override
-    public PageResult<SysDeviceErrorRecEntity> deviceInfoNew(DeviceInfoNewParam param) {
+    public SysDeviceErrorRecEntity deviceInfoNew() {
 
-        PageParam pageParam=new PageParam();
+        List<SysDeviceErrorRecEntity> errorRecEntityList =
+                errorRecMapper.selectList(Wrappers.<SysDeviceErrorRecEntity>lambdaQuery()
+                        .isNull(SysDeviceErrorRecEntity::getEndTime));
+        Map<Integer, List<SysDeviceErrorRecEntity>> collect = errorRecEntityList.stream().collect(Collectors.groupingBy(SysDeviceErrorRecEntity::getSiteId));
+        Set<Integer> integers = collect.keySet();
+        Integer[] nums = new Integer[]{1,2,3,4,5,6};
+        List<SysDeviceErrorRecEntity> list=new ArrayList<>();
+        integers.forEach(integer -> {
+            SysDeviceErrorRecEntity sysDeviceErrorRecEntity1=new SysDeviceErrorRecEntity();
+            sysDeviceErrorRecEntity1.setSiteId(integer);
+            List<SysDeviceErrorRecEntity> sysDeviceErrorRecEntities = collect.get(integer);
+            List<DeviceVo> deviceVos=new ArrayList<>();
+            sysDeviceErrorRecEntities.forEach(sysDeviceErrorRecEntity -> {
+                DeviceVo deviceVo=new DeviceVo();
+                if(sysDeviceErrorRecEntity.getDeviceType().equals("RYU")){
+                    deviceVo.setRTU(sysDeviceErrorRecEntity.getDeviceType());
+                }else if(sysDeviceErrorRecEntity.getDeviceType().equals("CAMERA")){
+                    deviceVo.setCAMERA(sysDeviceErrorRecEntity.getDeviceType());
+                }else{
+                    deviceVo.setInsectDevice(sysDeviceErrorRecEntity.getDeviceType());
+                }
+                deviceVos.add(deviceVo);
+            });
+            sysDeviceErrorRecEntity1.setDeviceVos(deviceVos);
+            list.add(sysDeviceErrorRecEntity1);
+        });
+        list.forEach(sysDeviceErrorRecEntity -> {
+
+        });
+
+        /*PageParam pageParam=new PageParam();
         pageParam.setPageNumber(param.getPageNumber());
         pageParam.setPageSize(param.getPageSize());
 
@@ -87,7 +120,8 @@ public class DeviceServiceImpl implements IDeviceService {
                 .pageData(sysDeviceErrorRecEntities)
                 .pageNumber(pageParam.getPageNumber())
                 .pageSize(pageParam.getPageSize())
-                .build();
+                .build();*/
+        return null;
     }
 
     public long fromDateStringToLong(String inVal) { //此方法计算时间毫秒

@@ -10,7 +10,7 @@ import java.util.Date;
 
 public interface IDeviceService {
 
-    PageResult<SysDeviceErrorRecEntity> deviceInfoNew(DeviceInfoNewParam param);
+    SysDeviceErrorRecEntity deviceInfoNew();
 
     PageResult<SysDeviceErrorRecEntity> deviceInfoOld(DeviceInfoOldParam param);
 

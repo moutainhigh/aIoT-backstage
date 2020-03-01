@@ -46,7 +46,8 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnRuleEntity.setEarlyType(earlyType(param.getEarlyType()));
         warnRuleEntity.setEarlyName(param.getEarlyName());
         warnRuleEntity.setEarlyDepth(param.getEarlyDepth());
-        warnRuleEntity.setEarlyThreshold(param.getEarlyThreshold());
+        warnRuleEntity.setEarlyMax(param.getEarlyMax());
+        warnRuleEntity.setEarlyMax(param.getEarlyMin());
         warnRuleEntity.setEarlyDegree(param.getEarlyDegree());
         warnRuleEntity.setEarlyContent(param.getEarlyContent());
         warnRuleEntity.setCreateTime(new Date());
@@ -81,7 +82,8 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnRuleEntity.setEarlyType(param.getEarlyType());
         warnRuleEntity.setEarlyName(param.getEarlyName());
         warnRuleEntity.setEarlyDepth(param.getEarlyDepth());
-        warnRuleEntity.setEarlyThreshold(param.getEarlyThreshold());
+        warnRuleEntity.setEarlyMax(param.getEarlyMax());
+        warnRuleEntity.setEarlyMin(param.getEarlyMin());
         warnRuleEntity.setEarlyDegree(param.getEarlyDegree());
         warnRuleEntity.setEarlyContent(param.getEarlyContent());
         warnRuleEntity.setCreateTime(new Date());
@@ -239,12 +241,16 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                                 .eq(SysWarnRuleEntity::getEarlyName,typeName));
             }
         if (ObjectUtils.isNotEmpty(warnRuleEntity)) {
-            String earlyThreshold = warnRuleEntity.getEarlyThreshold();
+            String earlyMax = warnRuleEntity.getEarlyMax();
+            String earlyMin = warnRuleEntity.getEarlyMin();
             Double v = Double.parseDouble(value);
-            Double v1 = Double.parseDouble(earlyThreshold);
+            Double v1 = Double.parseDouble(earlyMax);
+            Double v2 = Double.parseDouble(earlyMin);
             int i = v.compareTo(v1);
-            if (i > 0) {
-                SysWarnInfoEntity warnInfoEntity=new SysWarnInfoEntity();
+            int j = v.compareTo(v2);
+            if (i > 0 && j < 0) {
+
+                SysWarnInfoEntity warnInfoEntity = new SysWarnInfoEntity();
                 warnInfoEntity.setSiteId(siteId);
                 SysSiteEntity sysSiteEntity = siteMapper.selectById(siteId);
                 warnInfoEntity.setSiteName(sysSiteEntity.getName());
@@ -253,7 +259,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                 warnInfoEntity.setTime(new Date());
                 warnInfoEntity.setEarlyType(type);
                 warnInfoEntity.setEarlyName(warnRuleEntity.getEarlyName());
-                if(warnRuleEntity.getEarlyDepth() != null){
+                if (warnRuleEntity.getEarlyDepth() != null) {
                     warnInfoEntity.setEarlyDepth(warnRuleEntity.getEarlyDepth());
                 }
                 warnInfoEntity.setEarlyDegree(warnRuleEntity.getEarlyDegree());

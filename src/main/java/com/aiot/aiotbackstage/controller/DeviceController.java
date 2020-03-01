@@ -43,9 +43,9 @@ public class DeviceController {
     })
     @ResponseBody
     @PostMapping("/deviceInfoNew")
-    public Result deviceInfoNew(@RequestBody DeviceInfoNewParam param
+    public Result deviceInfoNew(
                                 ) {
-        return Result.success(deviceService.deviceInfoNew(param));
+        return Result.success(deviceService.deviceInfoNew());
     }
 
     @ApiOperation(value = "实时设备编辑", notes = "实时设备编辑")

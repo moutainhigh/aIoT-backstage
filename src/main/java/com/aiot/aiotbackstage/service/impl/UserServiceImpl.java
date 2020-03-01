@@ -180,7 +180,8 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private SysInsectRecMapper insectRecMapper;
-
+    @Autowired
+    private SysSensorRecMapper sensorRecMapper;
     @Autowired
     private SysDeviceErrorRecMapper deviceErrorRecMapper;
 //    private SysSensorRecMapper sensorRecMapper;
@@ -382,10 +383,10 @@ public class UserServiceImpl implements IUserService {
     public void  batchSave () {
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
         cachedThreadPool.execute(new Task(this.parseDate("2017-01-01 00:00:00"), this.parseDate("2017-03-01 00:00:00")));
-        cachedThreadPool.execute(new Task(this.parseDate("2017-03-01 00:00:00"), this.parseDate("2017-06-01 00:00:00")));
+//        cachedThreadPool.execute(new Task(this.parseDate("2017-03-01 00:00:00"), this.parseDate("2017-06-01 00:00:00")));
 //        cachedThreadPool.execute(new Task(this.parseDate("2017-06-01 00:00:00"), this.parseDate("2017-09-01 00:00:00")));
 //        cachedThreadPool.execute(new Task(this.parseDate("2017-09-01 00:00:00"), this.parseDate("2018-01-01 00:00:00")));
-//
+////
 //        cachedThreadPool.execute(new Task(this.parseDate("2018-01-01 00:00:00"), this.parseDate("2018-03-01 00:00:00")));
 //        cachedThreadPool.execute(new Task(this.parseDate("2018-03-01 00:00:00"), this.parseDate("2018-06-01 00:00:00")));
 //        cachedThreadPool.execute(new Task(this.parseDate("2018-06-01 00:00:00"), this.parseDate("2018-09-01 00:00:00")));
@@ -444,104 +445,109 @@ public class UserServiceImpl implements IUserService {
 //                deviceErrorRecMapper.insert(deviceErrorRecEntity);
 
 
-                SysDustRecEntity dustRecEntity=new SysDustRecEntity();
-                dustRecEntity.setDepth(10);
+//                SysDustRecEntity dustRecEntity=new SysDustRecEntity();
+//                dustRecEntity.setDepth(10);
                 Random random = new Random();
-                dustRecEntity.setEc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity.setEpsilon(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity.setSalinity(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity.setSiteId((int)(Math.random()*8)+1);
+//                dustRecEntity.setEc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity.setEpsilon(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity.setSalinity(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity.setSiteId((int)(Math.random()*8)+1);
+//                Calendar cal = Calendar.getInstance();
+//                cal.setTime(sdate);
+//                cal.add(Calendar.MINUTE, 5);
+//                Date time = cal.getTime();
+//                sdate=time;
+//                dustRecEntity.setTime(sdate);
+//                dustRecEntity.setTds(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity.setTemperature(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity.setWc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecMapper.insert(dustRecEntity);
+//////
+//                SysDustRecEntity dustRecEntity1=new SysDustRecEntity();
+//                dustRecEntity1.setDepth(20);
+//                dustRecEntity1.setEc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity1.setEpsilon(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity1.setSalinity(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity1.setSiteId((int)(Math.random()*8)+1);
+//                dustRecEntity1.setTime(sdate);
+//                dustRecEntity1.setTds(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity1.setTemperature(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity1.setWc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecMapper.insert(dustRecEntity1);
+////
+//                SysDustRecEntity dustRecEntity2=new SysDustRecEntity();
+//                dustRecEntity2.setDepth(40);
+//                dustRecEntity2.setEc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity2.setEpsilon(Double.parseDouble(df.format( random.nextInt(41) + 10)));
+//                dustRecEntity2.setSalinity(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity2.setSiteId((int)(Math.random()*8)+1);
+//                dustRecEntity2.setTime(sdate);
+//                dustRecEntity2.setTds(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity2.setTemperature(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity2.setWc(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecMapper.insert(dustRecEntity2);
+
+                SysSensorRecEntity dustRec=new SysSensorRecEntity();
+                dustRec.setSiteId((int)(Math.random()*8)+1);
+                dustRec.setSensor("wind_speed");
+                dustRec.setValue(df.format( random.nextInt(41) + 10));
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(sdate);
                 cal.add(Calendar.MINUTE, 5);
                 Date time = cal.getTime();
                 sdate=time;
-                dustRecEntity.setTime(sdate);
-                dustRecEntity.setTds(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity.setTemperature(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity.setWc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecMapper.insert(dustRecEntity);
-////
-                SysDustRecEntity dustRecEntity1=new SysDustRecEntity();
-                dustRecEntity1.setDepth(20);
-                dustRecEntity1.setEc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity1.setEpsilon(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity1.setSalinity(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity1.setSiteId((int)(Math.random()*8)+1);
-                dustRecEntity1.setTime(sdate);
-                dustRecEntity1.setTds(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity1.setTemperature(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity1.setWc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecMapper.insert(dustRecEntity1);
+                dustRec.setTime(sdate);
+                sensorRecMapper.insert(dustRec);
 //
-                SysDustRecEntity dustRecEntity2=new SysDustRecEntity();
-                dustRecEntity2.setDepth(40);
-                dustRecEntity2.setEc(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity2.setEpsilon(Double.parseDouble(df.format( random.nextInt(41) + 10)));
-                dustRecEntity2.setSalinity(Double.parseDouble(df.format( Math.random()*40)+20));
-                dustRecEntity2.setSiteId((int)(Math.random()*8)+1);
-                dustRecEntity2.setTime(sdate);
-                dustRecEntity2.setTds(Double.parseDouble(df.format( Math.random()*40)+20));
-                dustRecEntity2.setTemperature(Double.parseDouble(df.format( Math.random()*40)+20));
-                dustRecEntity2.setWc(Double.parseDouble(df.format( Math.random()*40)+20));
-                dustRecMapper.insert(dustRecEntity2);
+                SysSensorRecEntity dustRec1=new SysSensorRecEntity();
+                dustRec1.setSiteId((int)(Math.random()*8)+1);
+                dustRec1.setSensor("wind_direction");
 
-//                SysSensorRecEntity dustRec=new SysSensorRecEntity();
-//                dustRec.setSiteId((int)(Math.random()*8)+1);
-//                dustRec.setSensor("wind_speed");
-//                dustRec.setValue(df.format( Math.random()*20));
-//
-//                sensorRecMapper.insert(dustRec);
-//
-//                SysSensorRecEntity dustRec1=new SysSensorRecEntity();
-//                dustRec1.setSiteId((int)(Math.random()*8)+1);
-//                dustRec1.setSensor("wind_direction");
-//
-//                dustRec1.setValue(df.format( Math.random()*20));
-//                dustRec1.setTime(sdate);
-//                sensorRecMapper.insert(dustRec1);
-//
-//                SysSensorRecEntity dustRec2=new SysSensorRecEntity();
-//                dustRec2.setSiteId((int)(Math.random()*8)+1);
-//                dustRec2.setSensor("humidity");
-//                dustRec2.setValue(df.format( Math.random()*40));
-//                dustRec2.setTime(sdate);
-//                sensorRecMapper.insert(dustRec2);
-//
-//                SysSensorRecEntity dustRec3=new SysSensorRecEntity();
-//                dustRec3.setSiteId((int)(Math.random()*8)+1);
-//                dustRec3.setSensor("temperature");
-//                dustRec3.setValue(df.format( Math.random()*50));
-//                dustRec3.setTime(sdate);
-//                sensorRecMapper.insert(dustRec3);
-//
-//                SysSensorRecEntity dustRec4=new SysSensorRecEntity();
-//                dustRec4.setSiteId((int)(Math.random()*8)+1);
-//                dustRec4.setSensor("noise");
-//                dustRec4.setValue(df.format( Math.random()*50));
-//                dustRec4.setTime(sdate);
-//                sensorRecMapper.insert(dustRec4);
-//
-//                SysSensorRecEntity dustRec5=new SysSensorRecEntity();
-//                dustRec5.setSiteId((int)(Math.random()*8)+1);
-//                dustRec5.setSensor("PM25");
-//                dustRec5.setValue(df.format( Math.random()*100));
-//                dustRec5.setTime(sdate);
-//                sensorRecMapper.insert(dustRec5);
-//
-//                SysSensorRecEntity dustRec6=new SysSensorRecEntity();
-//                dustRec6.setSiteId((int)(Math.random()*8)+1);
-//                dustRec6.setSensor("PM10");
-//                dustRec6.setValue(df.format( Math.random()*100));
-//                dustRec6.setTime(sdate);
-//                sensorRecMapper.insert(dustRec6);
-//
-//                SysSensorRecEntity dustRec7=new SysSensorRecEntity();
-//                dustRec7.setSiteId((int)(Math.random()*8)+1);
-//                dustRec7.setSensor("atmos");
-//                dustRec7.setValue(df.format( Math.random()*200));
-//                dustRec7.setTime(sdate);
-//                sensorRecMapper.insert(dustRec7);
+                dustRec1.setValue(df.format( random.nextInt(41) + 10));
+                dustRec1.setTime(sdate);
+                sensorRecMapper.insert(dustRec1);
+
+                SysSensorRecEntity dustRec2=new SysSensorRecEntity();
+                dustRec2.setSiteId((int)(Math.random()*8)+1);
+                dustRec2.setSensor("humidity");
+                dustRec2.setValue(df.format( random.nextInt(41) + 10));
+                dustRec2.setTime(sdate);
+                sensorRecMapper.insert(dustRec2);
+
+                SysSensorRecEntity dustRec3=new SysSensorRecEntity();
+                dustRec3.setSiteId((int)(Math.random()*8)+1);
+                dustRec3.setSensor("temperature");
+                dustRec3.setValue(df.format( random.nextInt(41) + 10));
+                dustRec3.setTime(sdate);
+                sensorRecMapper.insert(dustRec3);
+
+                SysSensorRecEntity dustRec4=new SysSensorRecEntity();
+                dustRec4.setSiteId((int)(Math.random()*8)+1);
+                dustRec4.setSensor("noise");
+                dustRec4.setValue(df.format( random.nextInt(41) + 10));
+                dustRec4.setTime(sdate);
+                sensorRecMapper.insert(dustRec4);
+
+                SysSensorRecEntity dustRec5=new SysSensorRecEntity();
+                dustRec5.setSiteId((int)(Math.random()*8)+1);
+                dustRec5.setSensor("PM25");
+                dustRec5.setValue(df.format( random.nextInt(41) + 10));
+                dustRec5.setTime(sdate);
+                sensorRecMapper.insert(dustRec5);
+
+                SysSensorRecEntity dustRec6=new SysSensorRecEntity();
+                dustRec6.setSiteId((int)(Math.random()*8)+1);
+                dustRec6.setSensor("PM10");
+                dustRec6.setValue(df.format( random.nextInt(41) + 10));
+                dustRec6.setTime(sdate);
+                sensorRecMapper.insert(dustRec6);
+
+                SysSensorRecEntity dustRec7=new SysSensorRecEntity();
+                dustRec7.setSiteId((int)(Math.random()*8)+1);
+                dustRec7.setSensor("atmos");
+                dustRec7.setValue(df.format( random.nextInt(41) + 10));
+                dustRec7.setTime(sdate);
+                sensorRecMapper.insert(dustRec7);
 //                log.info("2---------{}",formatter.format(sdate));
             }
         }

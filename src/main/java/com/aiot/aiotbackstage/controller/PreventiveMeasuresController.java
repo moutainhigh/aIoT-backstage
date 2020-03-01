@@ -41,6 +41,17 @@ public class PreventiveMeasuresController {
         return Result.success(masuresService.getMasuresInfoByName(name));
     }
 
+    @ApiOperation(value = "明细", notes = "明细")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @ResponseBody
+    @GetMapping("/preventiveDetail")
+    public Result preventiveDetail(@RequestParam(required = false) String preventiveId,@RequestParam(required = false) String insectId
+    ) {
+        return Result.success(masuresService.preventiveDetail(preventiveId,insectId));
+    }
+
 
 
 }
