@@ -111,7 +111,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
             ruleEntityList= warnRuleMapper.warnRulePage(earlyType,pageParam);
         }
         if(CollectionUtils.isEmpty(ruleEntityList)){
-            throw new MyException(ResultStatusCode.EARLY_WARNING_NO_EXIT);
+            return  null;
         }
         return PageResult.<SysWarnRuleEntity>builder()
                 .total(total)
@@ -145,7 +145,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         Integer total = warnInfoMapper.selectCount(null);
         List<SysWarnInfoEntity> sysWarnInfoEntities = warnInfoMapper.warnInfoPage(pageParam);
         if(CollectionUtils.isEmpty(sysWarnInfoEntities)){
-            throw new MyException(ResultStatusCode.EARLY_WARNING_NO_EXIT);
+            return  null;
         }
         return PageResult.<SysWarnInfoEntity>builder()
                 .total(total)
@@ -184,7 +184,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                         .eq(SysWarnRuleEntity::getEarlyType, earlyType)
                         .eq(SysWarnRuleEntity::getEarlyDegree,earlyDegree));
         if(ObjectUtils.isEmpty(warnRuleEntity)){
-            throw new MyException(ResultStatusCode.EARLY_WARNING_NO_EXIT);
+            return  null;
         }
 //        Map<String, List<SysWarnRuleEntity>> collect = warnRuleEntity.stream()
 //                .collect(Collectors.groupingBy(SysWarnRuleEntity::getEarlyName, Collectors.toList()));

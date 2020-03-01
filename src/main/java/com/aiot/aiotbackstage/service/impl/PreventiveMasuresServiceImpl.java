@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,7 +25,7 @@ public class PreventiveMasuresServiceImpl implements IPreventiveMasuresService {
 
         List<SysPreventiveMeasuresEntity> preventiveMeasuresEntities = measuresMapper.selectAll();
         if(CollectionUtils.isEmpty(preventiveMeasuresEntities)){
-            throw new MyException(ResultStatusCode.MEASURES_NO_EXIT);
+            return  null;
         }
         return  preventiveMeasuresEntities;
     }
@@ -35,7 +36,7 @@ public class PreventiveMasuresServiceImpl implements IPreventiveMasuresService {
         List<SysPreventiveMeasuresEntity> preventiveMeasuresEntities = measuresMapper.selectList(Wrappers.<SysPreventiveMeasuresEntity>lambdaQuery()
                 .like(SysPreventiveMeasuresEntity::getName, name));
         if(CollectionUtils.isEmpty(preventiveMeasuresEntities)){
-            throw new MyException(ResultStatusCode.MEASURES_NO_EXIT);
+             return  null;
         }
         return preventiveMeasuresEntities;
     }

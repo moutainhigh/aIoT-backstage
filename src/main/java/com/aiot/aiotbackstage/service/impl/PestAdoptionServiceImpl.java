@@ -87,7 +87,7 @@ public class PestAdoptionServiceImpl implements IPestAdoptionService {
         List<SysPestAdoptionEntity> sysPestAdoptionEntities = pestAdoptionMapper.pestAdoptionPage(pageParam);
         Integer total = pestAdoptionMapper.selectCount(null);
         if(CollectionUtils.isEmpty(sysPestAdoptionEntities)){
-            throw new MyException(ResultStatusCode.DB_ERR);
+            return  null;
         }
         return PageResult.<SysPestAdoptionEntity>builder().total(total)
                 .pageData(sysPestAdoptionEntities)

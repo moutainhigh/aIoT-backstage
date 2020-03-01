@@ -51,7 +51,7 @@ public class GisServiceImpl implements IGisService {
 
         List<SysSiteEntity> gisStationEntities = siteMapper.selectList(null);
         if(CollectionUtils.isEmpty(gisStationEntities)){
-            throw new MyException(ResultStatusCode.GIS_NO_EXIT);
+            return  null;
         }
         gisStationEntities.forEach(sysSiteEntity -> {
             SensorInfoVo sensorInfoVo = sensorInfo(sysSiteEntity.getId());
@@ -152,7 +152,7 @@ public class GisServiceImpl implements IGisService {
         Integer total = seedlingGrowthMapper.selectCount(null);
 
         if(CollectionUtils.isEmpty(sysSeedlingGrowthEntities)){
-            throw new MyException(ResultStatusCode.NO_RESULT);
+            return  null;
         }
 
         return PageResult.<SysSeedlingGrowthEntity>builder()
@@ -169,7 +169,7 @@ public class GisServiceImpl implements IGisService {
         Integer total = disasterSituationMapper.selectCount(null);
 
         if(CollectionUtils.isEmpty(disasterSituationEntities)){
-            throw new MyException(ResultStatusCode.NO_RESULT);
+            return  null;
         }
 
         return PageResult.<SysDisasterSituationEntity>builder()
@@ -184,7 +184,7 @@ public class GisServiceImpl implements IGisService {
     public List<SysSiteEntity> stationData() {
         List<SysSiteEntity> gisStationEntities = siteMapper.selectList(null);
         if(CollectionUtils.isEmpty(gisStationEntities)){
-            throw new MyException(ResultStatusCode.GIS_NO_EXIT);
+            return  null;
         }
         return gisStationEntities;
     }

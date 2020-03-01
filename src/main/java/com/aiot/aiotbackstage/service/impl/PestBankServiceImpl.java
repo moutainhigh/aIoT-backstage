@@ -31,6 +31,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class PestBankServiceImpl implements IPestBankService {
                     .eq(SysPestBankEntity::getPestName,param.getPestName()));
         }
         if(CollectionUtils.isEmpty(sysPestBankEntities)){
-            throw new MyException(ResultStatusCode.USER_NAME_NO_EXIT);
+            return  null;
         }
         return PageResult.<SysPestBankEntity>builder().total(total)
                 .pageData(sysPestBankEntities)

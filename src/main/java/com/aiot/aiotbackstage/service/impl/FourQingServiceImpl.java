@@ -44,7 +44,7 @@ public class FourQingServiceImpl implements IFourQingService {
                 .selectList(Wrappers.<SysSensorRecEntity>lambdaQuery()
                 .eq(SysSensorRecEntity::getSiteId, stationId));
         if(CollectionUtils.isEmpty(sysSensorRecEntities)){
-            throw new MyException(ResultStatusCode.SYSSENSORREC_NO_EXIT);
+            return  null;
         }
         Map<Date, List<SysSensorRecEntity>> collect = sysSensorRecEntities.stream()
                 .collect(Collectors.groupingBy(SysSensorRecEntity::getTime, Collectors.toList()));
@@ -130,7 +130,7 @@ public class FourQingServiceImpl implements IFourQingService {
                 insectRecReportMapper.insectRecReportInfo(recReportParam.getWhetherExamine(), pageQuery);
         Integer total = insectRecReportMapper.insectRecReportCount(recReportParam.getWhetherExamine());
         if(CollectionUtils.isEmpty(sysInsectRecReportEntities)){
-            throw new MyException(ResultStatusCode.INSECT_REC_NO_EXIT);
+             return  null;
         }
         return PageResult.<SysInsectRecReportEntity>builder().total(total)
                 .pageData(sysInsectRecReportEntities)

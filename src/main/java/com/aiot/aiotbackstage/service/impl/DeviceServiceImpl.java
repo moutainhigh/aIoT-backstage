@@ -110,7 +110,7 @@ public class DeviceServiceImpl implements IDeviceService {
         Integer total = errorRecMapper.countOld(param);
 
         if(CollectionUtils.isEmpty(sysDeviceErrorRecEntities)){
-            throw new MyException(ResultStatusCode.NO_RESULT);
+            return  null;
         }
 
         sysDeviceErrorRecEntities.stream().forEach(sysDeviceErrorRecEntity -> {
