@@ -50,6 +50,4 @@ public interface SysDustRecStatisMapper extends BaseMapper<SysDustRecStatisEntit
      * @return
      */
     List<SysDustRecStatisEntity> findAllDaily(Map<String, Object> params);
-
-    List<SysDustRecStatisEntity> findByTimeGroupByDepth(String siteId, String time);
 }

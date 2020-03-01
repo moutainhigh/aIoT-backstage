@@ -102,25 +102,4 @@
         </if>
     </select>
 
-    <select id="findByTimeGroupByDepth" resultMap="BaseResultMap">
-        SELECT
-            *
-        FROM
-            sys_dust_rec
-        WHERE
-            ( depth, time ) IN (
-                SELECT
-                    depth,
-                    MAX( time )
-                FROM
-                    sys_dust_rec
-                WHERE
-                    site_id = #{siteId}
-                    AND time &lt;= #{time}
-                GROUP BY depth
-             )
-        ORDER BY
-            depth
-    </select>
-
 </mapper>

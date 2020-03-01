@@ -39,6 +39,9 @@ public class DataController {
     private SysDustRecStatisServiceImpl sysDustRecStatisService;
 
     @Autowired
+    private SysDustRecServiceImpl sysDustRecService;
+
+    @Autowired
     private SensorRecServiceImpl sensorRecService;
 
     @Autowired
@@ -52,8 +55,6 @@ public class DataController {
 
     @Autowired
     private SysSeedlingGrowthServiceImpl sysSeedlingGrowthService;
-
-    @Autowired
 
     @RequestMapping(value = "/insectDevice", method = RequestMethod.POST)
     public Result insectDevice(@RequestBody Map data) {
@@ -582,7 +583,7 @@ public class DataController {
         if (params.get("time") == null) {
             return Result.error(ResultStatusCode.PARAM_IS_BLANK);
         }
-        return Result.success(sysDustRecStatisService.getStatByTime(String.valueOf(params.get("siteId")), String.valueOf(params.get("time"))));
+        return Result.success(sysDustRecService.getStatByTime(String.valueOf(params.get("siteId")), String.valueOf(params.get("time"))));
     }
 
     @ApiOperation(value = "根据时间点查询气象数据")
@@ -604,7 +605,7 @@ public class DataController {
         if (params.get("time") == null) {
             return Result.error(ResultStatusCode.PARAM_IS_BLANK);
         }
-        return Result.success(sensorRecService.getStatByTime(String.valueOf(params.get("siteId")),String.valueOf(params.get("time"))));
+        return Result.success(sensorRecService.getStatByTime(String.valueOf(params.get("siteId")), String.valueOf(params.get("time"))));
     }
 
     @PostMapping("statis")
