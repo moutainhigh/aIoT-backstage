@@ -56,4 +56,16 @@
             LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
         </if>
     </select>
+
+    <select id="sumByLevel" resultType="map">
+        SELECT
+            SUM( good ) AS good,
+            SUM( `normal` ) AS `normal`,
+            SUM( sub_health ) AS sub_health,
+            SUM( unhealthy ) AS unhealthy
+        FROM
+            sys_seedling_growth
+        WHERE
+            `date` BETWEEN #{startDate} AND #{endDate}
+    </select>
 </mapper>

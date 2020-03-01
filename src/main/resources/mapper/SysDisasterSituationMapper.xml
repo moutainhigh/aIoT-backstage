@@ -63,6 +63,17 @@
         <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
             LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
         </if>
-  </select>
+    </select>
+
+    <select id="sumByLevel" resultType="map">
+        SELECT
+            SUM( serious ) AS serious,
+            SUM( `medium` ) AS `medium`,
+            SUM( normal ) AS normal
+        FROM
+            sys_disaster_situation
+        WHERE
+            date BETWEEN #{startDate} AND #{endDate}
+    </select>
 
 </mapper>

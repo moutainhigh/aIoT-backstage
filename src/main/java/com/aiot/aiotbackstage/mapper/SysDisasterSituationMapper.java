@@ -28,4 +28,6 @@ public interface SysDisasterSituationMapper extends BaseMapper<SysDisasterSituat
      * @return
      */
     List<SysDisasterSituationVo> findAll(Map<String, Object> params);
+
+    List<Map<String, Object>> sumByLevel(Map<String, Object> params);
 }

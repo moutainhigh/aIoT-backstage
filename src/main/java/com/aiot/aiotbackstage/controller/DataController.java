@@ -495,6 +495,54 @@ public class DataController {
         return Result.success(sysSeedlingGrowthService.getAll(startDate, endDate, pageIndex, pageSize));
     }
 
+    @ApiOperation(value = "灾情统计查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate")
+    })
+    @PostMapping("disasterStat")
+    public Result disasterStat(@RequestBody Map<String, Object> params) {
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        return Result.success(sysDisasterSituationService.getStat(startDate, endDate));
+    }
+
+    @ApiOperation(value = "苗情统计查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate")
+    })
+    @PostMapping("seedStat")
+    public Result seedStat(@RequestBody Map<String, Object> params) {
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        return Result.success(sysSeedlingGrowthService.getStat(startDate, endDate));
+    }
+
     @PostMapping("statis")
     public Result statis() {
         dataStatisSchedule.manual();

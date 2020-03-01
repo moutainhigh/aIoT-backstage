@@ -15,4 +15,6 @@ public interface SysSeedlingGrowthMapper extends BaseMapper<SysSeedlingGrowthEnt
     int countAll(Map<String, Object> params);
 
     List<SysSeedlingGrowthEntity> findAll(Map<String, Object> params);
+
+    List<Map<String, Object>> sumByLevel(Map<String, Object> params);
 }

@@ -26,4 +26,29 @@ public class SysDisasterSituationServiceImpl extends ServiceImpl<SysDisasterSitu
         List<SysDisasterSituationVo> all = baseMapper.findAll(params);
         return PageResult.<SysDisasterSituationVo>builder().total(total).pageNumber(pageIndex).pageSize(pageSize).pageData(all).build();
     }
+
+    @Override
+    public Map<String, Object> getStat(String startDate, String endDate) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+        List<Map<String, Object>> result = baseMapper.sumByLevel(params);
+
+        Object[] x = new Object[3];
+        Object[] y = new Object[3];
+        if (result.size() == 1) {
+            x[0] = "serious";
+            x[1] = "medium";
+            x[2] = "normal";
+
+            y[0] = result.get(0).get("serious");
+            y[1] = result.get(0).get("medium");
+            y[2] = result.get(0).get("normal");
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("x", x);
+        map.put("y", y);
+        return map;
+    }
 }
