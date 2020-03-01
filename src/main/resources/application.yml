@@ -61,4 +61,8 @@ obs:
   sk: BxsIdXtz8aIJKNll6XMz4D6K00AXzichqi5nB4lX
   endPoint: https://obs.cn-north-4.myhuaweicloud.com
   bucketName: aiot-obs
-
+dahua8900:
+  ip: 192.168.2.243
+  port: 9000
+  username: system
+  password: jyxt123456

@@ -16,8 +16,15 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -54,7 +61,18 @@ public class DataController {
     }
 
     @RequestMapping(value = "/insects", method = RequestMethod.POST)
-    public Result insects(@RequestBody YunFeiData data) {
+    public Result insects(HttpServletRequest request, YunFeiData data) {
+        try {
+            InputStream in = request.getInputStream();
+            BufferedReader br=new BufferedReader(new InputStreamReader(in,"utf-8"));
+            StringBuffer sb = new StringBuffer();
+            String s = "" ;
+            while((s=br.readLine())!=null){
+                sb.append(s) ;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         log.error("time:{}, received:{}", System.currentTimeMillis(), data.toString());
         sysInsectRecService.save(data);
         return Result.success();
