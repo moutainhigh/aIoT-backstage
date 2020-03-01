@@ -21,7 +21,7 @@
     select  <include refid="Base_Column_List" />  from sys_pest_bank
     <where>
       <if test="pestName != null">
-        and id = #{pestName,jdbcType=VARCHAR}
+        and pest_name = #{pestName,jdbcType=VARCHAR}
       </if>
     </where>
     ORDER BY create_time DESC

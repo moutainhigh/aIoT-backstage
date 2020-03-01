@@ -297,4 +297,26 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         }
         return list;
     }
+
+    @Override
+    public void earlyInfoUpdate(WarnInfoParam param) {
+
+        SysWarnInfoEntity sysWarnInfoEntity = warnInfoMapper.selectById(param.getId());
+        if(ObjectUtils.isEmpty(sysWarnInfoEntity)){
+            throw new MyException(ResultStatusCode.DB_ERR);
+        }
+        SysWarnInfoEntity warnInfoEntity=new SysWarnInfoEntity();
+        warnInfoEntity.setId(param.getId());
+        warnInfoEntity.setSiteId(param.getSiteId());
+        warnInfoEntity.setTime(param.getTime());
+        warnInfoEntity.setEarlyType(param.getEarlyType());
+        warnInfoEntity.setEarlyName(param.getEarlyName());
+        if(param.getEarlyDepth() != null){
+            warnInfoEntity.setEarlyDepth(param.getEarlyDepth());
+        }
+        warnInfoEntity.setEarlyDegree(param.getEarlyDegree());
+        warnInfoEntity.setEarlyContent(param.getEarlyContent());
+        warnInfoEntity.setUpdateTime(new Date());
+        warnInfoMapper.updateById(warnInfoEntity);
+    }
 }

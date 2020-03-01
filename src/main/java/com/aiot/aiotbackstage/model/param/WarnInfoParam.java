@@ -15,6 +15,8 @@ import java.util.Date;
 @ApiModel(value="预警信息上报",description="预警信息上报")
 public class WarnInfoParam {
 
+    private Long id;
+
     /**
      * 预警时间
      */

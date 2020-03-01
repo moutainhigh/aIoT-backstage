@@ -63,7 +63,7 @@ public class PestBankServiceImpl implements IPestBankService {
              sysPestBankEntities =
                     pestBankMapper.pestBankInfoByNamePage(param.getPestName(),pageQuery);
              total = pestBankMapper.selectCount(Wrappers.<SysPestBankEntity>lambdaQuery()
-                    .like(SysPestBankEntity::getPestName,param.getPestName()));
+                    .eq(SysPestBankEntity::getPestName,param.getPestName()));
         }
         if(CollectionUtils.isEmpty(sysPestBankEntities)){
             throw new MyException(ResultStatusCode.USER_NAME_NO_EXIT);
