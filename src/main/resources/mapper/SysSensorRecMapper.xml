@@ -54,7 +54,7 @@
 
     <select id="findByTimeGroupBySensor" resultMap="BaseResultMap">
         SELECT
-            *
+            <include refid="Base_Column_List"></include>
         FROM
             sys_sensor_rec
         WHERE

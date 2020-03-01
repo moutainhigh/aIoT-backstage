@@ -113,6 +113,39 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     }
 
     public Object getStatByTime(String siteId, String time) {
-        return baseMapper.findByTimeGroupBySensor(siteId, time);
+        List<SysSensorRecEntity> result = baseMapper.findByTimeGroupBySensor(siteId, time);
+
+        Map<String, Object> map = new HashMap<>();
+
+        String[] x = new String[result.size()];
+        String[] y = new String[result.size()];
+
+        map.put("x", x);
+        map.put("y", y);
+
+        for (int i = 0; i < result.size(); i++) {
+            SysSensorRecEntity item = result.get(i);
+
+            if (SensorType.wind_speed.name().equals(item.getSensor())) {
+                x[i] = "风速";
+            } else if (SensorType.wind_direction.name().equals(item.getSensor())) {
+                x[i] = "风向";
+            } else if (SensorType.humidity.name().equals(item.getSensor())) {
+                x[i] = "湿度";
+            } else if (SensorType.temperature.name().equals(item.getSensor())) {
+                x[i] = "温度";
+            } else if (SensorType.noise.name().equals(item.getSensor())) {
+                x[i] = "noise";
+            } else if (SensorType.PM10.name().equals(item.getSensor())) {
+                x[i] = "PM10";
+            } else if (SensorType.PM25.name().equals(item.getSensor())) {
+                x[i] = "PM25";
+            } else if (SensorType.atmos.name().equals(item.getSensor())) {
+                x[i] = "atmos";
+            }
+
+            y[i] = item.getValue();
+        }
+        return map;
     }
 }

@@ -566,7 +566,6 @@ public class DataController {
 
     @ApiOperation(value = "根据时间点查询土壤墒情")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "站点ID", value = "siteId"),
             @ApiImplicitParam(name = "时间", value = "time")
     })
     @PostMapping("soilStatByTime")
@@ -588,7 +587,6 @@ public class DataController {
 
     @ApiOperation(value = "根据时间点查询气象数据")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "站点ID", value = "siteId"),
             @ApiImplicitParam(name = "时间", value = "time")
     })
     @PostMapping("meteStatByTime")
