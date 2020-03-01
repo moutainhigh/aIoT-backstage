@@ -1,6 +1,7 @@
 package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
+import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.service.IPestAdoptionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -82,5 +83,21 @@ public class PestAdoptionController {
         return Result.success();
     }
 
+    /**
+     * 有害生物诊断信息查询
+     */
+    @ApiOperation(value = "有害生物诊断信息查询", notes = "有害生物诊断信息查询")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @GetMapping("/pestAdoption")
+    @ResponseBody
+    public Result pestAdoption(@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
+
+        PageParam pageParam=new PageParam();
+        pageParam.setPageNumber(pageNumber);
+        pageParam.setPageSize(pageSize);
+        return Result.success(pestAdoptionService.pestAdoption(pageParam));
+    }
 
 }

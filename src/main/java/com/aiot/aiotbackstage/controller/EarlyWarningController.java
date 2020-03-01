@@ -50,13 +50,23 @@ public class EarlyWarningController {
         return Result.success();
     }
 
-    @ApiOperation(value = "修改预警库数据(warnRuleAdd)", notes = "新增预警库信息(warnRuleAdd)")
+    @ApiOperation(value = "修改预警库数据(warnRuleUpdate)", notes = "新增预警库信息(warnRuleUpdate)")
     @ResponseBody
     @PutMapping("/warnRule")
     @RequiresPermissions("warnRule:update")
     public Result earlyInfoModify(@RequestBody @Validated WarnRuleParam param
     ) {
         iEarlyWarningService.earlyInfoModify(param);
+        return Result.success();
+    }
+
+    @ApiOperation(value = "修改预警信息数据(warnInfoModify)", notes = "修改预警信息数据(warnInfoModify)")
+    @ResponseBody
+    @PutMapping("/warnInfo/update")
+    @RequiresPermissions("warnInfo:update")
+    public Result earlyInfoModify(@RequestBody @Validated WarnInfoParam param
+    ) {
+        iEarlyWarningService.earlyInfoUpdate(param);
         return Result.success();
     }
 

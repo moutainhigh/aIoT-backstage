@@ -383,20 +383,20 @@ public class UserServiceImpl implements IUserService {
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
         cachedThreadPool.execute(new Task(this.parseDate("2017-01-01 00:00:00"), this.parseDate("2017-03-01 00:00:00")));
         cachedThreadPool.execute(new Task(this.parseDate("2017-03-01 00:00:00"), this.parseDate("2017-06-01 00:00:00")));
-        cachedThreadPool.execute(new Task(this.parseDate("2017-06-01 00:00:00"), this.parseDate("2017-09-01 00:00:00")));
-        cachedThreadPool.execute(new Task(this.parseDate("2017-09-01 00:00:00"), this.parseDate("2018-01-01 00:00:00")));
-
-        cachedThreadPool.execute(new Task(this.parseDate("2018-01-01 00:00:00"), this.parseDate("2018-03-01 00:00:00")));
-        cachedThreadPool.execute(new Task(this.parseDate("2018-03-01 00:00:00"), this.parseDate("2018-06-01 00:00:00")));
-        cachedThreadPool.execute(new Task(this.parseDate("2018-06-01 00:00:00"), this.parseDate("2018-09-01 00:00:00")));
-        cachedThreadPool.execute(new Task(this.parseDate("2018-09-01 00:00:00"), this.parseDate("2019-01-01 00:00:00")));
-
-        cachedThreadPool.execute(new Task(this.parseDate("2019-01-01 00:00:00"), this.parseDate("2019-03-01 00:00:00")));
-        cachedThreadPool.execute(new Task(this.parseDate("2019-03-01 00:00:00"), this.parseDate("2019-06-01 00:00:00")));
-        cachedThreadPool.execute(new Task(this.parseDate("2019-06-01 00:00:00"), this.parseDate("2019-09-01 00:00:00")));
-        cachedThreadPool.execute(new Task(this.parseDate("2019-09-01 00:00:00"), this.parseDate("2020-01-01 00:00:00")));
-
-        cachedThreadPool.execute(new Task(this.parseDate("2020-01-01 00:00:00"), this.parseDate("2020-03-01 00:00:00")));
+//        cachedThreadPool.execute(new Task(this.parseDate("2017-06-01 00:00:00"), this.parseDate("2017-09-01 00:00:00")));
+//        cachedThreadPool.execute(new Task(this.parseDate("2017-09-01 00:00:00"), this.parseDate("2018-01-01 00:00:00")));
+//
+//        cachedThreadPool.execute(new Task(this.parseDate("2018-01-01 00:00:00"), this.parseDate("2018-03-01 00:00:00")));
+//        cachedThreadPool.execute(new Task(this.parseDate("2018-03-01 00:00:00"), this.parseDate("2018-06-01 00:00:00")));
+//        cachedThreadPool.execute(new Task(this.parseDate("2018-06-01 00:00:00"), this.parseDate("2018-09-01 00:00:00")));
+//        cachedThreadPool.execute(new Task(this.parseDate("2018-09-01 00:00:00"), this.parseDate("2019-01-01 00:00:00")));
+//
+//        cachedThreadPool.execute(new Task(this.parseDate("2019-01-01 00:00:00"), this.parseDate("2019-03-01 00:00:00")));
+//        cachedThreadPool.execute(new Task(this.parseDate("2019-03-01 00:00:00"), this.parseDate("2019-06-01 00:00:00")));
+//        cachedThreadPool.execute(new Task(this.parseDate("2019-06-01 00:00:00"), this.parseDate("2019-09-01 00:00:00")));
+//        cachedThreadPool.execute(new Task(this.parseDate("2019-09-01 00:00:00"), this.parseDate("2020-01-01 00:00:00")));
+//
+//        cachedThreadPool.execute(new Task(this.parseDate("2020-01-01 00:00:00"), this.parseDate("2020-03-01 00:00:00")));
 
     }
     class Task implements Runnable {
@@ -426,29 +426,29 @@ public class UserServiceImpl implements IUserService {
 //                        +"#"+((int)(Math.random()*262))+","+((int)(Math.random()*100)));
 //
 //                insectRecMapper.insert(insectRecEntity);
-                SysDeviceErrorRecEntity deviceErrorRecEntity=new SysDeviceErrorRecEntity();
-                deviceErrorRecEntity.setSiteId((int)(Math.random()*8)+1);
-                deviceErrorRecEntity.setDeviceType("InsectDevice");
-                deviceErrorRecEntity.setSubType("zhan-wei");
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(sdate);
-                cal.add(Calendar.DATE, 1);
-                Date time = cal.getTime();
-                sdate=time;
-                deviceErrorRecEntity.setEndTime(sdate);
-                cal.setTime(sdate);
-                cal.add(Calendar.MINUTE,(int)(Math.random()*60));
-                Date time1 = cal.getTime();
-                deviceErrorRecEntity.setStartTime(time1);
-                deviceErrorRecEntity.setCreateTime(new Date());
-                deviceErrorRecMapper.insert(deviceErrorRecEntity);
+//                SysDeviceErrorRecEntity deviceErrorRecEntity=new SysDeviceErrorRecEntity();
+//                deviceErrorRecEntity.setSiteId((int)(Math.random()*8)+1);
+//                deviceErrorRecEntity.setDeviceType("InsectDevice");
+//                deviceErrorRecEntity.setSubType("zhan-wei");
+//                Calendar cal = Calendar.getInstance();
+//                cal.setTime(sdate);
+//                cal.add(Calendar.DATE, 1);
+//                Date time = cal.getTime();
+//                sdate=time;
+//                deviceErrorRecEntity.setEndTime(sdate);
+//                cal.setTime(sdate);
+//                cal.add(Calendar.MINUTE,(int)(Math.random()*60));
+//                Date time1 = cal.getTime();
+//                deviceErrorRecEntity.setStartTime(time1);
+//                deviceErrorRecEntity.setCreateTime(new Date());
+//                deviceErrorRecMapper.insert(deviceErrorRecEntity);
 
 
 //                SysDustRecEntity dustRecEntity=new SysDustRecEntity();
 //                dustRecEntity.setDepth(10);
-//                dustRecEntity.setEc(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity.setSalinity(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setEc(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity.setEpsilon(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity.setSalinity(Double.parseDouble(df.format( Math.random()*40)+20));
 //                dustRecEntity.setSiteId((int)(Math.random()*8)+1);
 //                Calendar cal = Calendar.getInstance();
 //                cal.setTime(sdate);
@@ -456,33 +456,33 @@ public class UserServiceImpl implements IUserService {
 //                Date time = cal.getTime();
 //                sdate=time;
 //                dustRecEntity.setTime(sdate);
-//                dustRecEntity.setTds(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity.setWc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity.setTds(Double.parseDouble(df.format( Math.random()*40))+20);
+//                dustRecEntity.setTemperature(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity.setWc(Double.parseDouble(df.format( Math.random()*40))+20);
 //                dustRecMapper.insert(dustRecEntity);
-////
+//////
 //                SysDustRecEntity dustRecEntity1=new SysDustRecEntity();
 //                dustRecEntity1.setDepth(20);
-//                dustRecEntity1.setEc(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity1.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity1.setSalinity(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setEc(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity1.setEpsilon(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity1.setSalinity(Double.parseDouble(df.format( Math.random()*40)+20));
 //                dustRecEntity1.setSiteId((int)(Math.random()*8)+1);
 //                dustRecEntity1.setTime(sdate);
-//                dustRecEntity1.setTds(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity1.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity1.setWc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity1.setTds(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity1.setTemperature(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity1.setWc(Double.parseDouble(df.format( Math.random()*40)+20));
 //                dustRecMapper.insert(dustRecEntity1);
 ////
 //                SysDustRecEntity dustRecEntity2=new SysDustRecEntity();
 //                dustRecEntity2.setDepth(40);
-//                dustRecEntity2.setEc(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity2.setEpsilon(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity2.setSalinity(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setEc(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity2.setEpsilon(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity2.setSalinity(Double.parseDouble(df.format( Math.random()*40)+20));
 //                dustRecEntity2.setSiteId((int)(Math.random()*8)+1);
 //                dustRecEntity2.setTime(sdate);
-//                dustRecEntity2.setTds(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity2.setTemperature(Double.parseDouble(df.format( Math.random()*40)));
-//                dustRecEntity2.setWc(Double.parseDouble(df.format( Math.random()*40)));
+//                dustRecEntity2.setTds(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity2.setTemperature(Double.parseDouble(df.format( Math.random()*40)+20));
+//                dustRecEntity2.setWc(Double.parseDouble(df.format( Math.random()*40)+20));
 //                dustRecMapper.insert(dustRecEntity2);
 
 //                SysSensorRecEntity dustRec=new SysSensorRecEntity();
