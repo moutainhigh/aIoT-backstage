@@ -7,10 +7,11 @@ import com.aiot.aiotbackstage.model.param.DeviceInfoParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 
 import java.util.Date;
+import java.util.List;
 
 public interface IDeviceService {
 
-    SysDeviceErrorRecEntity deviceInfoNew();
+    List<SysDeviceErrorRecEntity> deviceInfoNew();
 
     PageResult<SysDeviceErrorRecEntity> deviceInfoOld(DeviceInfoOldParam param);
 

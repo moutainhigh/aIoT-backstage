@@ -13,4 +13,11 @@ public class DeviceVo {
     private String CAMERA;
     private String InsectDevice;
 
+    private String statusRTU;
+    private String statusCAMERA;
+    private String statusInsectDevice;
+
+    private String deviceNameRTU;
+    private String deviceNameCAMERA;
+    private String deviceNameInsectDevice;
 }

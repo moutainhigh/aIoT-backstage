@@ -43,22 +43,21 @@ public class DeviceServiceImpl implements IDeviceService {
     private SysSiteMapper siteMapper;
 
     @Override
-    public SysDeviceErrorRecEntity deviceInfoNew() {
+    public List<SysDeviceErrorRecEntity> deviceInfoNew() {
 
+        //获取故障的设备
         List<SysDeviceErrorRecEntity> errorRecEntityList =
                 errorRecMapper.selectList(Wrappers.<SysDeviceErrorRecEntity>lambdaQuery()
                         .isNull(SysDeviceErrorRecEntity::getEndTime));
         Map<Integer, List<SysDeviceErrorRecEntity>> collect = errorRecEntityList.stream().collect(Collectors.groupingBy(SysDeviceErrorRecEntity::getSiteId));
         Set<Integer> integers = collect.keySet();
-        Integer[] nums = new Integer[]{1,2,3,4,5,6};
         List<SysDeviceErrorRecEntity> list=new ArrayList<>();
         integers.forEach(integer -> {
             SysDeviceErrorRecEntity sysDeviceErrorRecEntity1=new SysDeviceErrorRecEntity();
             sysDeviceErrorRecEntity1.setSiteId(integer);
             List<SysDeviceErrorRecEntity> sysDeviceErrorRecEntities = collect.get(integer);
-            List<DeviceVo> deviceVos=new ArrayList<>();
+            DeviceVo deviceVo=new DeviceVo();
             sysDeviceErrorRecEntities.forEach(sysDeviceErrorRecEntity -> {
-                DeviceVo deviceVo=new DeviceVo();
                 if(sysDeviceErrorRecEntity.getDeviceType().equals("RYU")){
                     deviceVo.setRTU(sysDeviceErrorRecEntity.getDeviceType());
                 }else if(sysDeviceErrorRecEntity.getDeviceType().equals("CAMERA")){
@@ -66,15 +65,61 @@ public class DeviceServiceImpl implements IDeviceService {
                 }else{
                     deviceVo.setInsectDevice(sysDeviceErrorRecEntity.getDeviceType());
                 }
-                deviceVos.add(deviceVo);
             });
-            sysDeviceErrorRecEntity1.setDeviceVos(deviceVos);
+            sysDeviceErrorRecEntity1.setDeviceVo(deviceVo);
             list.add(sysDeviceErrorRecEntity1);
         });
-        list.forEach(sysDeviceErrorRecEntity -> {
+        //组建正常的设备数据
+        List<SysDeviceErrorRecEntity> entities=new ArrayList<>();
+        for (int i = 0; i < 8 ; i++) {
+            SysDeviceErrorRecEntity errorRecEntity=new SysDeviceErrorRecEntity();
+            errorRecEntity.setSiteId(i);
+            DeviceVo deviceVo=new DeviceVo();
+            deviceVo.setCAMERA("CAMERA");
+            deviceVo.setDeviceNameCAMERA("摄像头");
+            deviceVo.setStatusCAMERA("正常");
+            deviceVo.setInsectDevice("InsectDevice");
+            deviceVo.setDeviceNameInsectDevice("虫情测报灯");
+            deviceVo.setStatusInsectDevice("正常");
+            deviceVo.setRTU("RYU");
+            deviceVo.setDeviceNameRTU("传感器RTU");
+            deviceVo.setStatusRTU("正常");
+            errorRecEntity.setDeviceVo(deviceVo);
+            entities.add(errorRecEntity);
+        }
+        //将故障的设备数据和组建数据合并
+        Map<Integer, List<SysDeviceErrorRecEntity>> collect1 = entities.stream().collect(Collectors.groupingBy(SysDeviceErrorRecEntity::getSiteId, Collectors.toList()));
+        Map<Integer, List<SysDeviceErrorRecEntity>> collect2 = list.stream().collect(Collectors.groupingBy(SysDeviceErrorRecEntity::getSiteId, Collectors.toList()));
+        Set<Integer> integers1 = collect1.keySet();
+        Set<Integer> integers2 = collect2.keySet();
+        integers1.stream().forEach(i -> {
+            integers2.stream().forEach(j -> {
+                if(i == j){
+                    List<SysDeviceErrorRecEntity> entities1 = collect1.get(i);
+                    List<SysDeviceErrorRecEntity> entities2 = collect2.get(j);
+                    entities1.stream().forEach(errorRecEntity -> {
+                        entities2.stream().forEach(errorRecEntity1 -> {
 
+                            DeviceVo deviceVos = errorRecEntity.getDeviceVo();
+                            DeviceVo deviceVos1 = errorRecEntity1.getDeviceVo();
+                            if(deviceVos.getCAMERA().equals(deviceVos1.getCAMERA())){
+                                errorRecEntity.setStartTime(errorRecEntity1.getStartTime());
+                                deviceVos.setStatusCAMERA("异常");
+                            }
+                            if(deviceVos.getInsectDevice().equals(deviceVos1.getInsectDevice())){
+                                errorRecEntity.setStartTime(errorRecEntity1.getStartTime());
+                                deviceVos.setStatusInsectDevice("异常");
+                            }
+                            if(deviceVos.getRTU().equals(deviceVos1.getRTU())){
+                                errorRecEntity.setStartTime(errorRecEntity1.getStartTime());
+                                deviceVos.setStatusRTU("异常");
+                            }
+                        });
+                    });
+                }
+            });
         });
-
+        return  entities;
         /*PageParam pageParam=new PageParam();
         pageParam.setPageNumber(param.getPageNumber());
         pageParam.setPageSize(param.getPageSize());
@@ -121,7 +166,6 @@ public class DeviceServiceImpl implements IDeviceService {
                 .pageNumber(pageParam.getPageNumber())
                 .pageSize(pageParam.getPageSize())
                 .build();*/
-        return null;
     }
 
     public long fromDateStringToLong(String inVal) { //此方法计算时间毫秒

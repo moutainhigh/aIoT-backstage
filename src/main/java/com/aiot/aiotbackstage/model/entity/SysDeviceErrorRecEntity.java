@@ -50,6 +50,6 @@ public class SysDeviceErrorRecEntity  {
     private String deviceName;
 
     @TableField(exist = false)
-    private List<DeviceVo> deviceVos;
+    private DeviceVo deviceVo;
 
 }
