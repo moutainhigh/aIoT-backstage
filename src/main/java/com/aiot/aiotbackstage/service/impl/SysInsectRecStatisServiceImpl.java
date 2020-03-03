@@ -7,7 +7,6 @@ import com.aiot.aiotbackstage.service.ISysInsectRecStatisService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +75,85 @@ public class SysInsectRecStatisServiceImpl extends ServiceImpl<SysInsectRecStati
         return map;
     }
 
-    public Object getAllPestNumStat() {
-        return sysInsectRecStatisMapper.findAllGroupByInsectId(null);
+    @Override
+    public Map<String, List<String>> getPerPestNumStat() {
+        List<Map<String, Object>> result = sysInsectRecStatisMapper.findAllGroupByInsectId(null);
+
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> tempList;
+        for (Map<String, Object> item : result) {
+            if (!map.containsKey("name")) {
+                tempList = new ArrayList<>();
+                map.put("name", tempList);
+            } else {
+                tempList = map.get("name");
+            }
+            tempList.add(String.valueOf(item.get("name")));
+
+            if (!map.containsKey("data")) {
+                tempList = new ArrayList<>();
+                map.put("data", tempList);
+            } else {
+                tempList = map.get("data");
+            }
+            tempList.add(String.valueOf(item.get("value")));
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, List<String>> getPestNumStatDaily(String startDate, String endDate) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+        List<Map<String, Object>> result = sysInsectRecStatisMapper.findAllGroupByDate(params);
+
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> tempList;
+        for (Map<String, Object> item : result) {
+            if (!map.containsKey("name")) {
+                tempList = new ArrayList<>();
+                map.put("name", tempList);
+            } else {
+                tempList = map.get("name");
+            }
+            tempList.add(String.valueOf(item.get("date")));
+
+            if (!map.containsKey("data")) {
+                tempList = new ArrayList<>();
+                map.put("data", tempList);
+            } else {
+                tempList = map.get("data");
+            }
+            tempList.add(String.valueOf(item.get("num")));
+        }
+        return map;
+    }
+
+    public Object getPestNumStatMonthly(String year) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("year", year);
+        List<Map<String, Object>> result = sysInsectRecStatisMapper.findAllGroupByDateMonth(params);
+
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> tempList;
+        for (Map<String, Object> item : result) {
+            if (!map.containsKey("name")) {
+                tempList = new ArrayList<>();
+                map.put("name", tempList);
+            } else {
+                tempList = map.get("name");
+            }
+            tempList.add(String.valueOf(item.get("date")));
+
+            if (!map.containsKey("data")) {
+                tempList = new ArrayList<>();
+                map.put("data", tempList);
+            } else {
+                tempList = map.get("data");
+            }
+            tempList.add(String.valueOf(item.get("num")));
+        }
+        return map;
     }
 }

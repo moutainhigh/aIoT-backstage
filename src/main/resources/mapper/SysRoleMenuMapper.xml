@@ -5,6 +5,11 @@
     <!--@mbg.generated-->
     <!--@Table sys_role_menu-->
     <result column="role_id" jdbcType="BIGINT" property="roleId" />
-    <result column="menu_id" jdbcType="BIGINT" property="menuId" />
+    <result column="" jdbcType="BIGINT" property="menuId" />
   </resultMap>
+
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    role_id, menu_id
+  </sql>
 </mapper>

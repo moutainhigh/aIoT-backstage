@@ -19,9 +19,11 @@ public interface IGisService {
 
     void disasterSituation(DisasterSituationGisParam param);
 
-    SensorInfoVo sensorInfo(Long stationId);
+    SensorInfoVo sensorInfo(Integer stationId);
 
     PageResult<SysSeedlingGrowthEntity> getSeedlingGrowth(PageParam pageParam);
 
     PageResult<SysDisasterSituationEntity> getDisasterSituation(PageParam pageParam);
+
+    List<SysSiteEntity> stationData();
 }

@@ -18,5 +18,7 @@ public interface SysInsectRecMapper extends BaseMapper<SysInsectRecEntity> {
     List<SysInsectRecStatisEntity> findAllPestNumHourly(Map<String, Object> params);
 
 
-    List<SysInsectRecEntity> insectRecGisInfo(@Param("site_id") Long site_id);
+    List<SysInsectRecEntity> insectRecGisInfo(@Param("site_id") Integer site_id);
+
+    List<Map<String, Object>> findByTimeGroupBySiteId(@Param("time") String time);
 }

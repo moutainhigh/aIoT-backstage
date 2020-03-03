@@ -1,6 +1,8 @@
 package com.aiot.aiotbackstage.model.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
@@ -12,12 +14,11 @@ import lombok.Data;
  */
 @Data
 @TableName(value = "sys_role_menu")
-public class SysRoleMenuEntity implements Serializable  {
-    @TableField(value = "role_id")
+public class SysRoleMenuEntity{
+    @TableId(value = "role_id", type = IdType.AUTO)
     private Long roleId;
 
     @TableField(value = "menu_id")
     private Long menuId;
 
-    private static final long serialVersionUID = 1L;
 }

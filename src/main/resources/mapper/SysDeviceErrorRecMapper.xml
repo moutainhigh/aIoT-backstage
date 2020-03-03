@@ -8,8 +8,76 @@
         <result column="sub_type" jdbcType="VARCHAR" property="subType" />
         <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
         <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     </resultMap>
     <sql id="Base_Column_List">
-        id, site_id siteId, device_type deviceType, sub_type subType, start_time startTime, end_time endTime
+        id, site_id siteId, device_type deviceType, sub_type subType, start_time startTime, end_time endTime,create_time
     </sql>
+
+    <select id="deviceErrorRecOldPage" resultMap="BaseResultMap">
+        select  *  from sys_device_error_rec
+        <where>
+            <if test="param.startDate != null">AND start_time <![CDATA[>=]]> #{param.startDate}</if>
+            <if test="param.endDate != null">AND end_time <![CDATA[<=]]>#{param.endDate}</if>
+            <if test="param.siteId != null">AND site_id = #{param.siteId}</if>
+            <if test="param.deviceType != null">AND device_type= #{param.deviceType}</if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{param.offset},#{param.pageSize}
+    </select>
+
+    <select id="countOld" resultType="java.lang.Integer">
+        select  count(*)  from sys_device_error_rec
+        <where>
+            <if test="param.startDate != null">AND start_time <![CDATA[>=]]> #{param.startDate}</if>
+            <if test="param.endDate != null">AND end_time <![CDATA[<=]]>#{param.endDate}</if>
+            <if test="param.siteId != null">AND site_id = #{param.siteId}</if>
+            <if test="param.deviceType != null">AND device_type= #{param.deviceType}</if>
+        </where>
+    </select>
+
+    <select id="deviceErrorRecNewYearPage" resultMap="BaseResultMap">
+        select *
+        from sys_device_error_rec
+        <where>
+            start_time > date_sub(curdate(), interval 12 month)
+            <if test="param.siteId != null">AND site_id = #{param.siteId}</if>
+            <if test="param.deviceType != null">AND device_type= #{param.deviceType}</if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{param.offset},#{param.pageSize}
+    </select>
+
+    <select id="countYear" resultType="java.lang.Integer">
+        select count(*)
+        from sys_device_error_rec
+        <where>
+            start_time > date_sub(curdate(), interval 12 month)
+            <if test="param.siteId != null">AND site_id = #{param.siteId}</if>
+            <if test="param.deviceType != null">AND device_type= #{param.deviceType}</if>
+        </where>
+    </select>
+
+    <select id="countYue" resultType="java.lang.Integer">
+        select count(*)
+        from sys_device_error_rec
+        <where>
+            start_time > date_sub(curdate(), interval 12 month)
+            <if test="param.siteId != null">AND site_id = #{param.siteId}</if>
+            <if test="param.deviceType != null">AND device_type= #{param.deviceType}</if>
+        </where>
+    </select>
+
+
+    <select id="deviceErrorRecNewYuePage" resultMap="BaseResultMap">
+        select *
+        from sys_device_error_rec
+        <where>
+            start_time > date_sub(curdate(), interval 1 month)
+            <if test="param.siteId != null">AND site_id = #{param.siteId}</if>
+            <if test="param.deviceType != null">AND device_type= #{param.deviceType}</if>
+        </where>
+        ORDER BY create_time DESC
+        LIMIT #{param.offset},#{param.pageSize}
+    </select>
 </mapper>

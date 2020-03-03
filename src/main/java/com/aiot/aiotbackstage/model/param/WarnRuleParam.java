@@ -25,7 +25,9 @@ public class WarnRuleParam {
     @ApiModelProperty(value="预警对象（1-苗情\n" +
             "2-灾情\n" +
             "3-气象\n" +
-            "4-土壤）",name="earlyType",example="预警对象")
+            "4-土壤\n" +
+            "5-虫情\n" +
+            "）",name="earlyType",example="预警对象")
     private String earlyType;
 
     /**
@@ -53,9 +55,15 @@ public class WarnRuleParam {
     private String earlyContent;
 
     /**
-     * 预警阈值
+     * 预警阈值最大值
      */
-    @ApiModelProperty(value="预警阈值",name="earlyThreshold",example="预警阈值")
-    private String earlyThreshold;
+    @ApiModelProperty(value="预警阈值最大值",name="earlyMax",example="预警阈值")
+    private String earlyMax;
+
+    /**
+     * 预警阈值最小值
+     */
+    @ApiModelProperty(value="预警阈值最小值",name="earlyMin",example="预警阈值")
+    private String earlyMin;
 
 }

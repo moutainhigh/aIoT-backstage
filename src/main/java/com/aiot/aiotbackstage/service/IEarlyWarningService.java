@@ -33,7 +33,7 @@ public interface IEarlyWarningService {
 
     void earlyInfoExamine(Long id);
 
-    List<Map<String,Object>> earlyContent(String earlyType);
+    Map<String,Object> earlyContent(String earlyType,String earlyDegree);
 
     Integer earlyCount();
 
@@ -43,4 +43,6 @@ public interface IEarlyWarningService {
     void earlyWarningReport(String type, String typeName, String depth, String value, Integer siteId);
 
     List<Map<String,Object>> earlyData(Integer type);
+
+    void earlyInfoUpdate(WarnInfoParam param);
 }

@@ -6,10 +6,7 @@ import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.util.DateUtils;
 import com.aiot.aiotbackstage.model.dto.YunFeiData;
 import com.aiot.aiotbackstage.server.schedule.DataStatisSchedule;
-import com.aiot.aiotbackstage.service.impl.SensorRecStatisServiceImpl;
-import com.aiot.aiotbackstage.service.impl.SysDustRecStatisServiceImpl;
-import com.aiot.aiotbackstage.service.impl.SysInsectRecServiceImpl;
-import com.aiot.aiotbackstage.service.impl.SysInsectRecStatisServiceImpl;
+import com.aiot.aiotbackstage.service.impl.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -49,10 +46,22 @@ public class DataController {
     private SysDustRecStatisServiceImpl sysDustRecStatisService;
 
     @Autowired
+    private SysDustRecServiceImpl sysDustRecService;
+
+    @Autowired
+    private SensorRecServiceImpl sensorRecService;
+
+    @Autowired
     private SensorRecStatisServiceImpl sensorRecStatisService;
 
     @Autowired
     private DataStatisSchedule dataStatisSchedule;
+
+    @Autowired
+    private SysDisasterSituationServiceImpl sysDisasterSituationService;
+
+    @Autowired
+    private SysSeedlingGrowthServiceImpl sysSeedlingGrowthService;
 
     @RequestMapping(value = "/insectDevice", method = RequestMethod.POST)
     public Result insectDevice(@RequestBody Map data) {
@@ -418,6 +427,189 @@ public class DataController {
         }
 
         return Result.success(sensorRecStatisService.getPestMeteInfo(siteId, startDate, endDate));
+    }
+
+    @ApiOperation(value = "灾情查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate"),
+            @ApiImplicitParam(name = "页码", value = "pageNumber"),
+            @ApiImplicitParam(name = "分页大小", value = "pageSize"),
+    })
+    @PostMapping("disaster")
+    public Result disasterSituation(@RequestBody Map<String, Object> params) {
+        int pageSize;
+        int pageIndex;
+        if (!params.containsKey("pageSize")) {
+            pageSize = Constants.Page.PAGE_SIZE;
+        } else {
+            pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+            if (pageSize > Constants.Page.MAX_PAGE_SIZE) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        if (!params.containsKey("pageNumber")) {
+            pageIndex = 1;
+        } else {
+            pageIndex = Integer.parseInt(String.valueOf(params.get("pageNumber")));
+            if (pageIndex <= 0) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        return Result.success(sysDisasterSituationService.getAll(startDate, endDate, pageIndex, pageSize));
+    }
+
+    @ApiOperation(value = "苗情查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate"),
+            @ApiImplicitParam(name = "页码", value = "pageNumber"),
+            @ApiImplicitParam(name = "分页大小", value = "pageSize"),
+    })
+    @PostMapping("seed")
+    public Result seed(@RequestBody Map<String, Object> params) {
+        int pageSize;
+        int pageIndex;
+        if (!params.containsKey("pageSize")) {
+            pageSize = Constants.Page.PAGE_SIZE;
+        } else {
+            pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+            if (pageSize > Constants.Page.MAX_PAGE_SIZE) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        if (!params.containsKey("pageNumber")) {
+            pageIndex = 1;
+        } else {
+            pageIndex = Integer.parseInt(String.valueOf(params.get("pageNumber")));
+            if (pageIndex <= 0) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        return Result.success(sysSeedlingGrowthService.getAll(startDate, endDate, pageIndex, pageSize));
+    }
+
+    @ApiOperation(value = "灾情统计查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate")
+    })
+    @PostMapping("disasterStat")
+    public Result disasterStat(@RequestBody Map<String, Object> params) {
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        return Result.success(sysDisasterSituationService.getStat(startDate, endDate));
+    }
+
+    @ApiOperation(value = "苗情统计查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate")
+    })
+    @PostMapping("seedStat")
+    public Result seedStat(@RequestBody Map<String, Object> params) {
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
+            if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                    || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        return Result.success(sysSeedlingGrowthService.getStat(startDate, endDate));
+    }
+
+    @ApiOperation(value = "根据时间点查询虫情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "时间", value = "time")
+    })
+    @PostMapping("pestNumStatByTime")
+    public Result pestNumStatByTime(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("time")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        if (params.get("time") == null) {
+            return Result.error(ResultStatusCode.PARAM_IS_BLANK);
+        }
+        return Result.success(sysInsectRecService.getStatByTime(String.valueOf(params.get("time"))));
+    }
+
+    @ApiOperation(value = "根据时间点查询土壤墒情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "时间", value = "time")
+    })
+    @PostMapping("soilStatByTime")
+    public Result soilStatByTime(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("time")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        if (params.get("time") == null) {
+            return Result.error(ResultStatusCode.PARAM_IS_BLANK);
+        }
+        return Result.success(sysDustRecService.getStatByTime( String.valueOf(params.get("time"))));
+    }
+
+    @ApiOperation(value = "根据时间点查询气象数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "时间", value = "time")
+    })
+    @PostMapping("meteStatByTime")
+    public Result meteStatByTime(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("time")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        if (params.get("time") == null) {
+            return Result.error(ResultStatusCode.PARAM_IS_BLANK);
+        }
+        return Result.success(sensorRecService.getStatByTime(String.valueOf(params.get("time"))));
     }
 
     @PostMapping("statis")

@@ -25,8 +25,10 @@ public class SysInsectRecServiceImpl extends ServiceImpl<SysInsectRecMapper, Sys
 
     @Resource
     private SysInsectDeviceMapper sysInsectDeviceMapper;
+
     @Resource
     private IEarlyWarningService earlyWarningService;
+
     @Autowired
     private SysInsectInfoMapper insectInfoMapper;
 
@@ -60,5 +62,31 @@ public class SysInsectRecServiceImpl extends ServiceImpl<SysInsectRecMapper, Sys
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Map<String, List<String>> getStatByTime(String time) {
+        List<Map<String, Object>> result = baseMapper.findByTimeGroupBySiteId(time);
+
+        Map<String, List<String>> map = new HashMap<>();
+        List<String> tempList;
+        for (Map<String, Object> item : result) {
+            if (!map.containsKey("name")) {
+                tempList = new ArrayList<>();
+                map.put("name", tempList);
+            } else {
+                tempList = map.get("name");
+            }
+            tempList.add(String.valueOf(item.get("name")));
+
+            if (!map.containsKey("data")) {
+                tempList = new ArrayList<>();
+                map.put("data", tempList);
+            } else {
+                tempList = map.get("data");
+            }
+            tempList.add(String.valueOf(item.get("num")));
+        }
+        return map;
     }
 }

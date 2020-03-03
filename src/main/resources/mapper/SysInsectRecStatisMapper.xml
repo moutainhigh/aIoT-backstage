@@ -194,4 +194,38 @@
 	        sii.`name`
     </select>
 
+    <select id="findAllGroupByDate" resultType="map">
+        SELECT
+            `date`,
+            SUM( num ) AS num
+        FROM
+            sys_insect_rec_statis
+        WHERE
+            `date` BETWEEN #{startDate} AND #{endDate}
+        GROUP BY
+            `date`
+        ORDER BY
+            `date`
+    </select>
+
+    <select id="findAllGroupByDateMonth" resultType="map">
+        SELECT
+            a.fmt_date AS `date` ,
+            SUM( a.num ) AS num
+        FROM
+        (
+            SELECT
+                DATE_FORMAT( `date`, '%Y-%m' ) AS fmt_date,
+                num
+            FROM
+                sys_insect_rec_statis
+            WHERE
+                DATE_FORMAT( `date`, '%Y' ) = #{year}
+        ) AS a
+        GROUP BY
+            a.fmt_date
+        ORDER BY
+            a.fmt_date
+    </select>
+
 </mapper>

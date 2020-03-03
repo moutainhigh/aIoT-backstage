@@ -10,15 +10,19 @@ import com.aiot.aiotbackstage.model.dto.RtuData;
 import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
+import com.aiot.aiotbackstage.model.vo.SysSensorRecVo;
+import com.aiot.aiotbackstage.model.vo.SysSensorRecVo2;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.ISensorRecService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net.sf.jsqlparser.expression.operators.relational.OldOracleJoinBinaryExpression;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 /**
@@ -89,8 +93,8 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         for (SysSensorRecEntity entity : list) {
             redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getSensor(), entity.getValue(), 60, TimeUnit.SECONDS);
             try {
-                earlyWarningService.earlyWarningReport("气象",entity.getSensor(),null,entity.getValue(),entity.getSiteId());
-            }catch (Exception e){
+                earlyWarningService.earlyWarningReport("气象", entity.getSensor(), null, entity.getValue(), entity.getSiteId());
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -101,14 +105,40 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getDepth(), entity, 60, TimeUnit.SECONDS);
         sysDustRecMapper.insert(entity);
         try {
-            earlyWarningService.earlyWarningReport("土壤","ec",entity.getDepth()+"cm",entity.getEc().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","epsilon",entity.getDepth()+"cm",entity.getEpsilon().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","salinity",entity.getDepth()+"cm",entity.getSalinity().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","temperature",entity.getDepth()+"cm",entity.getTemperature().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","wc",entity.getDepth()+"cm",entity.getWc().toString(),entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤","tds",entity.getDepth()+"cm",entity.getTds().toString(),entity.getSiteId());
-        }catch (Exception e){
+            earlyWarningService.earlyWarningReport("土壤", "ec", entity.getDepth() + "cm", entity.getEc().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "epsilon", entity.getDepth() + "cm", entity.getEpsilon().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "salinity", entity.getDepth() + "cm", entity.getSalinity().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "temperature", entity.getDepth() + "cm", entity.getTemperature().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "wc", entity.getDepth() + "cm", entity.getWc().toString(), entity.getSiteId());
+            earlyWarningService.earlyWarningReport("土壤", "tds", entity.getDepth() + "cm", entity.getTds().toString(), entity.getSiteId());
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Object getStatByTime(String time) {
+        List<SysSensorRecVo2> result = baseMapper.findByTimeGroupBySensor(time);
+
+        Map<String, List<SysSensorRecVo2>> collect = result.stream().collect(Collectors.groupingBy(SysSensorRecEntity::getSensor));
+
+        Map<String, Map<String, Object>> map = new HashMap<>();
+        Map<String, Object> tempMap;
+        for (Map.Entry<String, List<SysSensorRecVo2>> entry : collect.entrySet()) {
+            tempMap = new HashMap<>();
+            map.put(entry.getKey(), tempMap);
+
+            List<String> x = new ArrayList<>();
+            List<String> y = new ArrayList<>();
+
+            tempMap.put("x", x);
+            tempMap.put("y", y);
+
+            for (SysSensorRecVo2 item : entry.getValue()) {
+                x.add(item.getSiteName());
+                y.add(item.getValue());
+            }
+        }
+        return map;
     }
 }

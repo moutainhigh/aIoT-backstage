@@ -37,15 +37,9 @@ public class Result {
 
     public static Result success(Object object) {
         Result result = new Result();
-        // 返回结果为空
-        if (ObjectUtils.isEmpty(object)) {
-            result.setCode(ResultStatusCode.NO_RESULT.getCode());
-            result.setMsg(ResultStatusCode.NO_RESULT.getMessage());
-        } else {
-            result.setCode(ResultStatusCode.SUCCESS.getCode());
-            result.setMsg(ResultStatusCode.SUCCESS.getMessage());
-            result.setData(object);
-        }
+        result.setCode(ResultStatusCode.SUCCESS.getCode());
+        result.setMsg(ResultStatusCode.SUCCESS.getMessage());
+        result.setData(object);
         return result;
     }
 

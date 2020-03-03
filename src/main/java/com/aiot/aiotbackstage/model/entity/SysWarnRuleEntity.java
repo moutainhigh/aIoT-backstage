@@ -34,10 +34,18 @@ public class SysWarnRuleEntity {
 
 
     /**
-     * 预警阈值
+     * 预警阈值最大值
      */
-    @TableField(value = "early_threshold")
-    private String earlyThreshold;
+    @TableField(value = "early_max")
+    private String earlyMax;
+
+    /**
+     * 预警阈值最小值
+     */
+    @TableField(value = "early_min")
+    private String earlyMin;
+
+
 
     /**
      * 预警程度

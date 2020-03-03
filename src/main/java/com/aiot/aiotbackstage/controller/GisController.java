@@ -1,8 +1,8 @@
 package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
+import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.model.param.DisasterSituationGisParam;
-import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.SeedlingGrowthGisParam;
 import com.aiot.aiotbackstage.service.IGisService;
 import com.aiot.aiotbackstage.service.impl.SysInsectRecStatisServiceImpl;
@@ -32,7 +32,7 @@ public class GisController {
     @Autowired
     private SysInsectRecStatisServiceImpl sysInsectRecStatisService;
 
-    @ApiOperation(value = "站点数据接口(stationInfo)", notes = "站点数据接口(stationInfo)")
+    @ApiOperation(value = "站点数据接口GIS(stationInfo)", notes = "站点数据接口(stationInfo)")
     @ApiResponses({
             @ApiResponse(code = 200, message = "成功")
     })
@@ -43,7 +43,18 @@ public class GisController {
         return Result.success(iGisService.stationInfo());
     }
 
-    @ApiOperation(value = "苗情入库(seedlingGrowth)注意：该接口只用于GIS", notes = "苗情(seedlingGrowth)")
+    @ApiOperation(value = "站点数据接口(stationData)", notes = "站点数据接口(stationData)")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "成功")
+    })
+    @ResponseBody
+    @GetMapping("/stationData")
+    public Result stationData(
+    ) {
+        return Result.success(iGisService.stationData());
+    }
+
+    @ApiOperation(value = "苗情(seedlingGrowth)注意：该接口只用于GIS", notes = "苗情(seedlingGrowth)")
     @ResponseBody
     @PostMapping("/seedlingGrowth")
     public Result seedlingGrowth(@RequestBody SeedlingGrowthGisParam param
@@ -52,7 +63,7 @@ public class GisController {
         return Result.success();
     }
 
-    @ApiOperation(value = "灾情入库(disasterSituation)注意：该接口只用于GIS", notes = "灾情(disasterSituation)")
+    @ApiOperation(value = "灾情(disasterSituation)注意：该接口只用于GIS", notes = "灾情(disasterSituation)")
     @ResponseBody
     @PostMapping("/disasterSituation")
     public Result disasterSituation(@RequestBody DisasterSituationGisParam param
@@ -64,7 +75,7 @@ public class GisController {
     @ApiOperation(value = "传感器数据接口：该接口只用于GIS", notes = "传感器数据接口")
     @ResponseBody
     @PostMapping("/sensorInfo")
-    public Result sensorInfo(@RequestParam Long stationId
+    public Result sensorInfo(@RequestParam Integer stationId
     ) {
         return Result.success(iGisService.sensorInfo(stationId));
     }
@@ -85,32 +96,39 @@ public class GisController {
         ));
     }
 
-    @ApiOperation("总害虫数量统计")
+    @ApiOperation("每种害虫数量统计")
     @ResponseBody
-    @PostMapping("pestNumStat/all")
-    public Result allPestNumStat() {
-        return Result.success(sysInsectRecStatisService.getAllPestNumStat());
+    @PostMapping("perPestNumStat")
+    public Result perPestNumStat() {
+        return Result.success(sysInsectRecStatisService.getPerPestNumStat());
     }
 
-    @ApiOperation(value = "获取苗情数据", notes = "获取苗情数据")
+    @ApiOperation("每天害虫数量统计")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "startDate", name = "开始时间"),
+            @ApiImplicitParam(value = "endDate", name = "结束时间")
+    })
     @ResponseBody
-    @GetMapping("/getSeedlingGrowth")
-    public Result getSeedlingGrowth(@RequestParam Integer pageNumber,@RequestParam Integer pageSize
-    ) {
-        PageParam pageParam=new PageParam();
-        pageParam.setPageNumber(pageNumber);
-        pageParam.setPageSize(pageSize);
-        return Result.success(iGisService.getSeedlingGrowth(pageParam));
+    @PostMapping("pestNumStat/daily")
+    public Result allPestNumStatDaily(@RequestBody Map<String, Object> params) {
+        Object startDate = params.get("startDate");
+        Object endDate = params.get("endDate");
+        return Result.success(sysInsectRecStatisService.getPestNumStatDaily(
+                startDate == null ? null : String.valueOf(startDate),
+                endDate == null ? null : String.valueOf(endDate)
+        ));
     }
 
-    @ApiOperation(value = "获取灾情数据", notes = "获取灾情数据")
+    @ApiOperation("每月害虫数量统计")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "year", name = "年")
+    })
     @ResponseBody
-    @GetMapping("/getDisasterSituation")
-    public Result getDisasterSituation(@RequestParam Integer pageNumber,@RequestParam Integer pageSize
-    ) {
-        PageParam pageParam=new PageParam();
-        pageParam.setPageNumber(pageNumber);
-        pageParam.setPageSize(pageSize);
-        return Result.success(iGisService.getDisasterSituation(pageParam));
+    @PostMapping("pestNumStat/monthly")
+    public Result allPestNumStatMonthly(@RequestBody Map<String, Object> params) {
+        if (!params.containsKey("year")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        return Result.success(sysInsectRecStatisService.getPestNumStatMonthly(String.valueOf(params.get("year"))));
     }
 }

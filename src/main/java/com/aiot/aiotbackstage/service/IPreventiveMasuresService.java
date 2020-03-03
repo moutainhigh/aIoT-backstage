@@ -10,4 +10,5 @@ public interface IPreventiveMasuresService {
 
     List<SysPreventiveMeasuresEntity> getMasuresInfoByName(String name);
 
+    SysPreventiveMeasuresEntity preventiveDetail(String preventiveId, String insectId);
 }

@@ -15,6 +15,10 @@
         <result column="time" jdbcType="TIMESTAMP" property="time"/>
     </resultMap>
 
+    <resultMap id="BaseResultVo" extends="BaseResultMap" type="com.aiot.aiotbackstage.model.vo.SysDustRecVo">
+        <result column="site_name" property="siteName"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
         id, site_id siteId, depth, wc, temperature, ec, salinity, tds, epsilon, `time`
     </sql>
@@ -52,6 +56,29 @@
             a.depth,
             a.fmt_date,
             a.fmt_hour
+    </select>
+
+    <select id="findByTimeGroupByDepth" resultMap="BaseResultVo">
+        SELECT
+            sdr.*,
+            ss.`name` AS site_name
+        FROM
+            sys_dust_rec AS sdr
+            LEFT JOIN sys_site AS ss ON ss.id = sdr.site_id
+        WHERE
+            ( sdr.site_id, sdr.depth, sdr.time ) IN (
+                SELECT
+                    site_id,
+                    depth,
+                    MAX( time )
+                FROM
+                    sys_dust_rec
+                WHERE time &lt;= #{time}
+                GROUP BY
+                    site_id, depth
+                )
+        ORDER BY
+            ss.`name`, sdr.depth
     </select>
 
 </mapper>

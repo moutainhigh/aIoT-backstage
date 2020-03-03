@@ -45,5 +45,5 @@ public interface IUserService {
 
     void isToken(String token);
 
-    List<Map<String,Object>> permissionInfo();
+    List<Map<String,Object>> permissionInfo(String token);
 }

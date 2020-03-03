@@ -46,7 +46,8 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnRuleEntity.setEarlyType(earlyType(param.getEarlyType()));
         warnRuleEntity.setEarlyName(param.getEarlyName());
         warnRuleEntity.setEarlyDepth(param.getEarlyDepth());
-        warnRuleEntity.setEarlyThreshold(param.getEarlyThreshold());
+        warnRuleEntity.setEarlyMax(param.getEarlyMax());
+        warnRuleEntity.setEarlyMax(param.getEarlyMin());
         warnRuleEntity.setEarlyDegree(param.getEarlyDegree());
         warnRuleEntity.setEarlyContent(param.getEarlyContent());
         warnRuleEntity.setCreateTime(new Date());
@@ -81,7 +82,8 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnRuleEntity.setEarlyType(param.getEarlyType());
         warnRuleEntity.setEarlyName(param.getEarlyName());
         warnRuleEntity.setEarlyDepth(param.getEarlyDepth());
-        warnRuleEntity.setEarlyThreshold(param.getEarlyThreshold());
+        warnRuleEntity.setEarlyMax(param.getEarlyMax());
+        warnRuleEntity.setEarlyMin(param.getEarlyMin());
         warnRuleEntity.setEarlyDegree(param.getEarlyDegree());
         warnRuleEntity.setEarlyContent(param.getEarlyContent());
         warnRuleEntity.setCreateTime(new Date());
@@ -111,7 +113,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
             ruleEntityList= warnRuleMapper.warnRulePage(earlyType,pageParam);
         }
         if(CollectionUtils.isEmpty(ruleEntityList)){
-            throw new MyException(ResultStatusCode.EARLY_WARNING_NO_EXIT);
+            return  null;
         }
         return PageResult.<SysWarnRuleEntity>builder()
                 .total(total)
@@ -145,7 +147,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         Integer total = warnInfoMapper.selectCount(null);
         List<SysWarnInfoEntity> sysWarnInfoEntities = warnInfoMapper.warnInfoPage(pageParam);
         if(CollectionUtils.isEmpty(sysWarnInfoEntities)){
-            throw new MyException(ResultStatusCode.EARLY_WARNING_NO_EXIT);
+            return  null;
         }
         return PageResult.<SysWarnInfoEntity>builder()
                 .total(total)
@@ -176,30 +178,34 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
     }
 
     @Override
-    public List<Map<String,Object>> earlyContent(String earlyType) {
+    public  Map<String,Object> earlyContent(String earlyType , String earlyDegree) {
 
-        List<Map<String,Object>> mapList=new ArrayList<>();
+//        List<Map<String,Object>> mapList=new ArrayList<>();
         List<SysWarnRuleEntity> warnRuleEntity = warnRuleMapper
                 .selectList(Wrappers.<SysWarnRuleEntity>lambdaQuery()
-                        .eq(SysWarnRuleEntity::getEarlyType, earlyType));
+                        .eq(SysWarnRuleEntity::getEarlyType, earlyType)
+                        .eq(SysWarnRuleEntity::getEarlyDegree,earlyDegree));
         if(ObjectUtils.isEmpty(warnRuleEntity)){
-            throw new MyException(ResultStatusCode.EARLY_WARNING_NO_EXIT);
+            return  null;
         }
-        Map<String, List<SysWarnRuleEntity>> collect = warnRuleEntity.stream()
-                .collect(Collectors.groupingBy(SysWarnRuleEntity::getEarlyName, Collectors.toList()));
-        Set<String> strings = collect.keySet();
-        strings.forEach(s -> {
-            Map<String,Object> map=new HashMap<>();
-            map.put("earlyName",s);
-            List<String> list=new ArrayList<>();
-            List<SysWarnRuleEntity> ruleEntityList = collect.get(s);
-            ruleEntityList.forEach(sysWarnRuleEntity -> {
-                list.add(sysWarnRuleEntity.getEarlyContent());
-            });
-            map.put("earlyContent",list);
-            mapList.add(map);
-        });
-        return mapList;
+//        Map<String, List<SysWarnRuleEntity>> collect = warnRuleEntity.stream()
+//                .collect(Collectors.groupingBy(SysWarnRuleEntity::getEarlyName, Collectors.toList()));
+//        Set<String> strings = collect.keySet();
+//        strings.forEach(s -> {
+//            Map<String,Object> map=new HashMap<>();
+//            map.put("earlyName",s);
+//            List<String> list=new ArrayList<>();
+//            List<SysWarnRuleEntity> ruleEntityList = collect.get(s);
+//            ruleEntityList.forEach(sysWarnRuleEntity -> {
+//                list.add(sysWarnRuleEntity.getEarlyContent());
+//            });
+//            map.put("earlyContent",list);
+//            mapList.add(map);
+//        });
+        Map<String,Object> map=new HashMap<>();
+        map.put("earlyName",warnRuleEntity.get(0).getEarlyName());
+        map.put("earlyContent",warnRuleEntity.get(0).getEarlyContent());
+        return map;
     }
 
     @Override
@@ -235,12 +241,16 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                                 .eq(SysWarnRuleEntity::getEarlyName,typeName));
             }
         if (ObjectUtils.isNotEmpty(warnRuleEntity)) {
-            String earlyThreshold = warnRuleEntity.getEarlyThreshold();
+            String earlyMax = warnRuleEntity.getEarlyMax();
+            String earlyMin = warnRuleEntity.getEarlyMin();
             Double v = Double.parseDouble(value);
-            Double v1 = Double.parseDouble(earlyThreshold);
+            Double v1 = Double.parseDouble(earlyMax);
+            Double v2 = Double.parseDouble(earlyMin);
             int i = v.compareTo(v1);
-            if (i > 0) {
-                SysWarnInfoEntity warnInfoEntity=new SysWarnInfoEntity();
+            int j = v.compareTo(v2);
+            if (i > 0 && j < 0) {
+
+                SysWarnInfoEntity warnInfoEntity = new SysWarnInfoEntity();
                 warnInfoEntity.setSiteId(siteId);
                 SysSiteEntity sysSiteEntity = siteMapper.selectById(siteId);
                 warnInfoEntity.setSiteName(sysSiteEntity.getName());
@@ -249,7 +259,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                 warnInfoEntity.setTime(new Date());
                 warnInfoEntity.setEarlyType(type);
                 warnInfoEntity.setEarlyName(warnRuleEntity.getEarlyName());
-                if(warnRuleEntity.getEarlyDepth() != null){
+                if (warnRuleEntity.getEarlyDepth() != null) {
                     warnInfoEntity.setEarlyDepth(warnRuleEntity.getEarlyDepth());
                 }
                 warnInfoEntity.setEarlyDegree(warnRuleEntity.getEarlyDegree());
@@ -276,11 +286,11 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
             resultMap.put("PM10","PM10");
             resultMap.put("atmos","大气压");
             list.add(resultMap);
-        }else{
+        }else if(type == 4){
             Map resultMap=new HashMap();
-            resultMap.put("10cm","深度");
-            resultMap.put("20cm","深度");
-            resultMap.put("40cm","深度");
+            resultMap.put("deep1","10cm");
+            resultMap.put("deep2","20cm");
+            resultMap.put("deep3","40cm");
             list.add(resultMap);
             Map resultMap1=new HashMap();
             resultMap1.put("wc","含水率");
@@ -292,5 +302,27 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
             list.add(resultMap1);
         }
         return list;
+    }
+
+    @Override
+    public void earlyInfoUpdate(WarnInfoParam param) {
+
+        SysWarnInfoEntity sysWarnInfoEntity = warnInfoMapper.selectById(param.getId());
+        if(ObjectUtils.isEmpty(sysWarnInfoEntity)){
+            throw new MyException(ResultStatusCode.DB_ERR);
+        }
+        SysWarnInfoEntity warnInfoEntity=new SysWarnInfoEntity();
+        warnInfoEntity.setId(param.getId());
+        warnInfoEntity.setSiteId(param.getSiteId());
+        warnInfoEntity.setTime(param.getTime());
+        warnInfoEntity.setEarlyType(param.getEarlyType());
+        warnInfoEntity.setEarlyName(param.getEarlyName());
+        if(param.getEarlyDepth() != null){
+            warnInfoEntity.setEarlyDepth(param.getEarlyDepth());
+        }
+        warnInfoEntity.setEarlyDegree(param.getEarlyDegree());
+        warnInfoEntity.setEarlyContent(param.getEarlyContent());
+        warnInfoEntity.setUpdateTime(new Date());
+        warnInfoMapper.updateById(warnInfoEntity);
     }
 }

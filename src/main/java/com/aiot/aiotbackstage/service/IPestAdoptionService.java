@@ -1,5 +1,8 @@
 package com.aiot.aiotbackstage.service;
 
+import com.aiot.aiotbackstage.model.entity.SysPestAdoptionEntity;
+import com.aiot.aiotbackstage.model.param.PageParam;
+import com.aiot.aiotbackstage.model.vo.PageResult;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -9,4 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface IPestAdoptionService {
     void importWatchExcel(MultipartFile xlsFile);
+
+    PageResult<SysPestAdoptionEntity> pestAdoption(PageParam pageParam);
 }
