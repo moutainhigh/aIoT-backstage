@@ -21,7 +21,7 @@ public class SysWarnInfoEntity {
     private Integer siteId;
 
     /**
-     * 站点id
+     * 站点名称
      */
     @TableField(value = "site_name")
     private String siteName;
@@ -51,6 +51,12 @@ public class SysWarnInfoEntity {
     private String earlyType;
 
     /**
+     * 坐标
+     */
+    @TableField(value = "coordinate")
+    private String coordinate;
+
+    /**
      * 预警名称
      */
     @TableField(value = "early_name")
@@ -73,6 +79,13 @@ public class SysWarnInfoEntity {
      */
     @TableField(value = "early_content")
     private String earlyContent;
+
+
+    /**
+     * 上报人
+     */
+    @TableField(value = "report_user")
+    private String reportUser;
 
     /**
      * 创建时间

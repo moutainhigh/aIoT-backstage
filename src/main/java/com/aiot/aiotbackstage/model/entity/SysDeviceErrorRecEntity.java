@@ -38,6 +38,8 @@ public class SysDeviceErrorRecEntity  {
     private Date endTime;
     private Date createTime;
 
+    private Integer isUpdate;
+
 
 
     @TableField(exist = false)
@@ -50,6 +52,6 @@ public class SysDeviceErrorRecEntity  {
     private String deviceName;
 
     @TableField(exist = false)
-    private DeviceVo deviceVo;
+    private List<DeviceVo> deviceVo;
 
 }

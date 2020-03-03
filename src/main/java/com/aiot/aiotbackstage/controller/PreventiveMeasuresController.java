@@ -1,6 +1,7 @@
 package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
+import com.aiot.aiotbackstage.model.entity.SysPreventiveMeasuresEntity;
 import com.aiot.aiotbackstage.service.IPreventiveMasuresService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +42,7 @@ public class PreventiveMeasuresController {
         return Result.success(masuresService.getMasuresInfoByName(name));
     }
 
-    @ApiOperation(value = "明细", notes = "明细")
+    @ApiOperation(value = "防治措施明细", notes = "防治措施明细")
     @ApiResponses({
             @ApiResponse(code = 200,message = "成功")
     })
@@ -50,6 +51,44 @@ public class PreventiveMeasuresController {
     public Result preventiveDetail(@RequestParam(required = false) String preventiveId,@RequestParam(required = false) String insectId
     ) {
         return Result.success(masuresService.preventiveDetail(preventiveId,insectId));
+    }
+
+    @ApiOperation(value = "防治措施新增", notes = "防治措施新增")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @ResponseBody
+    @PostMapping("/preventiveAdd")
+    public Result preventiveAdd(@RequestBody SysPreventiveMeasuresEntity measuresEntity
+                                ) {
+        masuresService.preventiveAdd(measuresEntity);
+        return Result.success();
+    }
+
+
+    @ApiOperation(value = "防治措施编辑", notes = "防治措施编辑")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @ResponseBody
+    @PutMapping("/preventiveUpdate")
+    public Result preventiveUpdate(@RequestBody SysPreventiveMeasuresEntity measuresEntity
+    ) {
+        masuresService.preventiveUpdate(measuresEntity);
+        return Result.success();
+    }
+
+    @ApiOperation(value = "防治措施删除", notes = "防治措施删除")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @ResponseBody
+    @DeleteMapping("/preventiveDelete")
+    public Result preventiveDelete(@RequestParam Long id
+    ) {
+        masuresService.preventiveDelete(id);
+        return Result.success();
+
     }
 
 

@@ -2,15 +2,13 @@ package com.aiot.aiotbackstage.service.impl;
 
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
-import com.aiot.aiotbackstage.mapper.SysSiteMapper;
-import com.aiot.aiotbackstage.mapper.SysWarnInfoMapper;
-import com.aiot.aiotbackstage.mapper.SysWarnRuleMapper;
-import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
-import com.aiot.aiotbackstage.model.entity.SysWarnInfoEntity;
-import com.aiot.aiotbackstage.model.entity.SysWarnRuleEntity;
+import com.aiot.aiotbackstage.common.util.JWTUtil;
+import com.aiot.aiotbackstage.mapper.*;
+import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.param.WarnInfoParam;
 import com.aiot.aiotbackstage.model.param.WarnRuleParam;
+import com.aiot.aiotbackstage.model.vo.EarlyInfoVo;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -20,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @Description TODO
@@ -39,11 +36,24 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
     @Autowired
     private SysSiteMapper siteMapper;
 
+    @Autowired
+    private SysPreventiveMeasuresMapper measuresMapper;
+
+    @Autowired
+    private JWTUtil jwtUtil;
+
 
     @Override
     public void earlyInfoAdd(WarnRuleParam param) {
         SysWarnRuleEntity warnRuleEntity=new SysWarnRuleEntity();
         warnRuleEntity.setEarlyType(earlyType(param.getEarlyType()));
+        if(param.getEarlyType().equals("虫情")){
+            SysPreventiveMeasuresEntity measuresEntity = measuresMapper.selectOne(Wrappers.<SysPreventiveMeasuresEntity>lambdaQuery()
+                    .eq(SysPreventiveMeasuresEntity::getSeason, param.getEarlyName()));
+            if(ObjectUtils.isNotEmpty(measuresEntity)){
+                warnRuleEntity.setMeasures(measuresEntity.getMeasuresInfo());
+            }
+        }
         warnRuleEntity.setEarlyName(param.getEarlyName());
         warnRuleEntity.setEarlyDepth(param.getEarlyDepth());
         warnRuleEntity.setEarlyMax(param.getEarlyMax());
@@ -124,7 +134,10 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
     }
 
     @Override
-    public void earlyInfoReport(WarnInfoParam param) {
+    public void earlyInfoReport(WarnInfoParam param, String token) {
+
+        String userName = jwtUtil.getUserNameByToken(token);
+
         SysWarnInfoEntity warnInfoEntity=new SysWarnInfoEntity();
         warnInfoEntity.setSiteId(param.getSiteId());
         SysSiteEntity sysSiteEntity = siteMapper.selectById(param.getSiteId());
@@ -137,6 +150,15 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnInfoEntity.setEarlyType(param.getEarlyType());
         warnInfoEntity.setEarlyDegree(param.getEarlyDegree());
         warnInfoEntity.setEarlyContent(param.getEarlyContent());
+        if(userName != null){
+            warnInfoEntity.setReportUser(userName);
+        }
+        if(param.getCoordinate() == null){
+            //查询站点对应的坐标
+            warnInfoEntity.setCoordinate(sysSiteEntity.getCoordinate());
+        }else{
+            warnInfoEntity.setCoordinate(param.getCoordinate());
+        }
         warnInfoEntity.setCreateTime(new Date());
         warnInfoEntity.setUpdateTime(new Date());
         warnInfoMapper.insert(warnInfoEntity);
@@ -324,5 +346,37 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnInfoEntity.setEarlyContent(param.getEarlyContent());
         warnInfoEntity.setUpdateTime(new Date());
         warnInfoMapper.updateById(warnInfoEntity);
+    }
+
+    /**
+     * 此接口用于GIS预警
+     * @return
+     */
+    public List<EarlyInfoVo> earlyInfoGis() {
+
+        List<SysWarnInfoEntity> warnInfoEntities = warnInfoMapper
+                .selectList(Wrappers.<SysWarnInfoEntity>lambdaQuery()
+                .eq(SysWarnInfoEntity::getEarlyType, "虫情")
+                .eq(SysWarnInfoEntity::getIsClosed, 2)
+                .eq(SysWarnInfoEntity::getIsExamine, 1));
+        if(CollectionUtils.isNotEmpty(warnInfoEntities)){
+            List<EarlyInfoVo> earlyInfoVos=new ArrayList<>();
+            warnInfoEntities.stream().forEach(sysWarnInfoEntity -> {
+                EarlyInfoVo earlyInfoVo=new EarlyInfoVo();
+                earlyInfoVo.setTime(sysWarnInfoEntity.getTime());
+                earlyInfoVo.setEarlyName(sysWarnInfoEntity.getEarlyName());
+                earlyInfoVo.setEarlyContent(sysWarnInfoEntity.getEarlyContent());
+                SysPreventiveMeasuresEntity measuresEntity = measuresMapper.selectOne(Wrappers.<SysPreventiveMeasuresEntity>lambdaQuery()
+                        .eq(SysPreventiveMeasuresEntity::getSeason, sysWarnInfoEntity.getEarlyName()));
+                if(ObjectUtils.isNotEmpty(measuresEntity)){
+                    earlyInfoVo.setMasures(measuresEntity.getMeasuresInfo());
+                }
+                earlyInfoVo.setReportUser(sysWarnInfoEntity.getReportUser());
+                earlyInfoVo.setCoordinate(sysWarnInfoEntity.getCoordinate());
+                earlyInfoVos.add(earlyInfoVo);
+            });
+            return earlyInfoVos;
+        }
+        return null;
     }
 }

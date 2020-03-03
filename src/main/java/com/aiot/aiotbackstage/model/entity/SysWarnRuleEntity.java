@@ -45,6 +45,11 @@ public class SysWarnRuleEntity {
     @TableField(value = "early_min")
     private String earlyMin;
 
+    /**
+     * 防治措施
+     */
+    @TableField(value = "measures")
+    private String measures;
 
 
     /**

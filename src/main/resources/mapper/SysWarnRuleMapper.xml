@@ -10,6 +10,7 @@
     <result column="early_depth" jdbcType="VARCHAR" property="earlyDepth" />
     <result column="early_max" jdbcType="VARCHAR" property="earlyMax" />
     <result column="early_min" jdbcType="VARCHAR" property="earlyMin" />
+    <result column="measures" jdbcType="VARCHAR" property="measures" />
     <result column="early_degree" jdbcType="VARCHAR" property="earlyDegree" />
     <result column="early_content" jdbcType="LONGVARCHAR" property="earlyContent" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
@@ -17,7 +18,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, early_type, early_name,early_depth,early_max,early_min, early_degree, early_content, create_time, update_time
+    id, early_type, early_name,early_depth,early_max,early_min, measures,early_degree, early_content, create_time, update_time
   </sql>
 
   <select id="warnRulePage" resultMap="BaseResultMap">

@@ -14,4 +14,6 @@ public interface IPestAdoptionService {
     void importWatchExcel(MultipartFile xlsFile);
 
     PageResult<SysPestAdoptionEntity> pestAdoption(PageParam pageParam);
+
+    void pestAdoptionEdit(SysPestAdoptionEntity param);
 }

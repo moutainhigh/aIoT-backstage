@@ -42,7 +42,7 @@ public class DeviceController {
             @ApiResponse(code = 200,message = "成功")
     })
     @ResponseBody
-    @PostMapping("/deviceInfoNew")
+    @GetMapping("/deviceInfoNew")
     public Result deviceInfoNew(
                                 ) {
         return Result.success(deviceService.deviceInfoNew());

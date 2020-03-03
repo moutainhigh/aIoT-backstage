@@ -80,7 +80,10 @@ public class GisServiceImpl implements IGisService {
             e.printStackTrace();
         }
 
+        //TODO 调用GIS接口给他们防治措施
+
     }
+
 
     @Override
     public void disasterSituation(DisasterSituationGisParam param) {

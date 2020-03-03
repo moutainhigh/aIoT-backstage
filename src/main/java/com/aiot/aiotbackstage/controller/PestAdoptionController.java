@@ -1,6 +1,7 @@
 package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
+import com.aiot.aiotbackstage.model.entity.SysPestAdoptionEntity;
 import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.service.IPestAdoptionService;
 import io.swagger.annotations.Api;
@@ -76,9 +77,9 @@ public class PestAdoptionController {
     @PostMapping("/importExcel")
     @ResponseBody
     @RequiresPermissions("importExcel:add")
-    public Result importWatchExcel(@RequestParam("excelFile") MultipartFile xlsFile) {
+    public Result importWatchExcel(@RequestParam MultipartFile excelFile) {
 
-        pestAdoptionService.importWatchExcel(xlsFile);
+        pestAdoptionService.importWatchExcel(excelFile);
 
         return Result.success();
     }
@@ -98,6 +99,21 @@ public class PestAdoptionController {
         pageParam.setPageNumber(pageNumber);
         pageParam.setPageSize(pageSize);
         return Result.success(pestAdoptionService.pestAdoption(pageParam));
+    }
+
+    /**
+     * 有害生物诊断信息编辑
+     */
+    @ApiOperation(value = "有害生物诊断信息编辑", notes = "有害生物诊断信息编辑")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @PutMapping("/pestAdoptionEdit")
+    @ResponseBody
+    public Result pestAdoptionEdit(@RequestBody SysPestAdoptionEntity param) {
+
+        pestAdoptionService.pestAdoptionEdit(param);
+        return Result.success();
     }
 
 }

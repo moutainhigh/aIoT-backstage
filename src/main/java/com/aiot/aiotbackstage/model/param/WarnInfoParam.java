@@ -30,6 +30,12 @@ public class WarnInfoParam {
     private Integer siteId;
 
     /**
+     * 坐标
+     */
+    @ApiModelProperty(value="坐标",name="coordinate",example="坐标")
+    private String coordinate;
+
+    /**
      * 预警对象
      */
     @ApiModelProperty(value="预警对象",name="earlyType",example="预警对象")
@@ -58,5 +64,6 @@ public class WarnInfoParam {
      */
     @ApiModelProperty(value="预警内容",name="earlyContent",example="预警内容")
     private String earlyContent;
+
 
 }
