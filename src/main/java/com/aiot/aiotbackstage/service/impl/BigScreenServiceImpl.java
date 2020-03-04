@@ -77,4 +77,9 @@ public class BigScreenServiceImpl implements IBigScreenService {
     public Object dustRecStatistics() {
         return null;
     }
+
+    @Override
+    public Object sensorRecStatistics() {
+        return null;
+    }
 }
