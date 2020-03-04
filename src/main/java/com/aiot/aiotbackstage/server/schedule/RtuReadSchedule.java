@@ -16,6 +16,8 @@ public class RtuReadSchedule {
 
     @Resource
     private RedisUtils redisUtil;
+    @Resource
+    private TcpServer tcpServer;
 
     /**
      * frame问询帧结构
@@ -58,8 +60,8 @@ public class RtuReadSchedule {
     }
 
     private void broadcast(String frame) throws InterruptedException {
-        for (Channel channel : TcpServer.channels.values()) {
-            channel.writeAndFlush(frame);
+        for (Object channel : tcpServer.rtuChannels().values()) {
+            ((Channel)channel).writeAndFlush(frame);
         }
         Thread.sleep(2000);
     }

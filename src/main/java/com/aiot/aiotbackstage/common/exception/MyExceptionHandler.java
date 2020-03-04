@@ -66,7 +66,7 @@ public class MyExceptionHandler {
     @ExceptionHandler(MyException.class)
     @ResponseBody
     public Result handleException(MyException e, HttpServletRequest request) {
-        log.error(request.getRequestURI() + ":自定义内部异常",e.getMsg());
+        log.error(request.getRequestURI() + ":自定义内部异常 {}",e.getMsg());
         return new Result(e.getCode(),e.getMsg());
     }
 

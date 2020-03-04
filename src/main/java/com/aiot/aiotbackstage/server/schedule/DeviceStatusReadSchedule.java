@@ -32,6 +32,10 @@ public class DeviceStatusReadSchedule {
     @Resource
     private ISysDeviceErrorRecService sysDeviceErrorRecService;
     @Resource
+    private DahuaSDK sdk;
+    @Resource
+    private TcpServer tcpServer;
+    @Resource
     private RedisUtils redisUtil;
 
     @Scheduled(cron = "0 0 0/1 * * ? ")
@@ -44,7 +48,7 @@ public class DeviceStatusReadSchedule {
                     List<SysSiteEntity> sites = sysSiteMapper.selectAll();
                     for (SysSiteEntity site : sites) {
                         boolean online = false;
-                        for (Integer integer : TcpServer.channels.keySet()) {
+                        for (Object integer : tcpServer.rtuChannels().keySet()) {
                             if (site.getId().equals(integer)) {
                                 online = true;
                                 break;
@@ -61,7 +65,7 @@ public class DeviceStatusReadSchedule {
                     List<SysCameraEntity> cameras = sysCameraMapper.selectAll();
                     for (SysCameraEntity camera : cameras) {
                         boolean online = false;
-                        for (String name : DahuaSDK.channelMap.keySet()) {
+                        for (Object name : sdk.cameraChannel().keySet()) {
                             if (camera.getName().equals(name)) {
                                 online = true;
                                 break;

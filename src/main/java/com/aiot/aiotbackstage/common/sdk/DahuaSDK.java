@@ -1,6 +1,7 @@
 package com.aiot.aiotbackstage.common.sdk;
 
 import com.aiot.aiotbackstage.common.config.DahuaConfig;
+import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.dh.DpsdkCore.*;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,13 +27,16 @@ public class DahuaSDK implements ApplicationRunner {
 
     @Resource
     private DahuaConfig dahuaConfig;
+    @Resource
+    private RedisUtils redisUtil;
 
-    public static int m_nDLLHandle = -1;
+    private static int m_nDLLHandle = -1;
 
-    public static Map<String, String> channelMap = new HashMap<>();
+    private String channelKey = "CAMERA-CHANNEL";
 
     /**
      * 创建全局唯一SDK句柄
+     *
      * @return
      */
     public int init() {
@@ -47,19 +50,17 @@ public class DahuaSDK implements ApplicationRunner {
             log.info("dahua sdk init success!");
         }
 
-        boolean b = OnLogin();
+        OnLogin();
 
-        if (b) {
-            int i = loadGroup();
-            getDGroupStr(i);
-        }
+        getDGroupStr(loadGroup());
+
         return m_nDLLHandle;
     }
 
     /**
      * 登陆
      */
-    public boolean OnLogin() {
+    public void OnLogin() {
         Login_Info_t loginInfo = new Login_Info_t();
         loginInfo.szIp = dahuaConfig.getIp().getBytes();
         loginInfo.nPort = dahuaConfig.getPort();
@@ -70,9 +71,7 @@ public class DahuaSDK implements ApplicationRunner {
         int nRet = IDpsdkCore.DPSDK_Login(m_nDLLHandle, loginInfo, 10000);
         if (nRet != dpsdk_retval_e.DPSDK_RET_SUCCESS) {
             log.error("登录失败，nRet = {}", nRet);
-            return false;
         }
-        return true;
     }
 
     public int loadGroup() {
@@ -126,7 +125,9 @@ public class DahuaSDK implements ApplicationRunner {
             for (Object node : document.selectNodes("//Channel")) {
                 Element e = (Element) node;
                 if (e.attributeValue("name") != null) {
-                    channelMap.put(e.getParent().getParent().attributeValue("name"), e.attributeValue("id"));
+                    String name = e.getParent().getParent().attributeValue("name");
+                    String id = e.attributeValue("id");
+                    redisUtil.hset(channelKey, name, id);
                 }
             }
         } catch (DocumentException e) {
@@ -135,31 +136,27 @@ public class DahuaSDK implements ApplicationRunner {
         return document;
     }
 
-    public String real(String channelId) {
-//        Get_ExternalRealStreamUrl_Info_t pExternalRealStreamUrlInfo = new Get_ExternalRealStreamUrl_Info_t();
-//        pExternalRealStreamUrlInfo.szCameraId = channelId.getBytes();
-//        pExternalRealStreamUrlInfo.nMediaType = 1;
-//        pExternalRealStreamUrlInfo.nStreamType = 1;
-//        pExternalRealStreamUrlInfo.nTrackId = 8011;
-//        pExternalRealStreamUrlInfo.nTransType = 1;
-//        pExternalRealStreamUrlInfo.bUsedVCS = 0;
-//        pExternalRealStreamUrlInfo.nVcsbps = 0;
-//        pExternalRealStreamUrlInfo.nVcsfps = 0;
-//        pExternalRealStreamUrlInfo.nVcsResolution = 0;
-//        pExternalRealStreamUrlInfo.nVcsVideocodec = 0;
-//        int nRet = IDpsdkCore.DPSDK_GetExternalRealStreamUrl(m_nDLLHandle, pExternalRealStreamUrlInfo, 10000);
-        Get_RealStreamUrl_Info_t realStreamUrl_Info_t = new Get_RealStreamUrl_Info_t();
-        realStreamUrl_Info_t.szCameraId = channelId.getBytes();
-        realStreamUrl_Info_t.nMediaType = 1;
-        realStreamUrl_Info_t.nStreamType = 1;
-        realStreamUrl_Info_t.nTransType = 1;
-        realStreamUrl_Info_t.nTrackId = 8011;
-        int nRet = IDpsdkCore.DPSDK_GetRealStreamUrl(m_nDLLHandle, realStreamUrl_Info_t, 10000);
+    public Map<Object, Object> cameraChannel() {
+        return redisUtil.hmget(channelKey);
+    }
 
+    public String real(String channelId) {
+        Get_ExternalRealStreamUrl_Info_t pExternalRealStreamUrlInfo = new Get_ExternalRealStreamUrl_Info_t();
+        pExternalRealStreamUrlInfo.szCameraId = channelId.getBytes();
+        pExternalRealStreamUrlInfo.nMediaType = 1;
+        pExternalRealStreamUrlInfo.nStreamType = 1;
+        pExternalRealStreamUrlInfo.nTrackId = 8011;
+        pExternalRealStreamUrlInfo.nTransType = 1;
+        pExternalRealStreamUrlInfo.bUsedVCS = 0;
+        pExternalRealStreamUrlInfo.nVcsbps = 0;
+        pExternalRealStreamUrlInfo.nVcsfps = 0;
+        pExternalRealStreamUrlInfo.nVcsResolution = 0;
+        pExternalRealStreamUrlInfo.nVcsVideocodec = 0;
+        int nRet = IDpsdkCore.DPSDK_GetExternalRealStreamUrl(m_nDLLHandle, pExternalRealStreamUrlInfo, 10000);
         if (nRet != dpsdk_retval_e.DPSDK_RET_SUCCESS) {
             log.error("获取URL失败，nRet = {}", nRet);
         }
-        return new String(realStreamUrl_Info_t.szUrl).trim();
+        return new String(pExternalRealStreamUrlInfo.szUrl).trim();
     }
 
     public void ptzDirectCtrl(String channelId, Integer direction) {

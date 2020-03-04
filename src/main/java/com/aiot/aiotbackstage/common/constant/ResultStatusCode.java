@@ -53,6 +53,7 @@ public enum ResultStatusCode {
     EARLY_WARNING_ID_IS_EXIT(522, "预警标识存在！"),
     NO_RESULT(523, "查询无结果"),
     DATA_RESULT(524, "数据不存在"),
+    CAMERA_OFFLINE(525, "摄像头不在线"),
 
 
 

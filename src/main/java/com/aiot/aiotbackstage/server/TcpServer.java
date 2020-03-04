@@ -1,5 +1,6 @@
 package com.aiot.aiotbackstage.server;
 
+import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.server.codec.ModbusRtuCodec;
 import com.aiot.aiotbackstage.server.handler.DtuHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +31,10 @@ public class TcpServer {
 
     @Value("${server.tcp.port}")
     private int port;
+    @Resource
+    private RedisUtils redisUtil;
 
-    public static final Map<Integer, Channel> channels = new HashMap<>();
+    public static String channelsKey = "RTU-CHANNEL";
 
     public void start() throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -58,4 +62,11 @@ public class TcpServer {
         }
     }
 
+    public Map<Object, Object> rtuChannels() {
+        return redisUtil.hmget(channelsKey);
+    }
+
+    public void putChannel(int item, Channel channel) {
+        redisUtil.hset(channelsKey, item + "", channel);
+    }
 }

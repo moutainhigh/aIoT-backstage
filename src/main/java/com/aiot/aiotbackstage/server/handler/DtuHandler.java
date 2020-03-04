@@ -27,21 +27,26 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
 
     private ISensorRecService service;
 
+    private TcpServer tcpServer;
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String hex) throws Exception {
+        if (tcpServer == null) {
+            tcpServer = SpringContextHolder.getBean(TcpServer.class);
+        }
         //转为ASCII
         String asc = HexConvert.convertHexToString(hex.replace(" ",""));
 
         if (asc.startsWith("register")) {
             //注册包
-            TcpServer.channels.put(Integer.parseInt(asc.split("-")[1]), ctx.channel());
+            tcpServer.putChannel(Integer.parseInt(asc.split("-")[1]), ctx.channel());
             log.info("from {}, received hex {}, asc {}",ctx.channel().remoteAddress(), hex, asc);
         } else {
             //数据包
             Integer rtu = 0;
-            for (Map.Entry<Integer, Channel> entry : TcpServer.channels.entrySet()) {
+            for (Map.Entry<Object, Object> entry : tcpServer.rtuChannels().entrySet()) {
                 if (entry.getValue().equals(ctx.channel())) {
-                    rtu = entry.getKey();
+                    rtu = (Integer) entry.getKey();
                 }
             }
             if (rtu == 0) {
