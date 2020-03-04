@@ -3,6 +3,7 @@ package com.aiot.aiotbackstage.server.schedule;
 import com.aiot.aiotbackstage.common.constant.Constants;
 import com.aiot.aiotbackstage.common.enums.SensorType;
 import com.aiot.aiotbackstage.common.util.ListUtils;
+import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.SysDustRecStatisEntity;
 import com.aiot.aiotbackstage.model.entity.SysInsectRecStatisEntity;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 @Component
@@ -35,6 +37,8 @@ public class DataStatisSchedule {
 
     @Autowired
     private SysSensorRecStatisMapper sysSensorRecStatisMapper;
+    @Resource
+    private RedisUtils redisUtil;
 
     /**
      * 手动执行
@@ -54,10 +58,21 @@ public class DataStatisSchedule {
      */
 //    @Scheduled(cron = "0 0 * * * ?")
     public void statisHourly() {
-        Calendar now = Calendar.getInstance();
-        Calendar beforeTwoHour = Calendar.getInstance();
-        beforeTwoHour.add(Calendar.HOUR_OF_DAY, -2);
-        start(getYMDH(beforeTwoHour), getYMDH(now));
+        String key = "SYNC-LOCK:DATA-STATICS-HOURLY";
+        try {
+            if (redisUtil.get(key) == null) {
+                if (redisUtil.setScheduler(key, key)) {
+                    Calendar now = Calendar.getInstance();
+                    Calendar beforeTwoHour = Calendar.getInstance();
+                    beforeTwoHour.add(Calendar.HOUR_OF_DAY, -2);
+                    start(getYMDH(beforeTwoHour), getYMDH(now));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            redisUtil.del(key);
+        }
     }
 
     /**
@@ -65,11 +80,22 @@ public class DataStatisSchedule {
      */
 //    @Scheduled(cron = "0 0 0 * * ?")
     public void statisDaily() {
-        Calendar now = Calendar.getInstance();
-        Calendar beforeOneDay = Calendar.getInstance();
-        beforeOneDay.add(Calendar.HOUR_OF_DAY, -1);
-        beforeOneDay.add(Calendar.DAY_OF_MONTH, -1);
-        start(getYMDH(beforeOneDay), getYMDH(now));
+        String key = "SYNC-LOCK:DATA-STATICS-DAILY";
+        try {
+            if (redisUtil.get(key) == null) {
+                if (redisUtil.setScheduler(key, key)) {
+                    Calendar now = Calendar.getInstance();
+                    Calendar beforeOneDay = Calendar.getInstance();
+                    beforeOneDay.add(Calendar.HOUR_OF_DAY, -1);
+                    beforeOneDay.add(Calendar.DAY_OF_MONTH, -1);
+                    start(getYMDH(beforeOneDay), getYMDH(now));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            redisUtil.del(key);
+        }
     }
 
     private void start(String startTime, String endTime) {

@@ -15,6 +15,8 @@ import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Avernus
@@ -134,23 +136,30 @@ public class DahuaSDK implements ApplicationRunner {
     }
 
     public String real(String channelId) {
-        Get_ExternalRealStreamUrl_Info_t pExternalRealStreamUrlInfo = new Get_ExternalRealStreamUrl_Info_t();
-        pExternalRealStreamUrlInfo.szCameraId = channelId.getBytes();
-        pExternalRealStreamUrlInfo.nMediaType = 1;
-        pExternalRealStreamUrlInfo.nStreamType = 1;
-        pExternalRealStreamUrlInfo.nTrackId = 8011;
-        pExternalRealStreamUrlInfo.nTransType = 1;
-        pExternalRealStreamUrlInfo.bUsedVCS = 0;
-        pExternalRealStreamUrlInfo.nVcsbps = 0;
-        pExternalRealStreamUrlInfo.nVcsfps = 0;
-        pExternalRealStreamUrlInfo.nVcsResolution = 0;
-        pExternalRealStreamUrlInfo.nVcsVideocodec = 0;
-        int nRet = IDpsdkCore.DPSDK_GetExternalRealStreamUrl(m_nDLLHandle, pExternalRealStreamUrlInfo, 10000);
+//        Get_ExternalRealStreamUrl_Info_t pExternalRealStreamUrlInfo = new Get_ExternalRealStreamUrl_Info_t();
+//        pExternalRealStreamUrlInfo.szCameraId = channelId.getBytes();
+//        pExternalRealStreamUrlInfo.nMediaType = 1;
+//        pExternalRealStreamUrlInfo.nStreamType = 1;
+//        pExternalRealStreamUrlInfo.nTrackId = 8011;
+//        pExternalRealStreamUrlInfo.nTransType = 1;
+//        pExternalRealStreamUrlInfo.bUsedVCS = 0;
+//        pExternalRealStreamUrlInfo.nVcsbps = 0;
+//        pExternalRealStreamUrlInfo.nVcsfps = 0;
+//        pExternalRealStreamUrlInfo.nVcsResolution = 0;
+//        pExternalRealStreamUrlInfo.nVcsVideocodec = 0;
+//        int nRet = IDpsdkCore.DPSDK_GetExternalRealStreamUrl(m_nDLLHandle, pExternalRealStreamUrlInfo, 10000);
+        Get_RealStreamUrl_Info_t realStreamUrl_Info_t = new Get_RealStreamUrl_Info_t();
+        realStreamUrl_Info_t.szCameraId = channelId.getBytes();
+        realStreamUrl_Info_t.nMediaType = 1;
+        realStreamUrl_Info_t.nStreamType = 1;
+        realStreamUrl_Info_t.nTransType = 1;
+        realStreamUrl_Info_t.nTrackId = 8011;
+        int nRet = IDpsdkCore.DPSDK_GetRealStreamUrl(m_nDLLHandle, realStreamUrl_Info_t, 10000);
 
         if (nRet != dpsdk_retval_e.DPSDK_RET_SUCCESS) {
             log.error("获取URL失败，nRet = {}", nRet);
         }
-        return new String(pExternalRealStreamUrlInfo.szUrl).trim();
+        return new String(realStreamUrl_Info_t.szUrl).trim();
     }
 
     public void ptzDirectCtrl(String channelId, Integer direction) {
@@ -177,7 +186,12 @@ public class DahuaSDK implements ApplicationRunner {
             }
             //下线通知
             if (nStatus == 2) {
-
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        init();
+                    }
+                }, 600);
             }
         }
     };

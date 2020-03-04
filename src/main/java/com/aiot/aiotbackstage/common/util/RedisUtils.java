@@ -3,10 +3,12 @@ package com.aiot.aiotbackstage.common.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -576,6 +578,23 @@ public class RedisUtils {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    /**
+     * 定时任务分布式锁
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean setScheduler(final String key, Object value) {
+        boolean result = false;
+        try {
+            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            return operations.setIfAbsent(key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }
 

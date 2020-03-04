@@ -3,6 +3,7 @@ package com.aiot.aiotbackstage.service.impl;
 import com.aiot.aiotbackstage.common.enums.RtuAddrCode;
 import com.aiot.aiotbackstage.common.enums.SensorType;
 import com.aiot.aiotbackstage.common.enums.WindDirection;
+import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.mapper.SysDustRecMapper;
 import com.aiot.aiotbackstage.mapper.SysSensorRecMapper;
 import com.aiot.aiotbackstage.mapper.SysSiteMapper;
@@ -36,7 +37,7 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     @Resource
     private SysDustRecMapper sysDustRecMapper;
     @Resource
-    private RedisTemplate redisTemplate;
+    private RedisUtils redisUtils;
     @Resource
     private IEarlyWarningService earlyWarningService;
 
@@ -91,7 +92,7 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     private void save(SysSensorRecEntity... entities) {
         List<SysSensorRecEntity> list = Arrays.asList(entities);
         for (SysSensorRecEntity entity : list) {
-            redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getSensor(), entity.getValue(), 60, TimeUnit.SECONDS);
+            redisUtils.set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getSensor(), entity.getValue());
             try {
                 earlyWarningService.earlyWarningReport("气象", entity.getSensor(), null, entity.getValue(), entity.getSiteId());
             } catch (Exception e) {
@@ -102,7 +103,7 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     }
 
     private void save(SysDustRecEntity entity) {
-        redisTemplate.opsForValue().set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getDepth(), entity, 60, TimeUnit.SECONDS);
+        redisUtils.set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getDepth(), entity);
         sysDustRecMapper.insert(entity);
         try {
             earlyWarningService.earlyWarningReport("土壤", "ec", entity.getDepth() + "cm", entity.getEc().toString(), entity.getSiteId());
