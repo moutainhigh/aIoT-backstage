@@ -38,6 +38,9 @@ public class SysInsectRecEntity {
     private String result;
 
     @TableField(exist = false)
+    private String siteName;
+
+    @TableField(exist = false)
     private List<Map<String,Object>> maps;
 
     private Date time;

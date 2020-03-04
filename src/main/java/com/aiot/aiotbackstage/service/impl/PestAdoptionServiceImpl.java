@@ -9,6 +9,7 @@ import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.IPestAdoptionService;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -94,5 +95,25 @@ public class PestAdoptionServiceImpl implements IPestAdoptionService {
                 .pageNumber(pageParam.getPageNumber())
                 .pageSize(pageParam.getPageSize())
                 .build();
+    }
+
+    @Override
+    public void pestAdoptionEdit(SysPestAdoptionEntity param) {
+        SysPestAdoptionEntity pestAdoptionEntity = pestAdoptionMapper.selectById(param.getId());
+        if(ObjectUtils.isEmpty(pestAdoptionEntity)){
+            throw new MyException(ResultStatusCode.DATA_RESULT);
+        }
+        SysPestAdoptionEntity pestAdoptionModify=new SysPestAdoptionEntity();
+        pestAdoptionModify.setId(param.getId());
+        pestAdoptionModify.setDistributionSituation(param.getDistributionSituation());
+        pestAdoptionModify.setDistributionArea(param.getDistributionArea());
+        pestAdoptionModify.setDistributionAddress(param.getDistributionAddress());
+        pestAdoptionModify.setArea(param.getArea());
+        pestAdoptionModify.setCount(param.getCount());
+        pestAdoptionModify.setPestBankName(param.getPestBankName());
+        pestAdoptionModify.setCauseDisease(param.getCauseDisease());
+        pestAdoptionModify.setSource(param.getSource());
+        pestAdoptionModify.setUpdateTime(new Date());
+        pestAdoptionMapper.updateById(pestAdoptionModify);
     }
 }

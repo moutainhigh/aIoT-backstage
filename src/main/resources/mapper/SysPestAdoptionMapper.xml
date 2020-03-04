@@ -14,16 +14,17 @@
     <result column="cause_disease" jdbcType="LONGVARCHAR" property="causeDisease" />
     <result column="source" jdbcType="VARCHAR" property="source" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     id, distribution_situation, distribution_area, distribution_address, area, `count`, 
-    pest_bank_name, cause_disease, `source`, create_time
+    pest_bank_name, cause_disease, `source`, create_time,update_time
   </sql>
 
   <select id="pestAdoptionPage" resultMap="BaseResultMap">
     select  <include refid="Base_Column_List" />  from sys_pest_adoption
     ORDER BY create_time DESC
-    LIMIT #{page.offset},#{page.pageSize}
+    LIMIT #{param.offset},#{param.pageSize}
   </select>
 </mapper>

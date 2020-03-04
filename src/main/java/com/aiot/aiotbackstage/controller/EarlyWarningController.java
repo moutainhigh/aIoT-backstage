@@ -85,9 +85,9 @@ public class EarlyWarningController {
     @ResponseBody
     @PostMapping("/earlyInfoReport")
     @RequiresPermissions("earlyInfoReport")
-    public Result earlyInfoReport(@RequestBody @Validated WarnInfoParam param
+    public Result earlyInfoReport(@RequestBody @Validated WarnInfoParam param,@RequestHeader String token
     ) {
-        iEarlyWarningService.earlyInfoReport(param);
+        iEarlyWarningService.earlyInfoReport(param,token);
         return Result.success();
     }
 

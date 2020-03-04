@@ -25,7 +25,7 @@ public interface IEarlyWarningService {
 
     PageResult<SysWarnRuleEntity> earlyInfoPage(String earlyType, PageParam pageParam);
 
-    void earlyInfoReport(WarnInfoParam param);
+    void earlyInfoReport(WarnInfoParam param, String token);
 
     PageResult<SysWarnInfoEntity> earlyInfoReportPage(PageParam pageParam);
 

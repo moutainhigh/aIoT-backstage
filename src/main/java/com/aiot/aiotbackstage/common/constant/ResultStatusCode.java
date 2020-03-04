@@ -52,7 +52,7 @@ public enum ResultStatusCode {
     EARLY_WARNING_IS_EXIT(521, "预警对象已存在！"),
     EARLY_WARNING_ID_IS_EXIT(522, "预警标识存在！"),
     NO_RESULT(523, "查询无结果"),
-    DATA_RESULT(524, "修改数据不存在"),
+    DATA_RESULT(524, "数据不存在"),
 
 
 

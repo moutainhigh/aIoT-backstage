@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -57,5 +58,30 @@ public class PreventiveMasuresServiceImpl implements IPreventiveMasuresService {
             return  null;
         }
         return sysPreventiveMeasuresEntity;
+    }
+
+    @Override
+    public void preventiveAdd(SysPreventiveMeasuresEntity measuresEntity) {
+        measuresEntity.setCreateTime(new Date());
+        measuresMapper.insert(measuresEntity);
+    }
+
+    @Override
+    public void preventiveUpdate(SysPreventiveMeasuresEntity measuresEntity) {
+        SysPreventiveMeasuresEntity measuresEntity1 = measuresMapper.selectById(measuresEntity.getId());
+        if(ObjectUtils.isEmpty(measuresEntity1)){
+            throw new MyException(ResultStatusCode.DATA_RESULT);
+        }
+        measuresEntity.setUpdateTime(new Date());
+        measuresMapper.updateById(measuresEntity);
+    }
+
+    @Override
+    public void preventiveDelete(Long id) {
+        SysPreventiveMeasuresEntity measuresEntity1 = measuresMapper.selectById(id);
+        if(ObjectUtils.isEmpty(measuresEntity1)){
+            throw new MyException(ResultStatusCode.DATA_RESULT);
+        }
+        measuresMapper.deleteById(id);
     }
 }

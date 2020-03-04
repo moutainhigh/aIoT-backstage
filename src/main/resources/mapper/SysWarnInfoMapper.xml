@@ -11,6 +11,7 @@
     <result column="is_closed" jdbcType="INTEGER" property="isClosed" />
     <result column="time" jdbcType="TIMESTAMP" property="time" />
     <result column="early_type" jdbcType="VARCHAR" property="earlyType" />
+    <result column="coordinate" jdbcType="VARCHAR" property="coordinate" />
     <result column="early_name" jdbcType="VARCHAR" property="earlyName" />
     <result column="early_depth" jdbcType="VARCHAR" property="earlyDepth" />
     <result column="early_degree" jdbcType="VARCHAR" property="earlyDegree" />
