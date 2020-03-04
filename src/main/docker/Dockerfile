@@ -1,12 +1,10 @@
-FROM java:8
+FROM         java:8
+#FROM        tomcat:8
+# 环境变量
+ENV APP     aiot-backstage-0.0.1-SNAPSHOT.jar
 
-# 挂载test-docker目录
-VOLUME /tmp
-
-# COPY or ADD to image
-COPY aiot-backstage-0.0.1-SNAPSHOT.jar app.jar
-
-RUN bash -c "touch /app.jar"
-
-EXPOSE 8080 18080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+WORKDIR     /ysw/app
+VOLUME         /ysw/app
+ADD            $APP /ysw/app/app.jar
+ENTRYPOINT     ["java", "-jar", "/ysw/app/app.jar"]
+EXPOSE         8081

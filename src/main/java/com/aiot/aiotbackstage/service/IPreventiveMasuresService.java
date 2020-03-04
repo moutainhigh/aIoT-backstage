@@ -1,5 +1,7 @@
 package com.aiot.aiotbackstage.service;
 
+import com.aiot.aiotbackstage.mapper.SysInsectInfoMapper;
+import com.aiot.aiotbackstage.model.entity.SysInsectInfoEntity;
 import com.aiot.aiotbackstage.model.entity.SysPreventiveMeasuresEntity;
 
 import java.util.List;
@@ -17,4 +19,6 @@ public interface IPreventiveMasuresService {
     void preventiveUpdate(SysPreventiveMeasuresEntity measuresEntity);
 
     void preventiveDelete(Long id);
+
+    List<SysInsectInfoEntity> insect();
 }

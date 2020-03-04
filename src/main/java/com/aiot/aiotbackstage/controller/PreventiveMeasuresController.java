@@ -53,6 +53,17 @@ public class PreventiveMeasuresController {
         return Result.success(masuresService.preventiveDetail(preventiveId,insectId));
     }
 
+    @ApiOperation(value = "害虫查询", notes = "害虫查询")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @ResponseBody
+    @GetMapping("/insect")
+    public Result insect(
+    ) {
+        return Result.success(masuresService.insect());
+    }
+
     @ApiOperation(value = "防治措施新增", notes = "防治措施新增")
     @ApiResponses({
             @ApiResponse(code = 200,message = "成功")

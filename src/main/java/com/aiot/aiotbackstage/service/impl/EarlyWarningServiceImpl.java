@@ -322,6 +322,8 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
             resultMap1.put("tds","总溶解固体");
             resultMap1.put("epsilon","介电常数");
             list.add(resultMap1);
+        }else {
+            return null;
         }
         return list;
     }

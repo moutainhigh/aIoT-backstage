@@ -1,6 +1,7 @@
 package com.aiot.aiotbackstage.common.util;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
@@ -22,7 +23,7 @@ public class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
     private Class<T> clazz;
     static {
         // TODO by wl
-//        ParserConfig.getGlobalInstance().addAccept("com.aiot.aiotbackstage.model.entity.SysUserEntity");
+        ParserConfig.getGlobalInstance().addAccept("com.aiot.aiotbackstage.model.entity");
     }
     public FastJsonRedisSerializer(Class<T> clazz) {
         super();
