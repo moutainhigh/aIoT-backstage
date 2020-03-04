@@ -5,7 +5,6 @@ import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.util.JWTUtil;
 import com.aiot.aiotbackstage.common.util.JsonUtils;
-import com.aiot.aiotbackstage.common.util.MD5Utils;
 import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.*;
@@ -228,8 +227,7 @@ public class UserServiceImpl implements IUserService {
         SysUserEntity userEntity=new SysUserEntity();
         userEntity.setUserId(phoneEntity.getUserId());
         userEntity.setUserName(userParam.getUserName());
-        String encryptedPassword = MD5Utils.encrypt(userParam.getPassword());
-        userEntity.setPassword(encryptedPassword);
+        userEntity.setPassword(userParam.getPassword());
         userEntity.setUpdateTime(new Date());
         //修改用户信息
         userMapper.updateById(userEntity);

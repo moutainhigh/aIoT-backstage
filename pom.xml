@@ -173,11 +173,6 @@
 			<version>1.1.1</version>
 		</dependency>
 		<dependency>
-			<groupId>net.javacrumbs.shedlock</groupId>
-			<artifactId>shedlock-spring</artifactId>
-			<version>0.16.1</version>
-		</dependency>
-		<dependency>
 			<groupId>com.dahua</groupId>
 			<artifactId>sdk</artifactId>
 			<version>2.0</version>
@@ -192,39 +187,39 @@
 			</plugin>
 
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>1.0.0</version>
 
-				<!--将插件绑定在某个phase执行-->
-				<executions>
-					<execution>
-						<id>build-image</id>
-						<!--将插件绑定在package这个phase上。也就是说，用户只需执行mvn package ，就会自动执行mvn docker:build-->
-						<phase>package</phase>
-						<goals>
-							<goal>build</goal>
-						</goals>
-					</execution>
-				</executions>
+				<groupId>com.spotify</groupId>
+
+				<artifactId>docker-maven-plugin</artifactId>
+
+				<version>0.4.10</version>
+
 				<configuration>
-					<imageName>${docker.image.prefix}</imageName>
-					<!--指定标签-->
-					<imageTags>
-						<imageTag>latest</imageTag>
-					</imageTags>
-					<!-- 指定 Dockerfile 路径-->
+
+					<dockerHost>http://139.159.215.31:2375</dockerHost>
+
+					<imageName>${project.name}:${project.version}</imageName>
+
+					<baseImage>java</baseImage>
+
 					<dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
-					<!--指定远程 docker api地址-->
-					<dockerHost>http://127.0.0.1:2375</dockerHost>
+
 					<resources>
+
 						<resource>
+
 							<targetPath>/</targetPath>
+
 							<directory>${project.build.directory}</directory>
+
 							<include>${project.build.finalName}.jar</include>
+
 						</resource>
+
 					</resources>
+
 				</configuration>
+
 			</plugin>
 		</plugins>
 	</build>

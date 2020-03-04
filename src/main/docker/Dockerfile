@@ -1,10 +1,9 @@
-FROM         java:8
-#FROM        tomcat:8
-# 环境变量
-ENV APP     aiot-backstage-0.0.1-SNAPSHOT.jar
+FROM java:8
 
-WORKDIR     /ysw/app
-VOLUME         /ysw/app
-ADD            $APP /ysw/app/app.jar
-ENTRYPOINT     ["java", "-jar", "/ysw/app/app.jar"]
-EXPOSE         8081
+VOLUME /tmp
+
+ADD aiot-backstage-0.0.1-SNAPSHOT.jar aiot-app.jar
+
+EXPOSE 8081
+
+ENTRYPOINT [ "java", "-jar", "/aiot-app.jar" ]
