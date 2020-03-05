@@ -291,16 +291,16 @@ public class DataController {
         if (!params.containsKey("siteId")) {
             return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
         }
-        String siteId = String.valueOf(params.get("siteId"));
-        String startDate = String.valueOf(params.get("startDate"));
-        String endDate = String.valueOf(params.get("endDate"));
-        if (startDate.isEmpty()
-                || endDate.isEmpty()
-                || "null".equals(startDate)
-                || "null".equals(endDate)) {
-            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
-            endDate = startDate;
-        } else {
+            String siteId = String.valueOf(params.get("siteId"));
+            String startDate = String.valueOf(params.get("startDate"));
+            String endDate = String.valueOf(params.get("endDate"));
+            if (startDate.isEmpty()
+                    || endDate.isEmpty()
+                    || "null".equals(startDate)
+                    || "null".equals(endDate)) {
+                startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+                endDate = startDate;
+            } else {
             if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
                     || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
                 return Result.error(ResultStatusCode.PARAM_IS_INVALID);

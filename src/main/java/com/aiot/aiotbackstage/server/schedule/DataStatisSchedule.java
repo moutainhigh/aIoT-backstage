@@ -56,7 +56,7 @@ public class DataStatisSchedule {
     /**
      * 每小时【*：00：00】统计
      */
-//    @Scheduled(cron = "0 0 * * * ?")
+    @Scheduled(cron = "0 0 * * * ?")
     public void statisHourly() {
         String key = "SYNC-LOCK:DATA-STATICS-HOURLY";
         try {

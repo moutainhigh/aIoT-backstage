@@ -2,6 +2,7 @@ package com.aiot.aiotbackstage.service.impl;
 
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.SysDustRecStatisEntity;
+import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.ISysDustRecStatisService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -135,7 +136,7 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
         params.put("endDate", endDate);
         params.put("isMax", isMax);
         // 获取虫害最大日期
-        List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
+         List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
         if (pestResult != null && pestResult.size() == 1) {
             String pestDate = String.valueOf(pestResult.get(0).get("date"));
             params.clear();
@@ -143,7 +144,7 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
             params.put("startDate", pestDate);
             params.put("endDate", pestDate);
             int total = sysDustRecStatisMapper.countAllDaily(params);
-            params.put("pageIndex", pageIndex);
+            params.put("pageIndex", (pageIndex-1)*pageSize);
             params.put("pageSize", pageSize);
             List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily(params);
             return PageResult.<SysDustRecStatisEntity>builder()

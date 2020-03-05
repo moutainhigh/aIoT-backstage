@@ -96,9 +96,9 @@
             depth,
             `date`
         ORDER BY
-            `date`
+            `depth`
         <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
-            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
+            LIMIT #{pageIndex},#{pageSize}
         </if>
     </select>
 
