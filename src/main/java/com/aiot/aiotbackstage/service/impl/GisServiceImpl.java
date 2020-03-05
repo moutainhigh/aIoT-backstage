@@ -1,9 +1,6 @@
 package com.aiot.aiotbackstage.service.impl;
 
-import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
-import com.aiot.aiotbackstage.common.enums.RtuAddrCode;
 import com.aiot.aiotbackstage.common.enums.SensorType;
-import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.DisasterSituationGisParam;
@@ -79,9 +76,6 @@ public class GisServiceImpl implements IGisService {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        //TODO 调用GIS接口给他们防治措施
-
     }
 
 
@@ -109,7 +103,7 @@ public class GisServiceImpl implements IGisService {
     public SensorInfoVo sensorInfo(Integer stationId) {
 
         List<Map<String,String>> sensorRecVos=new ArrayList<>();
-        List<Map<String,String>> dustRecVos=new ArrayList<>();
+        List<Map<String, Object>> dustRecVos=new ArrayList<>();
         //气象数据
         Arrays.stream(SensorType.values()).forEach(sensorType -> {
             Map<String,String> map=new HashMap<>();
@@ -136,11 +130,15 @@ public class GisServiceImpl implements IGisService {
         });
 
         //土壤数据
-        Arrays.stream(RtuAddrCode.values()).forEach(rtuAddrCode -> {
-            Map<String,String> map=new HashMap<>();
-            map.put(rtuAddrCode.name(),(String)redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":"+rtuAddrCode.name()));
-            dustRecVos.add(map);
-        });
+        Map<String,Object> map=new HashMap<>();
+        map.put("10cm",redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":10"));
+        dustRecVos.add(map);
+        Map<String, Object> map1=new HashMap<>();
+        map1.put("20cm",redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":20"));
+        dustRecVos.add(map1);
+        Map<String, Object> map2=new HashMap<>();
+        map2.put("40cm",redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":40"));
+        dustRecVos.add(map2);
 
         SensorInfoVo infoVo=new SensorInfoVo();
         infoVo.setSensorRecVos(sensorRecVos);

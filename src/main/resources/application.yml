@@ -66,3 +66,5 @@ dahua8900:
   port: 9000
   username: system
   password: jyxt123456
+gis:
+  url: http://litecc.myds.me:9008/api/agriculture/warning

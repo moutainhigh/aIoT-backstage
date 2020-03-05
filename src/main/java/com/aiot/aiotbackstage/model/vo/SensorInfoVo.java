@@ -16,7 +16,7 @@ public class SensorInfoVo {
 
     private List<Map<String,String>> sensorRecVos;
 
-    private List<Map<String,String>> dustRecVos;
+    private List<Map<String,Object>> dustRecVos;
 
     private List<SysInsectRecEntity> insectRecVos;
 }

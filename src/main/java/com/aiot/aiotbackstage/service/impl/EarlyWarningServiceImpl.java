@@ -1,5 +1,6 @@
 package com.aiot.aiotbackstage.service.impl;
 
+import com.aiot.aiotbackstage.common.config.GisConfig;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.util.JWTUtil;
@@ -14,8 +15,12 @@ import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -25,6 +30,7 @@ import java.util.*;
  * @CreateTime 2020/2/24 10:37
  */
 @Service
+@Slf4j
 public class EarlyWarningServiceImpl implements IEarlyWarningService {
 
     @Autowired
@@ -41,6 +47,12 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
 
     @Autowired
     private JWTUtil jwtUtil;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private GisConfig gisConfig;
 
 
     @Override
@@ -189,6 +201,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnInfoMapper.updateById(warnInfoEntity);
     }
 
+
     @Override
     public void earlyInfoExamine(Long id) {
         SysWarnInfoEntity warnInfoEntity = warnInfoMapper.selectById(id);
@@ -197,6 +210,15 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         }
         warnInfoEntity.setIsExamine(1);
         warnInfoMapper.updateById(warnInfoEntity);
+
+        try {
+            if(warnInfoEntity.getEarlyType().equals("虫情")){
+                earlyInfoGis();
+            }
+        }catch (Exception e){
+            log.info("GIS调用失败[{}]",e.getMessage());
+        }
+
     }
 
     @Override
@@ -354,7 +376,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
      * 此接口用于GIS预警
      * @return
      */
-    public List<EarlyInfoVo> earlyInfoGis() {
+    public void earlyInfoGis() {
 
         List<SysWarnInfoEntity> warnInfoEntities = warnInfoMapper
                 .selectList(Wrappers.<SysWarnInfoEntity>lambdaQuery()
@@ -377,8 +399,10 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                 earlyInfoVo.setCoordinate(sysWarnInfoEntity.getCoordinate());
                 earlyInfoVos.add(earlyInfoVo);
             });
-            return earlyInfoVos;
+            String url = gisConfig.getUrl();
+            MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<String, Object>();
+            paramMap.add("data", earlyInfoVos);
+            restTemplate.postForObject(url, paramMap, String.class);
         }
-        return null;
     }
 }
