@@ -8,6 +8,7 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="parent_id" jdbcType="BIGINT" property="parentId" />
     <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
     <result column="perms" jdbcType="LONGVARCHAR" property="perms" />
     <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="priority" jdbcType="BIGINT" property="priority" />
@@ -15,6 +16,6 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, `name`, parent_id, url, perms, `type`, priority, create_time
+    id, `name`, parent_id, url,icon, perms, `type`, priority, create_time
   </sql>
 </mapper>

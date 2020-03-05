@@ -19,7 +19,7 @@
         select  *  from sys_device_error_rec
         <where>
             <if test="param.startDate != null">AND start_time <![CDATA[>=]]> #{param.startDate}</if>
-            <if test="param.endDate != null">AND end_time <![CDATA[<=]]>#{param.endDate}</if>
+            <if test="param.endDate != null">AND start_time <![CDATA[<=]]>#{param.endDate}</if>
             <if test="param.siteId != null">AND site_id = #{param.siteId}</if>
             <if test="param.deviceType != null">AND device_type= #{param.deviceType}</if>
         </where>
@@ -31,7 +31,7 @@
         select  count(*)  from sys_device_error_rec
         <where>
             <if test="param.startDate != null">AND start_time <![CDATA[>=]]> #{param.startDate}</if>
-            <if test="param.endDate != null">AND end_time <![CDATA[<=]]>#{param.endDate}</if>
+            <if test="param.endDate != null">AND start_time <![CDATA[<=]]>#{param.endDate}</if>
             <if test="param.siteId != null">AND site_id = #{param.siteId}</if>
             <if test="param.deviceType != null">AND device_type= #{param.deviceType}</if>
         </where>

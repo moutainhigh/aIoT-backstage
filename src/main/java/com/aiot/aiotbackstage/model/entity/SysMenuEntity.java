@@ -39,6 +39,12 @@ public class SysMenuEntity implements Serializable {
     private String url;
 
     /**
+     * icon
+     */
+    @TableField(value = "icon")
+    private String icon;
+
+    /**
      * 权限标识
      */
     @TableField(value = "perms")

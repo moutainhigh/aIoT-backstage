@@ -43,7 +43,9 @@ public class SysDisasterSituationServiceImpl extends ServiceImpl<SysDisasterSitu
             x[0] = "严重";
             x[1] = "中等";
             x[2] = "一般";
-
+            if(result.get(0) == null){
+                return null;
+            }
             y[0] = result.get(0).get("serious") == null ? 0 : result.get(0).get("serious");
             y[1] = result.get(0).get("medium") == null ? 0 : result.get(0).get("medium");
             y[2] = result.get(0).get("normal") == null ? 0 : result.get(0).get("normal");
