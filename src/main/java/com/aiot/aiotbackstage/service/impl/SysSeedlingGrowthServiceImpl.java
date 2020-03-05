@@ -6,6 +6,7 @@ import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.ISysSeedlingGrowthService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,9 @@ public class SysSeedlingGrowthServiceImpl extends ServiceImpl<SysSeedlingGrowthM
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         List<Map<String, Object>> result = baseMapper.sumByLevel(params);
-
+        if(CollectionUtils.isEmpty(result)){
+            return null;
+        }
         Object[] x = new Object[4];
         Object[] y = new Object[4];
         if (result.size() == 1) {

@@ -2,7 +2,9 @@ package com.aiot.aiotbackstage.service.impl;
 
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
+import com.aiot.aiotbackstage.mapper.SysInsectInfoMapper;
 import com.aiot.aiotbackstage.mapper.SysPreventiveMeasuresMapper;
+import com.aiot.aiotbackstage.model.entity.SysInsectInfoEntity;
 import com.aiot.aiotbackstage.model.entity.SysPreventiveMeasuresEntity;
 import com.aiot.aiotbackstage.service.IPreventiveMasuresService;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -21,6 +23,8 @@ public class PreventiveMasuresServiceImpl implements IPreventiveMasuresService {
     @Autowired
     private SysPreventiveMeasuresMapper measuresMapper;
 
+    @Autowired
+    private SysInsectInfoMapper insectInfoMapper;
 
     @Override
     public List<SysPreventiveMeasuresEntity> getMasuresInfo() {
@@ -63,6 +67,7 @@ public class PreventiveMasuresServiceImpl implements IPreventiveMasuresService {
     @Override
     public void preventiveAdd(SysPreventiveMeasuresEntity measuresEntity) {
         measuresEntity.setCreateTime(new Date());
+        measuresEntity.setUpdateTime(new Date());
         measuresMapper.insert(measuresEntity);
     }
 
@@ -83,5 +88,10 @@ public class PreventiveMasuresServiceImpl implements IPreventiveMasuresService {
             throw new MyException(ResultStatusCode.DATA_RESULT);
         }
         measuresMapper.deleteById(id);
+    }
+
+    @Override
+    public List<SysInsectInfoEntity> insect() {
+        return insectInfoMapper.selectList(null);
     }
 }

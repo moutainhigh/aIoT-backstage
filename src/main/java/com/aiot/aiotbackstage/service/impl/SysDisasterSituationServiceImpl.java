@@ -7,6 +7,7 @@ import com.aiot.aiotbackstage.model.vo.SysDisasterSituationVo;
 import com.aiot.aiotbackstage.service.ISysDisasterSituationService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,9 @@ public class SysDisasterSituationServiceImpl extends ServiceImpl<SysDisasterSitu
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         List<Map<String, Object>> result = baseMapper.sumByLevel(params);
-
+        if(CollectionUtils.isEmpty(result)){
+            return null;
+        }
         Object[] x = new Object[3];
         Object[] y = new Object[3];
         if (result.size() == 1) {
