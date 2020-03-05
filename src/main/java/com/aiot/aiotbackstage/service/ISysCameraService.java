@@ -19,4 +19,6 @@ public interface ISysCameraService extends IService<SysCameraEntity> {
      * @return
      */
     boolean PTZ_Control(Integer cameraId, Integer direction);
+
+
 }

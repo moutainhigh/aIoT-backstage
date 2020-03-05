@@ -29,4 +29,9 @@ public class SysCameraEntity {
     private String type;
 
     private String name;
+
+    /**
+     * 设备序列号
+     */
+    private String imei;
 }

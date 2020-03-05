@@ -65,4 +65,6 @@ public class SysCameraServiceImpl extends ServiceImpl<SysCameraMapper, SysCamera
         sdk.ptzDirectCtrl(s, direction);
         return true;
     }
+
+
 }
