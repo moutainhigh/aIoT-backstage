@@ -6,9 +6,10 @@
         <result column="site_id" jdbcType="BIGINT" property="siteId" />
         <result column="type" jdbcType="VARCHAR" property="type" />
         <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="imei" jdbcType="VARCHAR" property="imei" />
     </resultMap>
     <sql id="Base_Column_List">
-        id, site_id siteId, `type` ,`name`
+        id, site_id siteId, `type` ,`name`, imei
     </sql>
 
     <select id="selectAll" resultType="com.aiot.aiotbackstage.model.entity.SysCameraEntity">
