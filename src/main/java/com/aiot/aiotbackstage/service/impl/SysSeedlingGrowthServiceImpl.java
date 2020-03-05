@@ -43,7 +43,9 @@ public class SysSeedlingGrowthServiceImpl extends ServiceImpl<SysSeedlingGrowthM
             x[1] = "正常";
             x[2] = "亚健康";
             x[3] = "不健康";
-
+            if(result.get(0) == null){
+                return null;
+            }
             y[0] = result.get(0).get("good") == null ? 0 : result.get(0).get("good");
             y[1] = result.get(0).get("normal") == null ? 0 : result.get(0).get("normal");
             y[2] = result.get(0).get("sub_health") == null ? 0 : result.get(0).get("sub_health");

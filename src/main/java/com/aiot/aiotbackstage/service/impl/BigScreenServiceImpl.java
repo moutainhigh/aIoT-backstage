@@ -70,7 +70,7 @@ public class BigScreenServiceImpl implements IBigScreenService {
             SysSiteEntity sysSiteEntity = siteMapper.selectById(integer);
             Map<String,Object> map=new HashMap<>();
             map.put("name",sysSiteEntity.getName());
-            map.put("value,",total);
+            map.put("value",total);
             list.add(map);
             sumTotal+=total;
         }
