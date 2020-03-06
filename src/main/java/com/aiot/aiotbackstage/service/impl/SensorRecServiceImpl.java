@@ -11,18 +11,14 @@ import com.aiot.aiotbackstage.model.dto.RtuData;
 import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecEntity;
 import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
-import com.aiot.aiotbackstage.model.vo.SysSensorRecVo;
 import com.aiot.aiotbackstage.model.vo.SysSensorRecVo2;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.ISensorRecService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import net.sf.jsqlparser.expression.operators.relational.OldOracleJoinBinaryExpression;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -87,6 +83,16 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
             default:
 
         }
+    }
+
+    @Override
+    public Map<String, Object> current(Integer siteId) {
+        Map<String, Object> result = new HashMap<>();
+        for (SensorType value : SensorType.values()) {
+            Object o = redisUtils.get("SENSOR-VALUE:" + siteId + ":" + value.name());
+            result.put(value.name(), o == null ? "-" : o);
+        }
+        return result;
     }
 
     private void save(SysSensorRecEntity... entities) {

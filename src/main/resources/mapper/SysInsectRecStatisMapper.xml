@@ -161,14 +161,6 @@
             sid.site_id = #{siteId}
         GROUP BY
             a.date
-        <choose>
-            <when test="isMax == 0">
-                ORDER BY insect_num ASC LIMIT 1
-            </when>
-            <when test="isMax == 1">
-                ORDER BY insect_num DESC LIMIT 1
-            </when>
-        </choose>
     </select>
 
     <select id="findAllGroupByInsectId" resultType="map">

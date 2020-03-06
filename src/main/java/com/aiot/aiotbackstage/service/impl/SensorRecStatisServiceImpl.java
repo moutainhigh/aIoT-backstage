@@ -1,14 +1,17 @@
 package com.aiot.aiotbackstage.service.impl;
 
+import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.mapper.SysInsectRecStatisMapper;
 import com.aiot.aiotbackstage.mapper.SysSensorRecStatisMapper;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecStatisEntity;
 import com.aiot.aiotbackstage.model.vo.PageResult;
+import com.aiot.aiotbackstage.model.vo.SysSensorRecVo;
 import com.aiot.aiotbackstage.service.ISensorRecStatisService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 @Service
@@ -45,18 +48,16 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
      * @param siteId    站点ID
      * @param startDate 开始日期
      * @param endDate   结束日期
-     * @param isMax     1：最大，0：最小
      * @param pageIndex 页码
      * @param pageSize  分页大小
      * @return
      */
     @Override
-    public PageResult<SysSensorRecStatisEntity> getMaxOrMinPestMeteInfo(String siteId, String startDate, String endDate, int isMax, int pageIndex, int pageSize) {
+    public PageResult<SysSensorRecStatisEntity> getMaxOrMinPestMeteInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-        params.put("isMax", isMax);
         List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
 
         if (pestResult != null && pestResult.size() == 1) {

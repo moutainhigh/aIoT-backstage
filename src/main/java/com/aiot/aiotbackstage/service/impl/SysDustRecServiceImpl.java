@@ -1,5 +1,6 @@
 package com.aiot.aiotbackstage.service.impl;
 
+import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.mapper.SysDustRecMapper;
 import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
 import com.aiot.aiotbackstage.model.vo.SysDustRecVo;
@@ -7,6 +8,7 @@ import com.aiot.aiotbackstage.service.ISysDustRecService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +17,9 @@ import java.util.Map;
 @Service
 public class SysDustRecServiceImpl extends ServiceImpl<SysDustRecMapper, SysDustRecEntity>
         implements ISysDustRecService {
+
+    @Resource
+    private RedisUtils redisUtil;
 
     @Override
     public Map<Integer, Map<String, Object>> getStatByTime(String time) {
@@ -68,5 +73,22 @@ public class SysDustRecServiceImpl extends ServiceImpl<SysDustRecMapper, SysDust
         }
 
         return map;
+    }
+
+    /**
+     * 土壤深度只有10,20,40
+     * @param siteId
+     * @return
+     */
+    @Override
+    public Map<String, Object> current(Integer siteId) {
+        Map<String, Object> result = new HashMap<>();
+        Object cm10 = redisUtil.get("SENSOR-VALUE:" + siteId + ":" + 10);
+        result.put("10cm", cm10 == null ? "-" : cm10);
+        Object cm20 = redisUtil.get("SENSOR-VALUE:" + siteId + ":" + 20);
+        result.put("20cm", cm20 == null ? "-" : cm20);
+        Object cm40 = redisUtil.get("SENSOR-VALUE:" + siteId + ":" + 40);
+        result.put("40cm", cm40 == null ? "-" : cm40);
+        return result;
     }
 }

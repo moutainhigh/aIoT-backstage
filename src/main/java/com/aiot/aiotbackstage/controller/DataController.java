@@ -5,12 +5,10 @@ import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.util.DateUtils;
 import com.aiot.aiotbackstage.model.dto.YunFeiData;
+import com.aiot.aiotbackstage.model.vo.SysSensorRecVo;
 import com.aiot.aiotbackstage.server.schedule.DataStatisSchedule;
 import com.aiot.aiotbackstage.service.impl.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
@@ -73,11 +71,11 @@ public class DataController {
     public Result insects(HttpServletRequest request, YunFeiData data) {
         try {
             InputStream in = request.getInputStream();
-            BufferedReader br=new BufferedReader(new InputStreamReader(in,"utf-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "utf-8"));
             StringBuffer sb = new StringBuffer();
-            String s = "" ;
-            while((s=br.readLine())!=null){
-                sb.append(s) ;
+            String s = "";
+            while ((s = br.readLine()) != null) {
+                sb.append(s);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -261,15 +259,7 @@ public class DataController {
             }
         }
 
-        String isMax = String.valueOf(params.get("isMax"));
-        if (params.containsKey("isMax")
-                && !isMax.isEmpty()
-                && !"null".equals(isMax)
-                && (Integer.parseInt(isMax) == 0 || Integer.parseInt(isMax) == 1)) {
-            return Result.success(sysDustRecStatisService.getMaxOrMinPestSoilInfo(siteId, startDate, endDate, Integer.parseInt(isMax), pageIndex, pageSize));
-        } else {
-            return Result.error(ResultStatusCode.PARAM_IS_INVALID);
-        }
+        return Result.success(sysDustRecStatisService.getMaxOrMinPestSoilInfo(siteId, startDate, endDate, pageIndex, pageSize));
     }
 
     /**
@@ -291,16 +281,16 @@ public class DataController {
         if (!params.containsKey("siteId")) {
             return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
         }
-            String siteId = String.valueOf(params.get("siteId"));
-            String startDate = String.valueOf(params.get("startDate"));
-            String endDate = String.valueOf(params.get("endDate"));
-            if (startDate.isEmpty()
-                    || endDate.isEmpty()
-                    || "null".equals(startDate)
-                    || "null".equals(endDate)) {
-                startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
-                endDate = startDate;
-            } else {
+        String siteId = String.valueOf(params.get("siteId"));
+        String startDate = String.valueOf(params.get("startDate"));
+        String endDate = String.valueOf(params.get("endDate"));
+        if (startDate.isEmpty()
+                || endDate.isEmpty()
+                || "null".equals(startDate)
+                || "null".equals(endDate)) {
+            startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+            endDate = startDate;
+        } else {
             if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
                     || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
                 return Result.error(ResultStatusCode.PARAM_IS_INVALID);
@@ -380,16 +370,9 @@ public class DataController {
             }
         }
 
-        String isMax = String.valueOf(params.get("isMax"));
-        if (params.containsKey("isMax")
-                && !isMax.isEmpty()
-                && !"null".equals(isMax)
-                && (Integer.parseInt(isMax) == 0 || Integer.parseInt(isMax) == 1)) {
-            return Result.success(sensorRecStatisService.getMaxOrMinPestMeteInfo(siteId, startDate, endDate, Integer.parseInt(isMax), pageIndex, pageSize));
-        } else {
-            return Result.error(ResultStatusCode.PARAM_IS_INVALID);
-        }
+        return Result.success(sensorRecStatisService.getMaxOrMinPestMeteInfo(siteId, startDate, endDate, pageIndex, pageSize));
     }
+
 
     /**
      * 单站气候统计信息
@@ -594,7 +577,7 @@ public class DataController {
         if (params.get("time") == null) {
             return Result.error(ResultStatusCode.PARAM_IS_BLANK);
         }
-        return Result.success(sysDustRecService.getStatByTime( String.valueOf(params.get("time"))));
+        return Result.success(sysDustRecService.getStatByTime(String.valueOf(params.get("time"))));
     }
 
     @ApiOperation(value = "根据时间点查询气象数据")
@@ -616,5 +599,19 @@ public class DataController {
     public Result statis() {
         dataStatisSchedule.manual();
         return Result.success();
+    }
+
+    @ApiOperation(value = "获取实时土壤信息", notes = "获取实时土壤信息")
+    @RequestMapping(value = "/current/dust", method = RequestMethod.GET)
+    public Result dust(@ApiParam(value="站点id",name="siteId") Integer siteId) {
+        Map<String, Object> current = sysDustRecService.current(siteId);
+        return Result.success(current);
+    }
+
+    @ApiOperation(value = "获取实时气象信息", notes = "获取实时气象信息")
+    @RequestMapping(value = "/current/atmos", method = RequestMethod.GET)
+    public Result atmos(@ApiParam(value="站点id",name="siteId") Integer siteId) {
+        Map<String, Object> current = sensorRecService.current(siteId);
+        return Result.success(current);
     }
 }

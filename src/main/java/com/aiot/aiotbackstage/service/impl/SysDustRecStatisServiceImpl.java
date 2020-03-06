@@ -129,12 +129,11 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
      * @return
      */
     @Override
-    public PageResult<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, String startDate, String endDate, int isMax, int pageIndex, int pageSize) {
+    public PageResult<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-        params.put("isMax", isMax);
         // 获取虫害最大日期
          List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
         if (pestResult != null && pestResult.size() == 1) {
