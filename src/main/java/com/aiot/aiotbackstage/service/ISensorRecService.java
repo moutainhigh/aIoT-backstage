@@ -2,6 +2,7 @@ package com.aiot.aiotbackstage.service;
 
 import com.aiot.aiotbackstage.model.dto.RtuData;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecEntity;
+import com.aiot.aiotbackstage.model.param.InsectRecByDateParam;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
@@ -20,5 +21,7 @@ public interface ISensorRecService extends IService<SysSensorRecEntity> {
     Map<String, Object> current(Integer siteId);
 
     Object getStatByTime(String time);
+
+     Map<String,Object> insectRecByDate(InsectRecByDateParam param);
 }
 

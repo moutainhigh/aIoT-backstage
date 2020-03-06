@@ -68,6 +68,10 @@ public class PreventiveMasuresServiceImpl implements IPreventiveMasuresService {
     public void preventiveAdd(SysPreventiveMeasuresEntity measuresEntity) {
         measuresEntity.setCreateTime(new Date());
         measuresEntity.setUpdateTime(new Date());
+        SysInsectInfoEntity insectInfoEntity = insectInfoMapper.selectById(measuresEntity.getInsectInfoId());
+        if(ObjectUtils.isNotEmpty(insectInfoEntity)){
+            measuresEntity.setSeason(insectInfoEntity.getName());
+        }
         measuresMapper.insert(measuresEntity);
     }
 

@@ -4,16 +4,15 @@ import com.aiot.aiotbackstage.common.enums.RtuAddrCode;
 import com.aiot.aiotbackstage.common.enums.SensorType;
 import com.aiot.aiotbackstage.common.enums.WindDirection;
 import com.aiot.aiotbackstage.common.util.RedisUtils;
-import com.aiot.aiotbackstage.mapper.SysDustRecMapper;
-import com.aiot.aiotbackstage.mapper.SysSensorRecMapper;
-import com.aiot.aiotbackstage.mapper.SysSiteMapper;
+import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.dto.RtuData;
-import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
-import com.aiot.aiotbackstage.model.entity.SysSensorRecEntity;
-import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
+import com.aiot.aiotbackstage.model.entity.*;
+import com.aiot.aiotbackstage.model.param.InsectRecByDateParam;
 import com.aiot.aiotbackstage.model.vo.SysSensorRecVo2;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.ISensorRecService;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +35,11 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     private RedisUtils redisUtils;
     @Resource
     private IEarlyWarningService earlyWarningService;
+    @Resource
+    private SysInsectDeviceMapper deviceMapper;
+    @Resource
+    private SysInsectRecStatisMapper insectRecMapper;
+
 
     @Override
     public void receive(RtuData rtuData) {
@@ -147,5 +151,70 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
             }
         }
         return map;
+    }
+
+    @Override
+    public Map<String,Object> insectRecByDate(InsectRecByDateParam param) {
+        List<SysInsectRecStatisEntity> sysInsectRecEntities = insectRecMapper
+                .selectList(Wrappers.<SysInsectRecStatisEntity>lambdaQuery()
+                        .between(true, SysInsectRecStatisEntity::getDate, param.getStartDate(), param.getEndDate()));
+        if(CollectionUtils.isEmpty(sysInsectRecEntities)){
+            return null;
+        }
+        //获取设备对应的站点数据
+        List<String> collect2 = sysInsectRecEntities.stream().map(SysInsectRecStatisEntity::getDeviceId).collect(Collectors.toList());
+        List<String> collect3 = collect2.stream().distinct().collect(Collectors.toList());
+        List<SysInsectDeviceEntity> sysInsectDeviceEntities = deviceMapper.selectList(Wrappers.<SysInsectDeviceEntity>lambdaQuery().in(SysInsectDeviceEntity::getImei, collect3));
+        List<Integer> collect4 = sysInsectDeviceEntities.stream().map(SysInsectDeviceEntity::getSiteId).collect(Collectors.toList());
+        List<SysSiteEntity> sysSiteEntities = sysSiteMapper.selectBatchIds(collect4);
+
+        Map<String, List<SysInsectRecStatisEntity>> collect = sysInsectRecEntities.stream().collect(Collectors.groupingBy(SysInsectRecStatisEntity::getDate));
+        Set<String> strings = collect.keySet();
+        List<Map<String,Object>> siteList=new ArrayList<>();
+        List<String> list=new ArrayList<>();
+        strings.stream().forEach(s -> {
+            list.add(s);
+            List<SysInsectRecStatisEntity> sysInsectRecStatisEntities = collect.get(s);
+            List<String> collect5 = sysInsectRecStatisEntities.stream().map(SysInsectRecStatisEntity::getDate).collect(Collectors.toList());
+            Map<String, List<SysInsectRecStatisEntity>> collect1 = sysInsectRecStatisEntities.stream().collect(Collectors.groupingBy(SysInsectRecStatisEntity::getDeviceId));
+            Set<String> strings1 = collect1.keySet();
+            strings1.stream().forEach(s1 -> {
+                List<SysInsectRecStatisEntity> sysInsectRecStatisEntities1 = collect1.get(s1);
+                int sum = sysInsectRecStatisEntities1.stream().mapToInt(SysInsectRecStatisEntity::getNum).sum();
+                sysInsectDeviceEntities.stream().forEach(sysInsectDeviceEntity -> {
+
+                    if(Integer.parseInt(s1) == sysInsectDeviceEntity.getId()){
+                        Map<String,Object> map=new HashMap<>();
+                        sysSiteEntities.stream().forEach(sysSiteEntity -> {
+                            if(sysInsectDeviceEntity.getSiteId() == sysSiteEntity.getId()){
+                                map.put("siteName",sysSiteEntity.getName());
+                            }
+                        });
+                        List<Integer> integers = setValues(strings);
+                        for (int i = 0; i < integers.size(); i++) {
+                            for (int j = 0; j < collect5.size(); j++) {
+                                if(i == j){
+                                    integers.set(i,sum);
+                                }
+                            }
+                        }
+                        map.put("insectRecCount",integers);
+                        siteList.add(map);
+                    }
+                });
+            });
+        });
+        Map<String,Object> resultMap=new HashMap<>();
+        resultMap.put("dateList",list);
+        resultMap.put("siteList",siteList);
+        return resultMap;
+    }
+
+    private List<Integer> setValues(Set<String> strings){
+        List<Integer> list=new ArrayList<>();
+        for (int i = 0; i < strings.size(); i++) {
+            list.add(0);
+        }
+        return list;
     }
 }

@@ -5,6 +5,7 @@ import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.util.DateUtils;
 import com.aiot.aiotbackstage.model.dto.YunFeiData;
+import com.aiot.aiotbackstage.model.param.InsectRecByDateParam;
 import com.aiot.aiotbackstage.model.vo.SysSensorRecVo;
 import com.aiot.aiotbackstage.server.schedule.DataStatisSchedule;
 import com.aiot.aiotbackstage.service.impl.*;
@@ -614,4 +615,11 @@ public class DataController {
         Map<String, Object> current = sensorRecService.current(siteId);
         return Result.success(current);
     }
+
+    @ApiOperation(value = "根据时间范围查询害虫数据")
+    @PostMapping("insectRecByDate")
+    public Result insectRecByDate(@RequestBody InsectRecByDateParam param) {
+        return Result.success(sensorRecService.insectRecByDate(param));
+    }
+
 }
