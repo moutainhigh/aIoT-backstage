@@ -487,11 +487,10 @@ public class UserServiceImpl implements IUserService {
                 sdate=time;
                 dustRec.setTime(sdate);
                 sensorRecMapper.insert(dustRec);
-////
+//////
                 SysSensorRecEntity dustRec1=new SysSensorRecEntity();
                 dustRec1.setSiteId((int)(Math.random()*8)+1);
                 dustRec1.setSensor("wind_direction");
-
                 dustRec1.setValue(df.format( random.nextInt(41) + 10));
                 dustRec1.setTime(sdate);
                 sensorRecMapper.insert(dustRec1);

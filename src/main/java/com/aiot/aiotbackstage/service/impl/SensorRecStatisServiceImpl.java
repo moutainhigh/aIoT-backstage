@@ -58,13 +58,13 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-        List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
+//        List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
 
-        if (pestResult != null && pestResult.size() == 1) {
-            String pestDate = String.valueOf(pestResult.get(0).get("date"));
-            return getDayOrNightAveragePageable(siteId, pestDate, pestDate, pageIndex, pageSize);
-        }
-        return null;
+//        if (pestResult != null && pestResult.size() == 1) {
+//            String pestDate = String.valueOf(pestResult.get(0).get("date"));
+            return getDayOrNightAveragePageable(siteId, startDate, endDate, pageIndex, pageSize);
+//        }
+//        return null;
     }
 
     private Map<String, Object> getDayOrNightAverage(String siteId, String startDate, String endDate) {
@@ -72,7 +72,9 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-
+        int i1 = sysSensorRecStatisMapper.countAllBySiteIdDaily(params);
+        params.put("pageIndex", 0);
+        params.put("pageSize", i1);
         List<SysSensorRecStatisEntity> result = sysSensorRecStatisMapper.findAllBySiteIdDaily(params);
 
         List<SysSensorRecStatisEntity> tempList;
@@ -141,7 +143,7 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
         params.put("endDate", endDate);
 
         int total = sysSensorRecStatisMapper.countAllBySiteIdDaily(params);
-        params.put("pageIndex", pageIndex);
+        params.put("pageIndex", (pageIndex-1)*pageSize);
         params.put("pageSize", pageSize);
         List<SysSensorRecStatisEntity> result = sysSensorRecStatisMapper.findAllBySiteIdDaily(params);
 
@@ -151,6 +153,8 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
             params.put("siteId", siteId);
             params.put("startDate", entity.getDate());
             params.put("endDate", entity.getDate());
+            params.put("pageIndex", 0);
+            params.put("pageSize", total);
             tempList = sysSensorRecStatisMapper.findAllBySiteIdDailyDay(params);
             if (!tempList.isEmpty()) {
                 entity.setHumidityDay(tempList.get(0).getHumidity());

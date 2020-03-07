@@ -135,13 +135,13 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         // 获取虫害最大日期
-         List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
-        if (pestResult != null && pestResult.size() == 1) {
-            String pestDate = String.valueOf(pestResult.get(0).get("date"));
+//         List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
+//        if (pestResult != null && pestResult.size() == 1) {
+//            String pestDate = String.valueOf(pestResult.get(0).get("date"));
             params.clear();
             params.put("siteId", siteId);
-            params.put("startDate", pestDate);
-            params.put("endDate", pestDate);
+            params.put("startDate", startDate);
+            params.put("endDate", endDate);
             int total = sysDustRecStatisMapper.countAllDaily(params);
             params.put("pageIndex", (pageIndex-1)*pageSize);
             params.put("pageSize", pageSize);
@@ -152,7 +152,7 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
                     .pageSize(pageSize)
                     .pageNumber(pageIndex)
                     .build();
-        }
-        return null;
+//        }
+//        return null;
     }
 }

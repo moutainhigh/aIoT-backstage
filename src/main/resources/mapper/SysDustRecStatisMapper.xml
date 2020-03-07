@@ -97,9 +97,7 @@
             `date`
         ORDER BY
             `depth`
-        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
             LIMIT #{pageIndex},#{pageSize}
-        </if>
     </select>
 
 </mapper>
