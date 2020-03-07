@@ -17,8 +17,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -168,14 +171,15 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         List<Integer> collect4 = sysInsectDeviceEntities.stream().map(SysInsectDeviceEntity::getSiteId).collect(Collectors.toList());
         List<SysSiteEntity> sysSiteEntities = sysSiteMapper.selectBatchIds(collect4);
 
-        Map<String, List<SysInsectRecStatisEntity>> collect = sysInsectRecEntities.stream().collect(Collectors.groupingBy(SysInsectRecStatisEntity::getDate));
+        TreeMap<String, List<SysInsectRecStatisEntity>> collect = sysInsectRecEntities.stream()
+                .collect(Collectors.groupingBy(SysInsectRecStatisEntity::getDate
+                        , TreeMap::new, Collectors.toList()));
         Set<String> strings = collect.keySet();
         List<Map<String,Object>> siteList=new ArrayList<>();
         List<String> list=new ArrayList<>();
         strings.stream().forEach(s -> {
             list.add(s);
             List<SysInsectRecStatisEntity> sysInsectRecStatisEntities = collect.get(s);
-            List<String> collect5 = sysInsectRecStatisEntities.stream().map(SysInsectRecStatisEntity::getDate).collect(Collectors.toList());
             Map<String, List<SysInsectRecStatisEntity>> collect1 = sysInsectRecStatisEntities.stream().collect(Collectors.groupingBy(SysInsectRecStatisEntity::getDeviceId));
             Set<String> strings1 = collect1.keySet();
             strings1.stream().forEach(s1 -> {
@@ -190,31 +194,72 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
                                 map.put("siteName",sysSiteEntity.getName());
                             }
                         });
-                        List<Integer> integers = setValues(strings);
-                        for (int i = 0; i < integers.size(); i++) {
-                            for (int j = 0; j < collect5.size(); j++) {
-                                if(i == j){
-                                    integers.set(i,sum);
-                                }
-                            }
-                        }
-                        map.put("insectRecCount",integers);
+                        map.put("insectRecCount",sum);
+                        map.put("date",s);
                         siteList.add(map);
                     }
                 });
             });
         });
+        Map<Object, List<Map<String, Object>>> date = siteList.stream().collect(Collectors.groupingBy(stringObjectMap -> stringObjectMap.get("siteName")));
+        Set<Object> objects = date.keySet();
+        List<Map<String,Object>> siteList1=new ArrayList<>();
+        objects.forEach(o -> {
+            Map<String,Object> map1=new HashMap<>();
+            String sa="";
+            String dateStr="";
+            List<Map<String, Object>> maps = date.get(o);
+            for (Map<String, Object> map : maps) {
+                sa+=map.get("insectRecCount")+",";
+                dateStr+=map.get("date")+",";
+            }
+            map1.put("insectRecCount",sa.substring(0,sa.length()-1));
+            map1.put("dateStr",dateStr.substring(0,dateStr.length()-1));
+            map1.put("siteName",o);
+            siteList1.add(map1);
+        });
+        List<String> strings1 = dateList(param.getStartDate(), param.getEndDate());
+
+        for (Map<String, Object> stringObjectMap : siteList1) {
+            String[] dateStrs = stringObjectMap.get("dateStr").toString().split(",");
+            List<String> strings2 = Arrays.asList(dateStrs);
+            List<String> result = strings1.stream().filter(item -> !strings2.contains(item)).collect(Collectors.toList());
+            if(result.size() > 0){
+                result.forEach(s -> {
+                    stringObjectMap.put("insectRecCount",stringObjectMap.get("insectRecCount").toString()+","+0);
+                });
+            }
+            stringObjectMap.put("insectRecCount",Arrays.asList(stringObjectMap.get("insectRecCount")));
+            stringObjectMap.put("dateStr",Arrays.asList(stringObjectMap.get("dateStr")));
+        }
+
         Map<String,Object> resultMap=new HashMap<>();
         resultMap.put("dateList",list);
-        resultMap.put("siteList",siteList);
+        resultMap.put("siteList",siteList1);
         return resultMap;
     }
 
-    private List<Integer> setValues(Set<String> strings){
-        List<Integer> list=new ArrayList<>();
-        for (int i = 0; i < strings.size(); i++) {
-            list.add(0);
+    private  long get_Date(Calendar c) {
+        c.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) + 1);
+        return c.getTimeInMillis();
+    }
+
+    /**
+     * 开始时间与结束时间之间的所有日期
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    private List<String> dateList(Date beginDate,Date endDate) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(beginDate);
+        List<String> list=new ArrayList<>();
+        for (long d = cal.getTimeInMillis(); d <= endDate.getTime(); d = get_Date(cal)) {
+            list.add(sdf.format(d));
         }
         return list;
     }
+
 }
