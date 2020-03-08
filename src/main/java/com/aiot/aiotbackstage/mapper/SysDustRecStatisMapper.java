@@ -51,4 +51,9 @@ public interface SysDustRecStatisMapper extends BaseMapper<SysDustRecStatisEntit
      * @return
      */
     List<SysDustRecStatisEntity> findAllDaily(Map<String, Object> params);
+
+    int findAllDailyCount(Map<String, Object> params);
+
+    List<SysDustRecStatisEntity> findAllDaily1(Map<String, Object> params);
+    int findAllDailyCount1(Map<String, Object> params);
 }

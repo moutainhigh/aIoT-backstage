@@ -259,8 +259,9 @@ public class DataController {
                 }
             }
         }
-
-        return Result.success(sysDustRecStatisService.getMaxOrMinPestSoilInfo(siteId, startDate, endDate, pageIndex, pageSize));
+        return Result.success(sysDustRecStatisService
+                .getMaxOrMinPestSoilInfo(siteId, startDate,
+                        endDate, pageIndex, pageSize));
     }
 
     /**

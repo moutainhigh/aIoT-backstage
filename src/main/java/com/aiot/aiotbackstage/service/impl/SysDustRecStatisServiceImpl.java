@@ -5,6 +5,7 @@ import com.aiot.aiotbackstage.model.entity.SysDustRecStatisEntity;
 import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.ISysDustRecStatisService;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,11 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-
-        List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily(params);
+        int i1 = sysDustRecStatisMapper.selectCount(Wrappers.<SysDustRecStatisEntity>lambdaQuery()
+                .eq(SysDustRecStatisEntity::getSiteId,siteId).between(true,SysDustRecStatisEntity::getDate,startDate,endDate));
+        params.put("pageIndex", 0);
+        params.put("pageSize", i1);
+        List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily1(params);
         Map<Integer, Map<String, List<Object>>> map = new HashMap<>();
 
         Map<String, List<Object>> tempMap;
@@ -141,10 +145,12 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
             params.clear();
             params.put("siteId", siteId);
             params.put("startDate", startDate);
+//            params.put("depth", depth);
             params.put("endDate", endDate);
             int total = sysDustRecStatisMapper.countAllDaily(params);
             params.put("pageIndex", (pageIndex-1)*pageSize);
             params.put("pageSize", pageSize);
+
             List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily(params);
             return PageResult.<SysDustRecStatisEntity>builder()
                     .total(total)

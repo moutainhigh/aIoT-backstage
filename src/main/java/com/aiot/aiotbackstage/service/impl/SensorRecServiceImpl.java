@@ -234,6 +234,18 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
             stringObjectMap.put("insectRecCount",Arrays.asList(insectRecCounts));
             stringObjectMap.put("dateStr",Arrays.asList(dateStr));
         }
+        String[] siteStr={"三泉村","龙泉村","灯塔村","牌坊村"};
+        for (String s : siteStr) {
+            Map map =new HashMap();
+            map.put("siteName",s);
+            map.put("dateStr",strings1);
+            List list1=new ArrayList();
+            for (String s1 : strings1) {
+                list1.add("0");
+            }
+            map.put("insectRecCount",list1);
+            siteList1.add(map);
+        }
 
         Map<String,Object> resultMap=new HashMap<>();
         resultMap.put("dateList",list);

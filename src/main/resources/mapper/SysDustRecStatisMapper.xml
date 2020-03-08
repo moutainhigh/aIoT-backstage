@@ -100,4 +100,48 @@
             LIMIT #{pageIndex},#{pageSize}
     </select>
 
+    <select id="findAllDailyCount" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            sys_dust_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startDate} AND #{endDate}
+            and depth  = #{depth}
+    </select>
+
+    <select id="findAllDaily1" resultMap="BaseResultMap">
+        SELECT
+            depth,
+            `date`,
+            AVG( wc ) AS wc,
+            AVG( temperature ) AS temperature,
+            AVG( ec ) AS ec,
+            AVG( salinity ) AS salinity,
+            AVG( tds ) AS tds,
+            AVG( epsilon ) AS epsilon
+        FROM
+            sys_dust_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startDate} AND #{endDate}
+        GROUP BY
+            depth,
+            `date`
+        ORDER BY
+            `depth`
+            LIMIT #{pageIndex},#{pageSize}
+    </select>
+
+    <select id="findAllDailyCount1" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            sys_dust_rec_statis
+        WHERE
+            site_id = #{siteId}
+            AND `date` BETWEEN #{startDate} AND #{endDate}
+    </select>
+
 </mapper>
