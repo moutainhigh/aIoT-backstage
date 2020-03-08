@@ -17,7 +17,9 @@ import com.aiot.aiotbackstage.model.vo.DeviceResultVo;
 import com.aiot.aiotbackstage.model.vo.DeviceVo;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.IDeviceService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -206,17 +208,25 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Override
     public PageResult<SysDeviceErrorRecEntity> deviceInfoOld(DeviceInfoOldParam param) {
-        PageParam pageParam=new PageParam();
-        pageParam.setPageNumber(param.getPageNumber());
-        pageParam.setPageSize(param.getPageSize());
-        List<SysDeviceErrorRecEntity> sysDeviceErrorRecEntities = errorRecMapper.deviceErrorRecOldPage(param);
-        Integer total = errorRecMapper.countOld(param);
 
-        if(CollectionUtils.isEmpty(sysDeviceErrorRecEntities)){
+        IPage<SysDeviceErrorRecEntity> sysDeviceErrorRecEntityIPage;
+        if(param.getStartDate() == null){
+            sysDeviceErrorRecEntityIPage =
+            errorRecMapper.selectPage(new Page<>(param.getPageNumber(), param.getPageSize()), null);
+        }else{
+            sysDeviceErrorRecEntityIPage =
+            errorRecMapper.selectPage(new Page<>(param.getPageNumber(), param.getPageSize()),
+                    Wrappers.<SysDeviceErrorRecEntity>lambdaQuery()
+                            .between(true,SysDeviceErrorRecEntity::getStartTime,
+                                    param.getStartDate(),param.getEndDate()));
+        }
+        List<SysDeviceErrorRecEntity> records = sysDeviceErrorRecEntityIPage.getRecords();
+        Long total = sysDeviceErrorRecEntityIPage.getTotal();
+        if(CollectionUtils.isEmpty(records)){
             return  null;
         }
 
-        sysDeviceErrorRecEntities.stream().forEach(sysDeviceErrorRecEntity -> {
+        records.stream().forEach(sysDeviceErrorRecEntity -> {
             SysSiteEntity siteEntity = siteMapper.selectById(sysDeviceErrorRecEntity.getSiteId());
             sysDeviceErrorRecEntity.setSiteName(siteEntity.getName());
             if(sysDeviceErrorRecEntity.getDeviceType().equals("RTU")){
@@ -235,10 +245,10 @@ public class DeviceServiceImpl implements IDeviceService {
             sysDeviceErrorRecEntity.setDuration(Math.abs(MM)+" 分钟");
         });
         return PageResult.<SysDeviceErrorRecEntity>builder()
-                .total(total)
-                .pageData(sysDeviceErrorRecEntities)
-                .pageNumber(pageParam.getPageNumber())
-                .pageSize(pageParam.getPageSize())
+                .total(total.intValue())
+                .pageData(records)
+                .pageNumber(param.getPageNumber())
+                .pageSize(param.getPageSize())
                 .build();
     }
 

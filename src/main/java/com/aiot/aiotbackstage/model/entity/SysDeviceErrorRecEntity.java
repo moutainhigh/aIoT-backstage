@@ -2,6 +2,7 @@ package com.aiot.aiotbackstage.model.entity;
 
 import com.aiot.aiotbackstage.common.enums.DeviceType;
 import com.aiot.aiotbackstage.model.vo.DeviceVo;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
