@@ -187,8 +187,80 @@ public class DataController {
                 }
             }
         }
-        return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, startDate, endDate, pageSize, pageIndex));
+        return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, startDate, endDate, pageSize, pageIndex,2));
     }
+
+    /**
+     * 单站害虫统计及详情
+     *
+     * @param siteId       站点ID
+     * @param startDate    开始日期
+     * @param endDate      结束日期
+     * @param isNearlyWeek 是否是最近一周：1、是；其他：否
+     * @param pageSize     分页大小
+     * @param pageNumber   页码
+     * @return
+     */
+    @ApiOperation(value = "单站害虫统计及详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "站点ID", value = "siteId", required = true),
+            @ApiImplicitParam(name = "开始日期", value = "startDate"),
+            @ApiImplicitParam(name = "结束日期", value = "endDate"),
+            @ApiImplicitParam(name = "是否是最近一周", value = "isNearlyWeek"),
+            @ApiImplicitParam(name = "分页大小", value = "pageSize"),
+            @ApiImplicitParam(name = "页码", value = "pageNumber")
+    })
+    @PostMapping("site/pestNumStatDetail")
+    public Result sitePestNumStatDetail(@RequestBody Map<String, Object> params) {
+        int pageSize;
+        int pageIndex;
+        if (!params.containsKey("pageSize")) {
+            pageSize = Constants.Page.PAGE_SIZE;
+        } else {
+            pageSize = Integer.parseInt(String.valueOf(params.get("pageSize")));
+            if (pageSize > Constants.Page.MAX_PAGE_SIZE) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        if (!params.containsKey("pageNumber")) {
+            pageIndex = 1;
+        } else {
+            pageIndex = Integer.parseInt(String.valueOf(params.get("pageNumber")));
+            if (pageIndex <= 0) {
+                return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+            }
+        }
+        if (!params.containsKey("siteId")) {
+            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
+        }
+        String siteId = String.valueOf(params.get("siteId"));
+        String startDate;
+        String endDate;
+        if (params.containsKey("isNearlyWeek")
+                && Integer.parseInt(String.valueOf(params.get("isNearlyWeek"))) == 1) {
+            Calendar now = Calendar.getInstance();
+            endDate = DateUtils.format(now.getTime(), "yyyy-MM-dd");
+            now.add(Calendar.DAY_OF_MONTH, -7);
+            startDate = DateUtils.format(now.getTime(), "yyyy-MM-dd");
+        } else {
+            startDate = String.valueOf(params.get("startDate"));
+            endDate = String.valueOf(params.get("endDate"));
+            if (startDate.isEmpty()
+                    || endDate.isEmpty()
+                    || "null".equals(startDate)
+                    || "null".equals(endDate)) {
+                startDate = DateUtils.format(new Date(), "yyyy-MM-dd");
+                endDate = startDate;
+            } else {
+                if (!DateUtils.isValid(startDate, "yyyy-MM-dd")
+                        || !DateUtils.isValid(endDate, "yyyy-MM-dd")) {
+                    return Result.error(ResultStatusCode.PARAM_IS_INVALID);
+                }
+            }
+        }
+        return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, startDate, endDate, pageSize, pageIndex,1));
+    }
+
 
     /**
      * 单站土壤信息
