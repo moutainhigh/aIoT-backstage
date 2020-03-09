@@ -33,4 +33,6 @@ public class ObsConfig {
      * 桶名称
      */
     private String bucketName;
+
+    private String url;
 }

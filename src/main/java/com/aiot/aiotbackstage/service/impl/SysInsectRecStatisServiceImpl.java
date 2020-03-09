@@ -1,5 +1,6 @@
 package com.aiot.aiotbackstage.service.impl;
 
+import com.aiot.aiotbackstage.common.config.ObsConfig;
 import com.aiot.aiotbackstage.mapper.SysInsectRecStatisMapper;
 import com.aiot.aiotbackstage.mapper.SysPestBankMapper;
 import com.aiot.aiotbackstage.mapper.SysPreventiveMeasuresMapper;
@@ -46,6 +47,9 @@ public class SysInsectRecStatisServiceImpl extends ServiceImpl<SysInsectRecStati
     @Autowired
     private SysWarnInfoMapper warnInfoMapper;
 
+    @Autowired
+    private ObsConfig obsConfig;
+
     @Override
     public PageResult<Map<String, Object>> getSomeSitePestNumStat(String siteId, String startDate, String endDate, int pageSize, int pageIndex,int i) {
         Map<String, Object> params = new HashMap<>();
@@ -76,7 +80,7 @@ public class SysInsectRecStatisServiceImpl extends ServiceImpl<SysInsectRecStati
                 });
                 sysPreventiveMeasuresEntities.forEach(measuresEntity -> {
                     if(Long.valueOf(stringObjectMap.get("insectId")+"").equals(measuresEntity.getInsectInfoId())){
-                        stringObjectMap.put("picture",measuresEntity.getPicture());
+                        stringObjectMap.put("picture",obsConfig.getUrl()+measuresEntity.getPicture());
 //                        stringObjectMap.put("measuresInfo",measuresEntity.getMeasuresInfo());
                     }
                 });
