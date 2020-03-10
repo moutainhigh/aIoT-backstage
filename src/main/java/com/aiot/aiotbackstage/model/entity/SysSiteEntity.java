@@ -27,7 +27,7 @@ public class SysSiteEntity {
     private String locationUrl;
 
     /**
-     * 基座大小
+     * 坐标
      */
     private String coordinate;
 

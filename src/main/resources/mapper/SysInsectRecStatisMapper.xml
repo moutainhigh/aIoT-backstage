@@ -94,6 +94,7 @@
     <select id="findAllBySiteId" resultType="map">
         SELECT
             c.insect_id AS insectId,
+            c.site_id As siteId,
             c.insect_name AS insectName,
             SUM( c.insect_num ) AS insectNumber,
             GROUP_CONCAT( c.crop_name SEPARATOR ',' ) AS cropName,
@@ -103,6 +104,7 @@
             SELECT
                 b.insect_id,
                 b.insect_num,
+                b.site_id,
                 sii.`name` AS insect_name,
                 spm.id AS m_id,
                 spm.`name` AS crop_name,
@@ -110,6 +112,7 @@
             FROM
             (
                 SELECT
+                    sid.site_id,
                     a.insect_id,
                     SUM( a.num ) AS insect_num
                 FROM
@@ -125,8 +128,10 @@
                         `date` BETWEEN #{startDate} AND #{endDate}
                 ) AS a
                 LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
-                WHERE
-                    sid.site_id = #{siteId}
+                WHERE 1=1
+                    <if test="siteId != null">
+                       and sid.site_id = #{siteId}
+                    </if>
                 GROUP BY
                     a.insect_id
             ) AS b

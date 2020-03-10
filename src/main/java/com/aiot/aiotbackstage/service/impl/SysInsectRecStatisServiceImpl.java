@@ -1,16 +1,11 @@
 package com.aiot.aiotbackstage.service.impl;
 
 import com.aiot.aiotbackstage.common.config.ObsConfig;
-import com.aiot.aiotbackstage.mapper.SysInsectRecStatisMapper;
-import com.aiot.aiotbackstage.mapper.SysPestBankMapper;
-import com.aiot.aiotbackstage.mapper.SysPreventiveMeasuresMapper;
-import com.aiot.aiotbackstage.mapper.SysWarnInfoMapper;
-import com.aiot.aiotbackstage.model.entity.SysInsectRecStatisEntity;
-import com.aiot.aiotbackstage.model.entity.SysPestBankEntity;
-import com.aiot.aiotbackstage.model.entity.SysPreventiveMeasuresEntity;
-import com.aiot.aiotbackstage.model.entity.SysWarnInfoEntity;
+import com.aiot.aiotbackstage.mapper.*;
+import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.ISysInsectRecStatisService;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.swagger.models.auth.In;
@@ -50,6 +45,9 @@ public class SysInsectRecStatisServiceImpl extends ServiceImpl<SysInsectRecStati
     @Autowired
     private ObsConfig obsConfig;
 
+    @Autowired
+    private SysSiteMapper siteMapper;
+
     @Override
     public PageResult<Map<String, Object>> getSomeSitePestNumStat(String siteId, String startDate, String endDate, int pageSize, int pageIndex,int i) {
         Map<String, Object> params = new HashMap<>();
@@ -66,12 +64,14 @@ public class SysInsectRecStatisServiceImpl extends ServiceImpl<SysInsectRecStati
         if(i == 1){
             List<Long> insectId = (List<Long>)(List)result.stream().map(stringObjectMap -> stringObjectMap.get("insectId")).collect(Collectors.toList());
             List<Long> insectName = (List<Long>)(List)result.stream().map(stringObjectMap -> stringObjectMap.get("insectName")).collect(Collectors.toList());
+            List<Integer> siteIds = (List<Integer>)(List)result.stream().map(stringObjectMap -> stringObjectMap.get("siteId")).collect(Collectors.toList());
             List<SysPestBankEntity> sysPestBankEntities = pestBankMapper.selectBatchIds(insectId);
             List<SysPreventiveMeasuresEntity> sysPreventiveMeasuresEntities =
                     preventiveMeasuresMapper.selectList(Wrappers.<SysPreventiveMeasuresEntity>lambdaQuery()
                             .in(SysPreventiveMeasuresEntity::getInsectInfoId, insectId));
             List<SysWarnInfoEntity> warnInfoEntities = warnInfoMapper.selectList(Wrappers.<SysWarnInfoEntity>lambdaQuery()
                     .in(SysWarnInfoEntity::getEarlyName, insectName).eq(SysWarnInfoEntity::getTime,startDate));
+            List<SysSiteEntity> sysSiteEntityList = siteMapper.selectBatchIds(siteIds);
             result.stream().forEach(stringObjectMap -> {
                 sysPestBankEntities.forEach(sysPestBankEntity -> {
                     if(Long.valueOf(stringObjectMap.get("insectId")+"").equals(sysPestBankEntity.getId())){
@@ -89,7 +89,13 @@ public class SysInsectRecStatisServiceImpl extends ServiceImpl<SysInsectRecStati
                 }else{
                     stringObjectMap.put("reportUser","user");
                 }
-
+                if(!CollectionUtils.isEmpty(sysSiteEntityList)){
+                    sysSiteEntityList.forEach(sysSiteEntity -> {
+                        if((int)stringObjectMap.get("siteId") == sysSiteEntity.getId()){
+                            stringObjectMap.put("coordinate",sysSiteEntity.getCoordinate());
+                        }
+                    });
+                }
             });
         }
 

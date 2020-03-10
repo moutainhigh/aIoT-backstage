@@ -202,14 +202,6 @@ public class DataController {
      * @return
      */
     @ApiOperation(value = "单站害虫统计及详情")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "站点ID", value = "siteId", required = true),
-            @ApiImplicitParam(name = "开始日期", value = "startDate"),
-            @ApiImplicitParam(name = "结束日期", value = "endDate"),
-            @ApiImplicitParam(name = "是否是最近一周", value = "isNearlyWeek"),
-            @ApiImplicitParam(name = "分页大小", value = "pageSize"),
-            @ApiImplicitParam(name = "页码", value = "pageNumber")
-    })
     @PostMapping("site/pestNumStatDetail")
     public Result sitePestNumStatDetail(@RequestBody Map<String, Object> params) {
         int pageSize;
@@ -230,10 +222,7 @@ public class DataController {
                 return Result.error(ResultStatusCode.PARAM_IS_INVALID);
             }
         }
-        if (!params.containsKey("siteId")) {
-            return Result.error(ResultStatusCode.PARAM_NOT_COMPLETE);
-        }
-        String siteId = String.valueOf(params.get("siteId"));
+
         String startDate;
         String endDate;
         if (params.containsKey("isNearlyWeek")
@@ -257,6 +246,12 @@ public class DataController {
                     return Result.error(ResultStatusCode.PARAM_IS_INVALID);
                 }
             }
+        }
+        String siteId="";
+        if (!params.containsKey("siteId")) {
+            siteId=null;
+        }else{
+            siteId = String.valueOf(params.get("siteId"));
         }
         return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, startDate, endDate, pageSize, pageIndex,1));
     }
