@@ -10,6 +10,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -23,6 +24,7 @@ import java.util.TimerTask;
  */
 @Slf4j
 @Component
+@Order(1)
 public class DahuaSDK implements ApplicationRunner {
 
     @Resource
@@ -33,6 +35,11 @@ public class DahuaSDK implements ApplicationRunner {
     private static int m_nDLLHandle = -1;
 
     private String channelKey = "CAMERA-CHANNEL";
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        init();
+    }
 
     /**
      * 创建全局唯一SDK句柄
@@ -192,9 +199,4 @@ public class DahuaSDK implements ApplicationRunner {
             }
         }
     };
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        init();
-    }
 }

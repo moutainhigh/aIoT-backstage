@@ -60,7 +60,7 @@ public class DeviceServiceImpl implements IDeviceService {
             List<DeviceVo> deviceVos=new ArrayList<>();
             sysDeviceErrorRecEntities.forEach(sysDeviceErrorRecEntity -> {
                 DeviceVo deviceVo=new DeviceVo();
-                if(sysDeviceErrorRecEntity.getDeviceType().equals("RYU")){
+                if(sysDeviceErrorRecEntity.getDeviceType().equals("RTU")){
                     deviceVo.setDeviceType(sysDeviceErrorRecEntity.getDeviceType());
                     deviceVo.setStartTime(sysDeviceErrorRecEntity.getStartTime());
                     deviceVo.setId(sysDeviceErrorRecEntity.getId());
@@ -97,7 +97,7 @@ public class DeviceServiceImpl implements IDeviceService {
             deviceVo.setStartTime(null);
             deviceVos.add(deviceVo);
             DeviceVo deviceVo1=new DeviceVo();
-            deviceVo1.setDeviceType("RYU");
+            deviceVo1.setDeviceType("RTU");
             deviceVo1.setDeviceName("传感器RTU");
             deviceVo1.setStatus("正常");
             deviceVo1.setStartTime(null);
