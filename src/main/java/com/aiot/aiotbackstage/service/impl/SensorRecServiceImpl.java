@@ -4,22 +4,24 @@ import com.aiot.aiotbackstage.common.enums.RtuAddrCode;
 import com.aiot.aiotbackstage.common.enums.SensorType;
 import com.aiot.aiotbackstage.common.enums.WindDirection;
 import com.aiot.aiotbackstage.common.util.RedisUtils;
-import com.aiot.aiotbackstage.mapper.SysDustRecMapper;
-import com.aiot.aiotbackstage.mapper.SysSensorRecMapper;
-import com.aiot.aiotbackstage.mapper.SysSiteMapper;
+import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.dto.RtuData;
-import com.aiot.aiotbackstage.model.entity.SysDustRecEntity;
-import com.aiot.aiotbackstage.model.entity.SysSensorRecEntity;
-import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
+import com.aiot.aiotbackstage.model.entity.*;
+import com.aiot.aiotbackstage.model.param.InsectRecByDateParam;
 import com.aiot.aiotbackstage.model.vo.SysSensorRecVo2;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.ISensorRecService;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -36,6 +38,11 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     private RedisUtils redisUtils;
     @Resource
     private IEarlyWarningService earlyWarningService;
+    @Resource
+    private SysInsectDeviceMapper deviceMapper;
+    @Resource
+    private SysInsectRecStatisMapper insectRecMapper;
+
 
     @Override
     public void receive(RtuData rtuData) {
@@ -148,4 +155,125 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         }
         return map;
     }
+
+    @Override
+    public Map<String,Object> insectRecByDate(InsectRecByDateParam param) {
+        List<SysInsectRecStatisEntity> sysInsectRecEntities = insectRecMapper
+                .selectList(Wrappers.<SysInsectRecStatisEntity>lambdaQuery()
+                        .between(true, SysInsectRecStatisEntity::getDate, param.getStartDate(), param.getEndDate()));
+        if(CollectionUtils.isEmpty(sysInsectRecEntities)){
+            return null;
+        }
+        //获取设备对应的站点数据
+        List<String> collect2 = sysInsectRecEntities.stream().map(SysInsectRecStatisEntity::getDeviceId).collect(Collectors.toList());
+        List<String> collect3 = collect2.stream().distinct().collect(Collectors.toList());
+        List<SysInsectDeviceEntity> sysInsectDeviceEntities = deviceMapper.selectList(Wrappers.<SysInsectDeviceEntity>lambdaQuery().in(SysInsectDeviceEntity::getImei, collect3));
+        List<Integer> collect4 = sysInsectDeviceEntities.stream().map(SysInsectDeviceEntity::getSiteId).collect(Collectors.toList());
+        List<SysSiteEntity> sysSiteEntities = sysSiteMapper.selectBatchIds(collect4);
+
+        TreeMap<String, List<SysInsectRecStatisEntity>> collect = sysInsectRecEntities.stream()
+                .collect(Collectors.groupingBy(SysInsectRecStatisEntity::getDate
+                        , TreeMap::new, Collectors.toList()));
+        Set<String> strings = collect.keySet();
+        List<Map<String,Object>> siteList=new ArrayList<>();
+        List<String> list=new ArrayList<>();
+        strings.stream().forEach(s -> {
+            list.add(s);
+            List<SysInsectRecStatisEntity> sysInsectRecStatisEntities = collect.get(s);
+            Map<String, List<SysInsectRecStatisEntity>> collect1 = sysInsectRecStatisEntities.stream().collect(Collectors.groupingBy(SysInsectRecStatisEntity::getDeviceId));
+            Set<String> strings1 = collect1.keySet();
+            strings1.stream().forEach(s1 -> {
+                List<SysInsectRecStatisEntity> sysInsectRecStatisEntities1 = collect1.get(s1);
+                int sum = sysInsectRecStatisEntities1.stream().mapToInt(SysInsectRecStatisEntity::getNum).sum();
+                sysInsectDeviceEntities.stream().forEach(sysInsectDeviceEntity -> {
+
+                    if(Integer.parseInt(s1) == sysInsectDeviceEntity.getId()){
+                        Map<String,Object> map=new HashMap<>();
+                        sysSiteEntities.stream().forEach(sysSiteEntity -> {
+                            if(sysInsectDeviceEntity.getSiteId() == sysSiteEntity.getId()){
+                                map.put("siteName",sysSiteEntity.getName());
+                            }
+                        });
+                        map.put("insectRecCount",sum);
+                        map.put("date",s);
+                        siteList.add(map);
+                    }
+                });
+            });
+        });
+        Map<Object, List<Map<String, Object>>> date = siteList.stream().collect(Collectors.groupingBy(stringObjectMap -> stringObjectMap.get("siteName")));
+        Set<Object> objects = date.keySet();
+        List<Map<String,Object>> siteList1=new ArrayList<>();
+        objects.forEach(o -> {
+            Map<String,Object> map1=new HashMap<>();
+            String sa="";
+            String dateStr="";
+            List<Map<String, Object>> maps = date.get(o);
+            for (Map<String, Object> map : maps) {
+                sa+=map.get("insectRecCount")+",";
+                dateStr+=map.get("date")+",";
+            }
+            map1.put("insectRecCount",sa.substring(0,sa.length()-1));
+            map1.put("dateStr",dateStr.substring(0,dateStr.length()-1));
+            map1.put("siteName",o);
+            siteList1.add(map1);
+        });
+        List<String> strings1 = dateList(param.getStartDate(), param.getEndDate());
+
+        for (Map<String, Object> stringObjectMap : siteList1) {
+            String[] dateStrs = stringObjectMap.get("dateStr").toString().split(",");
+            List<String> strings2 = Arrays.asList(dateStrs);
+            List<String> result = strings1.stream().filter(item -> !strings2.contains(item)).collect(Collectors.toList());
+            if(result.size() > 0){
+                result.forEach(s -> {
+                    stringObjectMap.put("insectRecCount",stringObjectMap.get("insectRecCount").toString()+","+0);
+                });
+            }
+            String[] insectRecCounts = stringObjectMap.get("insectRecCount").toString().split(",");
+            String[] dateStr = stringObjectMap.get("dateStr").toString().split(",");
+            stringObjectMap.put("insectRecCount",Arrays.asList(insectRecCounts));
+            stringObjectMap.put("dateStr",Arrays.asList(dateStr));
+        }
+        String[] siteStr={"三泉村","龙泉村","灯塔村","牌坊村"};
+        for (String s : siteStr) {
+            Map map =new HashMap();
+            map.put("siteName",s);
+            map.put("dateStr",strings1);
+            List list1=new ArrayList();
+            for (String s1 : strings1) {
+                list1.add("0");
+            }
+            map.put("insectRecCount",list1);
+            siteList1.add(map);
+        }
+
+        Map<String,Object> resultMap=new HashMap<>();
+        resultMap.put("dateList",list);
+        resultMap.put("siteList",siteList1);
+        return resultMap;
+    }
+
+    private  long get_Date(Calendar c) {
+        c.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) + 1);
+        return c.getTimeInMillis();
+    }
+
+    /**
+     * 开始时间与结束时间之间的所有日期
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    private List<String> dateList(Date beginDate,Date endDate) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(beginDate);
+        List<String> list=new ArrayList<>();
+        for (long d = cal.getTimeInMillis(); d <= endDate.getTime(); d = get_Date(cal)) {
+            list.add(sdf.format(d));
+        }
+        return list;
+    }
+
 }

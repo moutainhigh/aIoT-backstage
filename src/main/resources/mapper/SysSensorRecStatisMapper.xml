@@ -88,9 +88,7 @@
             AND `date` BETWEEN #{startDate} AND #{endDate}
         ORDER BY
             `date`
-        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
-            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
-        </if>
+        LIMIT #{pageIndex},#{pageSize}
     </select>
 
     <select id="findAllBySiteIdDaily" resultMap="BaseResultMap">
@@ -111,10 +109,9 @@
             AND `date` BETWEEN #{startDate} AND #{endDate}
         GROUP BY
             `date`
-        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
-            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
-        </if>
+            LIMIT #{pageIndex},#{pageSize}
     </select>
+
 
     <select id="findAllBySiteIdDailyDay" resultMap="BaseResultMap">
         SELECT
@@ -136,9 +133,7 @@
             AND `hour` &lt; 19
         GROUP BY
             `date`
-        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
-            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
-        </if>
+           LIMIT #{pageIndex},#{pageSize}
     </select>
 
     <select id="findAllBySiteIdDailyNight" resultMap="BaseResultMap">
@@ -165,9 +160,8 @@
             )
         GROUP BY
             `date`
-        <if test="pageSize != null and pageSize != '' and pageIndex != null and pageIndex != ''">
-            LIMIT ${pageSize * (pageIndex - 1)}, #{pageSize}
-        </if>
+
+            LIMIT #{pageIndex},#{pageSize}
     </select>
 
 </mapper>

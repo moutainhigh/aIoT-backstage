@@ -7,6 +7,7 @@ import com.aiot.aiotbackstage.model.entity.SysSensorRecStatisEntity;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.model.vo.SysSensorRecVo;
 import com.aiot.aiotbackstage.service.ISensorRecStatisService;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,13 +59,13 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-        List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
+//        List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
 
-        if (pestResult != null && pestResult.size() == 1) {
-            String pestDate = String.valueOf(pestResult.get(0).get("date"));
-            return getDayOrNightAveragePageable(siteId, pestDate, pestDate, pageIndex, pageSize);
-        }
-        return null;
+//        if (pestResult != null && pestResult.size() == 1) {
+//            String pestDate = String.valueOf(pestResult.get(0).get("date"));
+            return getDayOrNightAveragePageable(siteId, startDate, endDate, pageIndex, pageSize);
+//        }
+//        return null;
     }
 
     private Map<String, Object> getDayOrNightAverage(String siteId, String startDate, String endDate) {
@@ -72,7 +73,11 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-
+        Integer integer = sysSensorRecStatisMapper.selectCount(Wrappers.<SysSensorRecStatisEntity>lambdaQuery()
+                .eq(SysSensorRecStatisEntity::getSiteId, siteId)
+                .between(true, SysSensorRecStatisEntity::getDate, startDate, endDate));
+        params.put("pageIndex", 0);
+        params.put("pageSize", integer);
         List<SysSensorRecStatisEntity> result = sysSensorRecStatisMapper.findAllBySiteIdDaily(params);
 
         List<SysSensorRecStatisEntity> tempList;
@@ -110,6 +115,11 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
             params.put("siteId", siteId);
             params.put("startDate", entity.getDate());
             params.put("endDate", entity.getDate());
+            Integer counts = sysSensorRecStatisMapper.selectCount(Wrappers.<SysSensorRecStatisEntity>lambdaQuery()
+                    .eq(SysSensorRecStatisEntity::getSiteId, siteId)
+                    .between(true, SysSensorRecStatisEntity::getDate, entity.getDate(), entity.getDate()));
+            params.put("pageIndex", 0);
+            params.put("pageSize", counts);
 
             date[i] = entity.getDate();
             windSpeed[i] = entity.getWindSpeed();
@@ -141,7 +151,7 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
         params.put("endDate", endDate);
 
         int total = sysSensorRecStatisMapper.countAllBySiteIdDaily(params);
-        params.put("pageIndex", pageIndex);
+        params.put("pageIndex", (pageIndex-1)*pageSize);
         params.put("pageSize", pageSize);
         List<SysSensorRecStatisEntity> result = sysSensorRecStatisMapper.findAllBySiteIdDaily(params);
 
@@ -151,6 +161,8 @@ public class SensorRecStatisServiceImpl extends ServiceImpl<SysSensorRecStatisMa
             params.put("siteId", siteId);
             params.put("startDate", entity.getDate());
             params.put("endDate", entity.getDate());
+            params.put("pageIndex", 0);
+            params.put("pageSize", total);
             tempList = sysSensorRecStatisMapper.findAllBySiteIdDailyDay(params);
             if (!tempList.isEmpty()) {
                 entity.setHumidityDay(tempList.get(0).getHumidity());

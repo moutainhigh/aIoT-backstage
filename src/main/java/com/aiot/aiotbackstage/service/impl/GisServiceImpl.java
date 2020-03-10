@@ -131,13 +131,13 @@ public class GisServiceImpl implements IGisService {
 
         //土壤数据
         Map<String,Object> map=new HashMap<>();
-        map.put("10cm",redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":10"));
+        map.put("SENSOR10",redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":10"));
         dustRecVos.add(map);
         Map<String, Object> map1=new HashMap<>();
-        map1.put("20cm",redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":20"));
+        map1.put("SENSOR20",redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":20"));
         dustRecVos.add(map1);
         Map<String, Object> map2=new HashMap<>();
-        map2.put("40cm",redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":40"));
+        map2.put("SENSOR40",redisTemplate.opsForValue().get("SENSOR-VALUE:" + stationId + ":40"));
         dustRecVos.add(map2);
 
         SensorInfoVo infoVo=new SensorInfoVo();

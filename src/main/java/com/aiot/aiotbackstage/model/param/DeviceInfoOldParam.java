@@ -1,6 +1,5 @@
 package com.aiot.aiotbackstage.model.param;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -14,10 +13,10 @@ import java.util.Date;
 @Data
 public class DeviceInfoOldParam extends PageParam{
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
     private Integer siteId;

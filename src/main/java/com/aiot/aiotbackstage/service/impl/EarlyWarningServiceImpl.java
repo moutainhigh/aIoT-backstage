@@ -178,7 +178,8 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
 
     @Override
     public PageResult<SysWarnInfoEntity> earlyInfoReportPage(PageParam pageParam) {
-        Integer total = warnInfoMapper.selectCount(null);
+        Integer total = warnInfoMapper.selectCount(Wrappers.<SysWarnInfoEntity>lambdaQuery()
+                .eq(SysWarnInfoEntity::getIsClosed,2));
         List<SysWarnInfoEntity> sysWarnInfoEntities = warnInfoMapper.warnInfoPage(pageParam);
         if(CollectionUtils.isEmpty(sysWarnInfoEntities)){
             return  null;

@@ -99,8 +99,8 @@ public class DataStatisSchedule {
     }
 
     private void start(String startTime, String endTime) {
-        startPestStatis(startTime, endTime);
-        startSoilStatis(startTime, endTime);
+//        startPestStatis(startTime, endTime);
+//        startSoilStatis(startTime, endTime);
         startMeteStatis(startTime, endTime);
     }
 

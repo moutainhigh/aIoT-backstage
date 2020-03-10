@@ -5,6 +5,7 @@ import com.aiot.aiotbackstage.model.entity.SysDustRecStatisEntity;
 import com.aiot.aiotbackstage.model.param.PageParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.ISysDustRecStatisService;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,11 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
         params.put("siteId", siteId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
-
-        List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily(params);
+        int i1 = sysDustRecStatisMapper.selectCount(Wrappers.<SysDustRecStatisEntity>lambdaQuery()
+                .eq(SysDustRecStatisEntity::getSiteId,siteId).between(true,SysDustRecStatisEntity::getDate,startDate,endDate));
+        params.put("pageIndex", 0);
+        params.put("pageSize", i1);
+        List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily1(params);
         Map<Integer, Map<String, List<Object>>> map = new HashMap<>();
 
         Map<String, List<Object>> tempMap;
@@ -135,16 +139,18 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         // 获取虫害最大日期
-         List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
-        if (pestResult != null && pestResult.size() == 1) {
-            String pestDate = String.valueOf(pestResult.get(0).get("date"));
+//         List<Map<String, Object>> pestResult = sysInsectRecStatisMapper.findMaxOrMinPestDate(params);
+//        if (pestResult != null && pestResult.size() == 1) {
+//            String pestDate = String.valueOf(pestResult.get(0).get("date"));
             params.clear();
             params.put("siteId", siteId);
-            params.put("startDate", pestDate);
-            params.put("endDate", pestDate);
+            params.put("startDate", startDate);
+//            params.put("depth", depth);
+            params.put("endDate", endDate);
             int total = sysDustRecStatisMapper.countAllDaily(params);
             params.put("pageIndex", (pageIndex-1)*pageSize);
             params.put("pageSize", pageSize);
+
             List<SysDustRecStatisEntity> result = sysDustRecStatisMapper.findAllDaily(params);
             return PageResult.<SysDustRecStatisEntity>builder()
                     .total(total)
@@ -152,7 +158,7 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
                     .pageSize(pageSize)
                     .pageNumber(pageIndex)
                     .build();
-        }
-        return null;
+//        }
+//        return null;
     }
 }
