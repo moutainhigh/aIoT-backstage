@@ -128,10 +128,8 @@
                         `date` BETWEEN #{startDate} AND #{endDate}
                 ) AS a
                 LEFT JOIN sys_insect_device AS sid ON sid.id = a.device_id
-                WHERE 1=1
-                    <if test="siteId != null">
-                       and sid.site_id = #{siteId}
-                    </if>
+                WHERE
+                    sid.site_id = #{siteId}
                 GROUP BY
                     a.insect_id
             ) AS b

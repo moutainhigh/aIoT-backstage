@@ -187,7 +187,7 @@ public class DataController {
                 }
             }
         }
-        return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, startDate, endDate, pageSize, pageIndex,2));
+        return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, startDate, endDate, pageSize, pageIndex));
     }
 
     /**
@@ -253,7 +253,11 @@ public class DataController {
         }else{
             siteId = String.valueOf(params.get("siteId"));
         }
-        return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, startDate, endDate, pageSize, pageIndex,1));
+        if(siteId == null){
+            return Result.success(sysInsectRecStatisService.getSomeSitePestNumDatail(siteId, startDate, endDate, pageSize, pageIndex));
+        }else{
+            return Result.success(sysInsectRecStatisService.getSomeSitePestNumStat(siteId, startDate, endDate, pageSize, pageIndex));
+        }
     }
 
 

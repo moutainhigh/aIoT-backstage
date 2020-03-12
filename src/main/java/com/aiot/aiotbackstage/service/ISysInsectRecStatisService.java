@@ -11,11 +11,13 @@ public interface ISysInsectRecStatisService extends IService<SysInsectRecStatisE
 
     List<Map<String, Object>> getAllSitesPestNumStat(String startDate, String endDate);
 
-    PageResult<Map<String, Object>> getSomeSitePestNumStat(String siteId, String startDate, String endDate, int pageSize, int pageIndex,int i);
+    PageResult<Map<String, Object>> getSomeSitePestNumStat(String siteId, String startDate, String endDate, int pageSize, int pageIndex);
 
     Map<String, List<String>> getPestNumStat(String startDate, String endDate);
 
     Map<String, List<String>> getPerPestNumStat();
 
     Map<String, List<String>> getPestNumStatDaily(String startDate, String endDate);
+
+    PageResult<Map<String, Object>> getSomeSitePestNumDatail(String siteId, String startDate, String endDate, int pageSize, int pageIndex);
 }

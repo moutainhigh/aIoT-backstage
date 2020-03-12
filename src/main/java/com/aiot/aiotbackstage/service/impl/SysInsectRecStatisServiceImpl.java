@@ -49,7 +49,7 @@ public class SysInsectRecStatisServiceImpl extends ServiceImpl<SysInsectRecStati
     private SysSiteMapper siteMapper;
 
     @Override
-    public PageResult<Map<String, Object>> getSomeSitePestNumStat(String siteId, String startDate, String endDate, int pageSize, int pageIndex,int i) {
+    public PageResult<Map<String, Object>> getSomeSitePestNumStat(String siteId, String startDate, String endDate, int pageSize, int pageIndex) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
         params.put("startDate", startDate);
@@ -58,49 +58,57 @@ public class SysInsectRecStatisServiceImpl extends ServiceImpl<SysInsectRecStati
         params.put("pageSize", pageSize);
         params.put("pageIndex", pageIndex);
         List<Map<String, Object>> result = sysInsectRecStatisMapper.findAllBySiteId(params);
-        if(result == null){
-            return null;
-        }
-        if(i == 1){
-            List<Long> insectId = (List<Long>)(List)result.stream().map(stringObjectMap -> stringObjectMap.get("insectId")).collect(Collectors.toList());
-            List<Long> insectName = (List<Long>)(List)result.stream().map(stringObjectMap -> stringObjectMap.get("insectName")).collect(Collectors.toList());
-            List<Integer> siteIds = (List<Integer>)(List)result.stream().map(stringObjectMap -> stringObjectMap.get("siteId")).collect(Collectors.toList());
-            List<SysPestBankEntity> sysPestBankEntities = pestBankMapper.selectBatchIds(insectId);
-            List<SysPreventiveMeasuresEntity> sysPreventiveMeasuresEntities =
-                    preventiveMeasuresMapper.selectList(Wrappers.<SysPreventiveMeasuresEntity>lambdaQuery()
-                            .in(SysPreventiveMeasuresEntity::getInsectInfoId, insectId));
-            List<SysWarnInfoEntity> warnInfoEntities = warnInfoMapper.selectList(Wrappers.<SysWarnInfoEntity>lambdaQuery()
-                    .in(SysWarnInfoEntity::getEarlyName, insectName).eq(SysWarnInfoEntity::getTime,startDate));
-            List<SysSiteEntity> sysSiteEntityList = siteMapper.selectBatchIds(siteIds);
-            result.stream().forEach(stringObjectMap -> {
-                sysPestBankEntities.forEach(sysPestBankEntity -> {
-                    if(Long.valueOf(stringObjectMap.get("insectId")+"").equals(sysPestBankEntity.getId())){
-                        stringObjectMap.put("pestIntroduce",sysPestBankEntity.getPestIntroduce());
-                    }
-                });
-                sysPreventiveMeasuresEntities.forEach(measuresEntity -> {
-                    if(Long.valueOf(stringObjectMap.get("insectId")+"").equals(measuresEntity.getInsectInfoId())){
-                        stringObjectMap.put("picture",obsConfig.getUrl()+measuresEntity.getPicture());
-//                        stringObjectMap.put("measuresInfo",measuresEntity.getMeasuresInfo());
-                    }
-                });
-                if(warnInfoEntities.size()>0){
-                    stringObjectMap.put("reportUser",warnInfoEntities.get(0).getReportUser());
-                }else{
-                    stringObjectMap.put("reportUser","user");
-                }
-                if(!CollectionUtils.isEmpty(sysSiteEntityList)){
-                    sysSiteEntityList.forEach(sysSiteEntity -> {
-                        if((int)stringObjectMap.get("siteId") == sysSiteEntity.getId()){
-                            stringObjectMap.put("coordinate",sysSiteEntity.getCoordinate());
-                        }
-                    });
-                }
-            });
-        }
-
         return PageResult.<Map<String, Object>>builder()
                 .pageData(result)
+                .total(total)
+                .pageSize(pageSize)
+                .pageNumber(pageIndex)
+                .build();
+    }
+
+    @Override
+    public PageResult<Map<String, Object>> getSomeSitePestNumDatail(String siteId, String startDate, String endDate, int pageSize, int pageIndex) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("siteId", siteId);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+
+        params.put("pageSize", pageSize);
+        params.put("pageIndex", pageIndex);
+        List<SysSiteEntity> sysSiteEntities = siteMapper.selectAll();
+        List<Map<String, Object>> results=new ArrayList<>();
+        int total =0;
+        for (SysSiteEntity sysSiteEntity : sysSiteEntities) {
+            params.put("siteId", sysSiteEntity.getId());
+            List<Map<String, Object>> allBySiteId = sysInsectRecStatisMapper.findAllBySiteId(params);
+            if(!CollectionUtils.isEmpty(allBySiteId)){
+                Map<String, Object> map = allBySiteId.get(0);
+                map.put("coordinate",sysSiteEntity.getCoordinate());
+                results.add(map);
+            }
+            total+=sysInsectRecStatisMapper.countAllBySiteId(params);
+        }
+        for (Map<String, Object> mapList : results) {
+            SysPestBankEntity sysPestBankEntities = pestBankMapper.selectById((int)mapList.get("insectId"));
+            List<SysPreventiveMeasuresEntity> sysPreventiveMeasuresEntities =
+                    preventiveMeasuresMapper.selectList(Wrappers.<SysPreventiveMeasuresEntity>lambdaQuery()
+                            .eq(SysPreventiveMeasuresEntity::getInsectInfoId, mapList.get("insectId")));
+            List<SysWarnInfoEntity> warnInfoEntities = warnInfoMapper.selectList(Wrappers.<SysWarnInfoEntity>lambdaQuery()
+                    .eq(SysWarnInfoEntity::getEarlyName, mapList.get("insectName")).eq(SysWarnInfoEntity::getTime,startDate));
+            if(Long.valueOf(mapList.get("insectId")+"").equals(sysPestBankEntities.getId())) {
+                mapList.put("pestIntroduce", sysPestBankEntities.getPestIntroduce());
+            }
+            if(Long.valueOf(mapList.get("insectId")+"").equals(sysPreventiveMeasuresEntities.get(0).getInsectInfoId())){
+                mapList.put("picture",obsConfig.getUrl()+sysPreventiveMeasuresEntities.get(0).getPicture());
+            }
+            if(warnInfoEntities.size()>0){
+                mapList.put("reportUser",warnInfoEntities.get(0).getReportUser());
+            }else{
+                mapList.put("reportUser","user");
+            }
+        }
+        return PageResult.<Map<String, Object>>builder()
+                .pageData(results)
                 .total(total)
                 .pageSize(pageSize)
                 .pageNumber(pageIndex)
