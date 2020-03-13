@@ -330,9 +330,10 @@ public class DataController {
                 }
             }
         }
+        int depth = (int)params.get("depth");
         return Result.success(sysDustRecStatisService
                 .getMaxOrMinPestSoilInfo(siteId, startDate,
-                        endDate, pageIndex, pageSize));
+                        endDate, pageIndex, pageSize,depth));
     }
 
     /**

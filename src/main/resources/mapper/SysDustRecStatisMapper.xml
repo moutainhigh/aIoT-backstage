@@ -70,6 +70,7 @@
                 sys_dust_rec_statis
             WHERE
                 site_id = #{siteId}
+                AND depth = #{depth}
                 AND `date` BETWEEN #{startDate} AND #{endDate}
             GROUP BY
                 depth,
@@ -91,6 +92,7 @@
             sys_dust_rec_statis
         WHERE
             site_id = #{siteId}
+            AND depth = #{depth}
             AND `date` BETWEEN #{startDate} AND #{endDate}
         GROUP BY
             depth,

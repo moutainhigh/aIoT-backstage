@@ -10,6 +10,6 @@ public interface ISysDustRecStatisService extends IService<SysDustRecStatisEntit
 
     Object getPestSoilInfo(String siteId, String startDate, String endDate);
 
-    PageResult<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize);
+    PageResult<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize,int depth);
 
 }

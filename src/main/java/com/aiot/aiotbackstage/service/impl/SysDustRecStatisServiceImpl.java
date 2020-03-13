@@ -133,7 +133,7 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
      * @return
      */
     @Override
-    public PageResult<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize) {
+    public PageResult<SysDustRecStatisEntity> getMaxOrMinPestSoilInfo(String siteId, String startDate, String endDate, int pageIndex, int pageSize,int depth) {
         Map<String, Object> params = new HashMap<>();
         params.put("siteId", siteId);
         params.put("startDate", startDate);
@@ -145,7 +145,7 @@ public class SysDustRecStatisServiceImpl extends ServiceImpl<SysDustRecStatisMap
             params.clear();
             params.put("siteId", siteId);
             params.put("startDate", startDate);
-//            params.put("depth", depth);
+            params.put("depth", depth);
             params.put("endDate", endDate);
             int total = sysDustRecStatisMapper.countAllDaily(params);
             params.put("pageIndex", (pageIndex-1)*pageSize);
