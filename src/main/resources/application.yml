@@ -69,3 +69,15 @@ dahua8900:
   password: jyxt123456
 gis:
   url: http://litecc.myds.me:9008/api/agriculture/warning
+#=========微信公众号开发基本配置============
+wx:
+#微信公众号的appid
+  appid: wx237d99cedc2fd33d
+#微信公众号的appsecret
+  secret: 578e0f828767854b625af0b1d06cae8b
+#微信公众号的模板
+  template: 9gC8ZJFIlcN80Q-YwzRY2WFoh5VTy5ptyZrTp6p7WqQ
+
+
+
+

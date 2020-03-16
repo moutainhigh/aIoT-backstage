@@ -4,6 +4,7 @@ import com.aiot.aiotbackstage.common.config.GisConfig;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.util.JWTUtil;
+import com.aiot.aiotbackstage.common.util.WeXinUtils;
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.PageParam;
@@ -202,6 +203,8 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnInfoMapper.updateById(warnInfoEntity);
     }
 
+    @Autowired
+    private WeXinUtils weXinUtils;
 
     @Override
     public void earlyInfoExamine(Long id) {
@@ -219,7 +222,8 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         }catch (Exception e){
             log.info("GIS调用失败[{}]",e.getMessage());
         }
-
+        //预警信息微信公众号推送
+        weXinUtils.push();
     }
 
     @Override

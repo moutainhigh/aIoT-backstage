@@ -236,13 +236,17 @@ public class DeviceServiceImpl implements IDeviceService {
             }else{
                 sysDeviceErrorRecEntity.setDeviceName("虫情测报灯");
             }
-            long startTime = sysDeviceErrorRecEntity.getStartTime().getTime();
-            long endTime = sysDeviceErrorRecEntity.getEndTime().getTime();
-            long ss=(startTime-endTime)/(1000); //共计秒数
-            int MM = (int)ss/60;   //共计分钟数
-            int hh=(int)ss/3600;  //共计小时数
-            int dd=(int)hh/24;   //共计天数
-            sysDeviceErrorRecEntity.setDuration(Math.abs(MM)+" 分钟");
+            if(sysDeviceErrorRecEntity.getEndTime() == null||sysDeviceErrorRecEntity.getStartTime() == null){
+                sysDeviceErrorRecEntity.setDuration(0+" 分钟");
+            }else{
+                long startTime = sysDeviceErrorRecEntity.getStartTime().getTime();
+                long endTime = sysDeviceErrorRecEntity.getEndTime().getTime();
+                long ss=(startTime-endTime)/(1000); //共计秒数
+                int MM = (int)ss/60;   //共计分钟数
+                int hh=(int)ss/3600;  //共计小时数
+                int dd=(int)hh/24;   //共计天数
+                sysDeviceErrorRecEntity.setDuration(Math.abs(MM)+" 分钟");
+            }
         });
         return PageResult.<SysDeviceErrorRecEntity>builder()
                 .total(total.intValue())
