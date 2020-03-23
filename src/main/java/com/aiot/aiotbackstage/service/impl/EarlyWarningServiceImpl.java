@@ -24,6 +24,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Description TODO
@@ -375,6 +376,16 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         warnInfoEntity.setEarlyContent(param.getEarlyContent());
         warnInfoEntity.setUpdateTime(new Date());
         warnInfoMapper.updateById(warnInfoEntity);
+    }
+
+    @Autowired
+    private SysWarnDictionariesMapper dictionariesMapper;
+
+    @Override
+    public Map<String, List<SysWarnDictionariesEntity>> warnDictionaries() {
+        List<SysWarnDictionariesEntity> list = dictionariesMapper.selectList(null);
+        Map<String, List<SysWarnDictionariesEntity>> collect = list.stream().collect(Collectors.groupingBy(SysWarnDictionariesEntity::getType));
+        return collect;
     }
 
     /**

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysSceneMapper">
+  <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysSceneEntity">
+    <!--@mbg.generated-->
+    <!--@Table sys_scene-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="time" jdbcType="VARCHAR" property="time" />
+    <result column="tmin" jdbcType="VARCHAR" property="tmin" />
+    <result column="tmax" jdbcType="VARCHAR" property="tmax" />
+    <result column="tavg" jdbcType="VARCHAR" property="tavg" />
+    <result column="humidity" jdbcType="VARCHAR" property="humidity" />
+    <result column="wind_speed" jdbcType="VARCHAR" property="windSpeed" />
+    <result column="wind_scale" jdbcType="VARCHAR" property="windScale" />
+    <result column="pressure" jdbcType="VARCHAR" property="pressure" />
+    <result column="visibility" jdbcType="VARCHAR" property="visibility" />
+    <result column="sum_precipitation" jdbcType="VARCHAR" property="sumPrecipitation" />
+    <result column="avg_total_cloud" jdbcType="VARCHAR" property="avgTotalCloud" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, city, `time`, tmin, tmax, tavg, humidity, wind_speed, wind_scale, pressure, visibility, 
+    sum_precipitation, avg_total_cloud
+  </sql>
+</mapper>

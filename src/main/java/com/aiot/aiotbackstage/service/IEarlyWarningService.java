@@ -1,5 +1,6 @@
 package com.aiot.aiotbackstage.service;
 
+import com.aiot.aiotbackstage.model.entity.SysWarnDictionariesEntity;
 import com.aiot.aiotbackstage.model.entity.SysWarnInfoEntity;
 import com.aiot.aiotbackstage.model.entity.SysWarnRuleEntity;
 import com.aiot.aiotbackstage.model.param.PageParam;
@@ -45,4 +46,6 @@ public interface IEarlyWarningService {
     List<Map<String,Object>> earlyData(Integer type);
 
     void earlyInfoUpdate(WarnInfoParam param);
+
+    Map<String, List<SysWarnDictionariesEntity>> warnDictionaries();
 }

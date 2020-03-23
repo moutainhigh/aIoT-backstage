@@ -147,4 +147,12 @@ public class EarlyWarningController {
         return Result.success(iEarlyWarningService.earlyData(type));
     }
 
+
+    @ApiOperation(value = "规则字典属性获取(warnDictionaries)", notes = "规则字典属性获取(warnDictionaries)")
+    @ResponseBody
+    @GetMapping("/warnDictionaries")
+    public Result warnDictionaries(
+    ) {
+        return Result.success(iEarlyWarningService.warnDictionaries());
+    }
 }

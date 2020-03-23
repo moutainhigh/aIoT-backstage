@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysWarnDictionariesMapper">
+  <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysWarnDictionariesEntity">
+    <!--@mbg.generated-->
+    <!--@Table sys_warn_dictionaries-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="type_name" jdbcType="VARCHAR" property="typeName" />
+    <result column="unit" jdbcType="VARCHAR" property="unit" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="value" jdbcType="VARCHAR" property="value" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, `type`, `name`, `type_name`,`unit`,`value`
+  </sql>
+</mapper>
