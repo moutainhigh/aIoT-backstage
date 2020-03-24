@@ -66,7 +66,7 @@ public class MeteorologicalController {
      * @return
      */
     @ApiOperation(value = "导出气象信息", notes = "导出气象信息")
-    @PostMapping("/sensorExcelOut")
+    @GetMapping("/sensorExcelOut")
 //    @RequiresPermissions("sensorExcelOut:get")
     public Result meteorologicalExcelOutput(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
