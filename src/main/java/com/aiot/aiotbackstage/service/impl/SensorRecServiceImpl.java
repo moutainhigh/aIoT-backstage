@@ -108,6 +108,22 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
             redisUtils.set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getSensor(), entity.getValue());
             try {
                 earlyWarningService.earlyWarningReport("气象", entity.getSensor(), null, entity.getValue(), entity.getSiteId());
+                Date date = new Date();
+                SimpleDateFormat f = new SimpleDateFormat("MM-dd");
+                String time = f.format(date);
+                String temp="";
+                if(entity.getSensor().equals("temperature")){
+                    temp=entity.getValue();
+                }else{
+                    temp=null;
+                }
+                String humidity="";
+                if(entity.getSensor().equals("humidity")){
+                    humidity=entity.getValue();
+                }else{
+                    humidity=null;
+                }
+                earlyWarningService.earlyWarningReportNew(time,temp,humidity,null);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -119,12 +135,10 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         redisUtils.set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getDepth(), entity);
         sysDustRecMapper.insert(entity);
         try {
-            earlyWarningService.earlyWarningReport("土壤", "ec", entity.getDepth() + "cm", entity.getEc().toString(), entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤", "epsilon", entity.getDepth() + "cm", entity.getEpsilon().toString(), entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤", "salinity", entity.getDepth() + "cm", entity.getSalinity().toString(), entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤", "temperature", entity.getDepth() + "cm", entity.getTemperature().toString(), entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤", "wc", entity.getDepth() + "cm", entity.getWc().toString(), entity.getSiteId());
-            earlyWarningService.earlyWarningReport("土壤", "tds", entity.getDepth() + "cm", entity.getTds().toString(), entity.getSiteId());
+            Date date = new Date();
+            SimpleDateFormat f = new SimpleDateFormat("MM-dd");
+            String time = f.format(date);
+            earlyWarningService.earlyWarningReportNew(time,null,null,entity.getWc().toString());
         } catch (Exception e) {
             e.printStackTrace();
         }

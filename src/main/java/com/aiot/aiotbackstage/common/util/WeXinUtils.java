@@ -59,7 +59,7 @@ public class WeXinUtils {
         return result;
     }
 
-    public void push() {
+    public void push(String first,String performance,String time,String remark) {
         //1，配置
         WxMpInMemoryConfigStorage wxStorage = new WxMpInMemoryConfigStorage();
         wxStorage.setAppId(wxMpConfig.getAppId());
@@ -72,7 +72,10 @@ public class WeXinUtils {
         templateMessage.setTemplateId(wxMpConfig.getTemplate());
 //				.url(alarmPath)//点击模版消息要访问的网址
         List<WxMpTemplateData> wxMpTemplateData = new ArrayList<>();
-        wxMpTemplateData.add(new WxMpTemplateData("first", "虫子预警了", "#FF0000"));
+        wxMpTemplateData.add(new WxMpTemplateData("first", first, "#FF0000"));
+        wxMpTemplateData.add(new WxMpTemplateData("performance", performance, "#FF0000"));
+        wxMpTemplateData.add(new WxMpTemplateData("time", time, "#FF0000"));
+        wxMpTemplateData.add(new WxMpTemplateData("remark", remark, "#FF0000"));
         templateMessage.setData(wxMpTemplateData);
         List<String> openList = new ArrayList<>();
         try {

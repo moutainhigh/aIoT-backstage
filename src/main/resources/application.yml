@@ -72,11 +72,11 @@ gis:
 #=========微信公众号开发基本配置============
 wx:
 #微信公众号的appid
-  appid: wx237d99cedc2fd33d
+  appid: wxf1f1cb90e2e9cb20
 #微信公众号的appsecret
-  secret: 578e0f828767854b625af0b1d06cae8b
+  secret: e1426ee6c3ff9f3984db7854c7ba5303
 #微信公众号的模板
-  template: 9gC8ZJFIlcN80Q-YwzRY2WFoh5VTy5ptyZrTp6p7WqQ
+  template: PPelW5xAJTQF3WsilLnX7fuYL2HiLh71Ccjc_a9X-QQ
 
 
 

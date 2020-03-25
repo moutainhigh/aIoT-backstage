@@ -43,6 +43,11 @@ public interface IEarlyWarningService {
      */
     void earlyWarningReport(String type, String typeName, String depth, String value, Integer siteId);
 
+
+    void earlyWarningReportNew(String time,String sensorTemp,String sensorHumidity,String dustTemp) throws Exception;
+
+
+
     List<Map<String,Object>> earlyData(Integer type);
 
     void earlyInfoUpdate(WarnInfoParam param);

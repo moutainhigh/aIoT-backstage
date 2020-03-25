@@ -23,6 +23,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -224,7 +225,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
             log.info("GIS调用失败[{}]",e.getMessage());
         }
         //预警信息微信公众号推送
-        weXinUtils.push();
+//        weXinUtils.push();
     }
 
     @Override
@@ -319,6 +320,108 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                 warnInfoMapper.insert(warnInfoEntity);
             }
         }
+    }
+
+    private SysNewRuleMapper newRuleMapper;
+
+    /**
+     * 自动预警  NEW
+     * @param time 时间
+     * @param sensorTemp 空气温度
+     * @param sensorHumidity 空气湿度
+     * @param dustTemp 土壤湿度
+     */
+    @Override
+    public void earlyWarningReportNew(String time,String sensorTemp,String sensorHumidity,String dustTemp) throws Exception {
+
+        List<SysNewRuleEntity> sysNewRuleEntities = newRuleMapper.selectList(null);
+        Map<Integer, List<SysNewRuleEntity>> collect = sysNewRuleEntities.stream().collect(Collectors.groupingBy(SysNewRuleEntity::getId));
+        List<SysNewRuleEntity> sysNewRuleEntities1 = collect.get(1);
+        List<SysNewRuleEntity> sysNewRuleEntities2 = collect.get(2);
+        SysNewRuleEntity sysNewRuleEntity = sysNewRuleEntities1.get(0);//水稻
+        SysNewRuleEntity sysNewRuleEntity1 = sysNewRuleEntities2.get(0);//油菜
+
+        boolean youcai01 = hourMinuteBetween(time, "01-01", "04-01"); //油菜的季节
+        boolean youcai02 = hourMinuteBetween(time, "09-01", "12-31"); //油菜的季节
+
+        if(youcai01||youcai02){ //油菜
+            String sensorTemp1 = sysNewRuleEntity1.getSensorTemp(); //空气温度
+            int min = Integer.parseInt(sensorTemp1);
+            if(sensorTemp !=null){
+                if (Integer.parseInt(sensorTemp) < min) {
+                    //预警
+                    //预警信息微信公众号推送
+                    weXinUtils.push("（油菜）温度预警",sysNewRuleEntity1.getAppearance(),time,sysNewRuleEntity1.getMeasure());
+                }
+            }
+            String sensorHumidity1 = sysNewRuleEntity1.getSensorHumidity();//空气湿度
+            int max = Integer.parseInt(sensorHumidity1);
+            if(sensorHumidity !=null){
+                if (Integer.parseInt(sensorHumidity) > max) {
+                    //预警
+                    //预警信息微信公众号推送
+                    weXinUtils.push("（油菜）湿度预警",sysNewRuleEntity1.getAppearance(),time,sysNewRuleEntity1.getMeasure());
+                }
+            }
+        }else{//水稻
+            String sensorTemp1 = sysNewRuleEntity.getSensorTemp(); //空气温度
+            String[] split = sensorTemp1.split(",");
+            List<String> list = Arrays.asList(split);
+            int min = Integer.parseInt(list.get(0));
+            int max = Integer.parseInt(list.get(1));
+            if(sensorTemp!=null){
+                if (Integer.parseInt(sensorTemp) > max || Integer.parseInt(sensorTemp) < min) {
+                    //预警
+                    //预警信息微信公众号推送
+                    weXinUtils.push("（水稻）空气温度预警",sysNewRuleEntity.getAppearance(),time,sysNewRuleEntity.getMeasure());
+                }
+            }
+            String sensorHumidity1 = sysNewRuleEntity.getSensorHumidity(); //空气湿度
+            String[] split1 = sensorHumidity1.split(",");
+            List<String> list1 = Arrays.asList(split1);
+            int min1 = Integer.parseInt(list1.get(0));
+            int max1 = Integer.parseInt(list1.get(1));
+            if(sensorHumidity !=null){
+                if (Integer.parseInt(sensorHumidity) > max1 || Integer.parseInt(sensorHumidity) < min1) {
+                    //预警
+                    //预警信息微信公众号推送
+                    weXinUtils.push("（水稻）空气湿度预警",sysNewRuleEntity.getAppearance(),time,sysNewRuleEntity.getMeasure());
+                }
+            }
+            String dustTemp1 = sysNewRuleEntity.getDustTemp();//土壤湿度
+            int max2 = Integer.parseInt(dustTemp1);
+            if (dustTemp != null) {
+                if (Integer.parseInt(dustTemp) > max2) {
+                    //预警
+                    //预警信息微信公众号推送
+                    weXinUtils.push("（水稻）土壤湿度预警",sysNewRuleEntity.getAppearance(),time,sysNewRuleEntity.getMeasure());
+                }
+            }
+        }
+    }
+
+
+    /**
+     *
+     * @param nowDate   要比较的时间
+     * @param startDate   开始时间
+     * @param endDate   结束时间
+     * @return   true在时间段内，false不在时间段内
+     * @throws Exception
+     */
+
+    public static boolean hourMinuteBetween(String nowDate, String startDate, String endDate) throws Exception{
+
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd");
+        Date now = format.parse(nowDate);
+        Date start = format.parse(startDate);
+        Date end = format.parse(endDate);
+
+        long nowTime = now.getTime();
+        long startTime = start.getTime();
+        long endTime = end.getTime();
+        return nowTime >= startTime && nowTime <= endTime;
+
     }
 
     @Override
