@@ -388,7 +388,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
 
                 String  fieldName =field.getName();  //属性名称
                 String  fieldName1 =field1.getName();
-                if(fieldName.equals(fieldName1)&&
+                if(fieldName.equals(fieldName1)&&  //排除掉不需要比对的属性
                         !fieldName1.equals("crops")&&
                         !fieldName1.equals("growthcycle")&&
                         !fieldName1.equals("warn")&&
