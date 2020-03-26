@@ -8,14 +8,17 @@ import com.aiot.aiotbackstage.common.util.WeXinUtils;
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.PageParam;
+import com.aiot.aiotbackstage.model.param.SysNewRuleParam;
 import com.aiot.aiotbackstage.model.param.WarnInfoParam;
 import com.aiot.aiotbackstage.model.param.WarnRuleParam;
 import com.aiot.aiotbackstage.model.vo.EarlyInfoVo;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,6 +61,9 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
 
     @Autowired
     private GisConfig gisConfig;
+
+    @Autowired
+    private SysNewRuleMapper newRuleMapper;
 
 
     @Override
@@ -322,82 +330,103 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         }
     }
 
-    private SysNewRuleMapper newRuleMapper;
 
     /**
      * 自动预警  NEW
-     * @param time 时间
-     * @param sensorTemp 空气温度
-     * @param sensorHumidity 空气湿度
-     * @param dustTemp 土壤湿度
      */
     @Override
-    public void earlyWarningReportNew(String time,String sensorTemp,String sensorHumidity,String dustTemp) throws Exception {
+    public void earlyWarningReportNew(SysNewRuleParam newRuleEntity) throws Exception {
 
         List<SysNewRuleEntity> sysNewRuleEntities = newRuleMapper.selectList(null);
-        Map<Integer, List<SysNewRuleEntity>> collect = sysNewRuleEntities.stream().collect(Collectors.groupingBy(SysNewRuleEntity::getId));
-        List<SysNewRuleEntity> sysNewRuleEntities1 = collect.get(1);
-        List<SysNewRuleEntity> sysNewRuleEntities2 = collect.get(2);
-        SysNewRuleEntity sysNewRuleEntity = sysNewRuleEntities1.get(0);//水稻
-        SysNewRuleEntity sysNewRuleEntity1 = sysNewRuleEntities2.get(0);//油菜
+        Map<String, List<SysNewRuleEntity>> collect = sysNewRuleEntities.stream().collect(Collectors.groupingBy(SysNewRuleEntity::getCrops));
 
-        boolean youcai01 = hourMinuteBetween(time, "01-01", "04-01"); //油菜的季节
-        boolean youcai02 = hourMinuteBetween(time, "09-01", "12-31"); //油菜的季节
+        collect.keySet().forEach(crops -> {
 
-        if(youcai01||youcai02){ //油菜
-            String sensorTemp1 = sysNewRuleEntity1.getSensorTemp(); //空气温度
-            int min = Integer.parseInt(sensorTemp1);
-            if(sensorTemp !=null){
-                if (Integer.parseInt(sensorTemp) < min) {
-                    //预警
-                    //预警信息微信公众号推送
-                    weXinUtils.push("（油菜）温度预警",sysNewRuleEntity1.getAppearance(),time,sysNewRuleEntity1.getMeasure());
+            List<SysNewRuleEntity> sysNewRuleEntities1 = collect.get(crops);
+            sysNewRuleEntities1.forEach(newRuleEntity1 -> {
+                String growthcycle = newRuleEntity1.getGrowthcycle();
+                String[] split = growthcycle.split(",");
+                List<String> list = Arrays.asList(split);
+                String minTime = list.get(0);
+                String maxTime = list.get(1);
+                String recTime = newRuleEntity.getGrowthcycle();
+                try {
+                    boolean flag = hourMinuteBetween(recTime, minTime, maxTime);
+                    if(flag){
+                        warn(newRuleEntity1,newRuleEntity);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }
-            String sensorHumidity1 = sysNewRuleEntity1.getSensorHumidity();//空气湿度
-            int max = Integer.parseInt(sensorHumidity1);
-            if(sensorHumidity !=null){
-                if (Integer.parseInt(sensorHumidity) > max) {
-                    //预警
-                    //预警信息微信公众号推送
-                    weXinUtils.push("（油菜）湿度预警",sysNewRuleEntity1.getAppearance(),time,sysNewRuleEntity1.getMeasure());
-                }
-            }
-        }else{//水稻
-            String sensorTemp1 = sysNewRuleEntity.getSensorTemp(); //空气温度
-            String[] split = sensorTemp1.split(",");
-            List<String> list = Arrays.asList(split);
-            int min = Integer.parseInt(list.get(0));
-            int max = Integer.parseInt(list.get(1));
-            if(sensorTemp!=null){
-                if (Integer.parseInt(sensorTemp) > max || Integer.parseInt(sensorTemp) < min) {
-                    //预警
-                    //预警信息微信公众号推送
-                    weXinUtils.push("（水稻）空气温度预警",sysNewRuleEntity.getAppearance(),time,sysNewRuleEntity.getMeasure());
-                }
-            }
-            String sensorHumidity1 = sysNewRuleEntity.getSensorHumidity(); //空气湿度
-            String[] split1 = sensorHumidity1.split(",");
-            List<String> list1 = Arrays.asList(split1);
-            int min1 = Integer.parseInt(list1.get(0));
-            int max1 = Integer.parseInt(list1.get(1));
-            if(sensorHumidity !=null){
-                if (Integer.parseInt(sensorHumidity) > max1 || Integer.parseInt(sensorHumidity) < min1) {
-                    //预警
-                    //预警信息微信公众号推送
-                    weXinUtils.push("（水稻）空气湿度预警",sysNewRuleEntity.getAppearance(),time,sysNewRuleEntity.getMeasure());
-                }
-            }
-            String dustTemp1 = sysNewRuleEntity.getDustTemp();//土壤湿度
-            int max2 = Integer.parseInt(dustTemp1);
-            if (dustTemp != null) {
-                if (Integer.parseInt(dustTemp) > max2) {
-                    //预警
-                    //预警信息微信公众号推送
-                    weXinUtils.push("（水稻）土壤湿度预警",sysNewRuleEntity.getAppearance(),time,sysNewRuleEntity.getMeasure());
+            });
+
+
+        });
+    }
+
+    /**
+     *
+     * @param newRuleEntity1  规则库的数据
+     * @param newRuleEntity  传感器的数据
+     * @throws IllegalAccessException
+     */
+    public void warn(SysNewRuleEntity newRuleEntity1,SysNewRuleParam newRuleEntity) throws IllegalAccessException {
+
+        Class clazz = (Class)newRuleEntity.getClass();
+        Class clazz1 = (Class)newRuleEntity1.getClass();
+
+        Field fields[] = clazz.getDeclaredFields();
+        Field fields1[] = clazz1.getDeclaredFields();
+//        boolean flag=true;
+        for(Field field : fields){
+            for(Field field1 : fields1) {
+
+                String value = getValue(field.get(newRuleEntity));
+                String value1 = getValue(field1.get(newRuleEntity1));
+
+                String  fieldName =field.getName();  //属性名称
+                String  fieldName1 =field1.getName();
+                if(fieldName.equals(fieldName1)){
+                    if (value1 != null && value != null) {
+                        if (value1.contains(",")) {
+                            String[] split = value1.split(",");
+                            List<String> asList = Arrays.asList(split);
+                            int min = Integer.parseInt(asList.get(0));
+                            int max = Integer.parseInt(asList.get(1));
+                            if (Integer.parseInt(value) > max || Integer.parseInt(value) < min) {
+//                                flag=false;
+                                weXinUtils.push(newRuleEntity1.getCrops(), newRuleEntity1.getWarn(), newRuleEntity1.getGrowthcycle(), newRuleEntity1.getControl());
+                            }
+                        } else {
+                            int windSpeed = Integer.parseInt(value1);
+                            if (Integer.parseInt(value) > windSpeed) {
+//                                flag=false;
+                                weXinUtils.push(newRuleEntity1.getCrops(), newRuleEntity1.getWarn(), newRuleEntity1.getGrowthcycle(), newRuleEntity1.getControl());
+                            }
+                        }
+                    }
                 }
             }
         }
+//        if(!flag){
+            //预警信息微信公众号推送
+
+//        }
+    }
+
+    public String getValue(Object valueObj){
+        String value1Str=null;
+        if (valueObj instanceof Integer) {
+            int  valueType = ((Integer) valueObj).intValue();
+            value1Str=valueType+"";
+        } else if (valueObj instanceof String) {
+            value1Str = (String) valueObj;
+
+        } else if (valueObj instanceof Double) {
+            Double d = ((Double) valueObj).doubleValue();
+            value1Str=d.toString();
+        }
+        return value1Str;
     }
 
 
@@ -412,7 +441,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
 
     public static boolean hourMinuteBetween(String nowDate, String startDate, String endDate) throws Exception{
 
-        SimpleDateFormat format = new SimpleDateFormat("MM-dd");
+        SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd");
         Date now = format.parse(nowDate);
         Date start = format.parse(startDate);
         Date end = format.parse(endDate);
@@ -423,6 +452,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         return nowTime >= startTime && nowTime <= endTime;
 
     }
+
 
     @Override
     public List<Map<String,Object>> earlyData(Integer type) {
@@ -489,6 +519,32 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
         List<SysWarnDictionariesEntity> list = dictionariesMapper.selectList(null);
         Map<String, List<SysWarnDictionariesEntity>> collect = list.stream().collect(Collectors.groupingBy(SysWarnDictionariesEntity::getType));
         return collect;
+    }
+
+    @Override
+    public void newRule(SysNewRuleEntity param) {
+        newRuleMapper.insert(param);
+    }
+
+    @Override
+    public void alertRule(SysNewRuleEntity param) {
+        SysNewRuleEntity sysNewRuleEntity = newRuleMapper.selectById(param.getId());
+        if(ObjectUtils.isEmpty(sysNewRuleEntity)){
+            throw new MyException(ResultStatusCode.BAD_REQUEST);
+        }
+        newRuleMapper.updateById(param);
+    }
+
+    @Override
+    public PageResult<SysNewRuleEntity> ruleInfo(PageParam param) {
+        IPage<SysNewRuleEntity> sysNewRuleEntityIPage = newRuleMapper.selectPage(new Page<>(param.getPageNumber(), param.getPageSize()), null);
+        Long total = sysNewRuleEntityIPage.getTotal();
+        return PageResult.<SysNewRuleEntity>builder()
+                .total(total.intValue())
+                .pageData(sysNewRuleEntityIPage.getRecords())
+                .pageNumber(param.getPageNumber())
+                .pageSize(param.getPageSize())
+                .build();
     }
 
     /**

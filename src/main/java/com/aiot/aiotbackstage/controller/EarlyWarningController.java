@@ -1,7 +1,9 @@
 package com.aiot.aiotbackstage.controller;
 
 import com.aiot.aiotbackstage.common.constant.Result;
+import com.aiot.aiotbackstage.model.entity.SysNewRuleEntity;
 import com.aiot.aiotbackstage.model.param.PageParam;
+import com.aiot.aiotbackstage.model.param.SysNewRuleParam;
 import com.aiot.aiotbackstage.model.param.WarnInfoParam;
 import com.aiot.aiotbackstage.model.param.WarnRuleParam;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
@@ -43,12 +45,51 @@ public class EarlyWarningController {
     @ApiOperation(value = "新增预警库数据(warnRuleAdd)", notes = "新增预警库信息(warnRuleAdd)")
     @ResponseBody
     @PostMapping("/warnRule")
-    @RequiresPermissions("warnRule:add")
+//    @RequiresPermissions("warnRule:add")
     public Result earlyInfoAdd(@RequestBody @Validated WarnRuleParam param
     ) {
         iEarlyWarningService.earlyInfoAdd(param);
         return Result.success();
     }
+
+    @ApiOperation(value = "专家新增预警库数据(newRule)", notes = "新增预警库信息(newRule)")
+    @ResponseBody
+    @PostMapping("/newRule")
+//    @RequiresPermissions("newRule:add")
+    public Result newRule(@RequestBody @Validated SysNewRuleEntity param
+    ) {
+        iEarlyWarningService.newRule(param);
+        return Result.success();
+    }
+
+    @ApiOperation(value = "专家测试预警", notes = "专家测试预警")
+    @ResponseBody
+    @PostMapping("/test")
+    public Result test(@RequestBody @Validated SysNewRuleParam param
+    ) throws Exception {
+        iEarlyWarningService.earlyWarningReportNew(param);
+        return Result.success();
+    }
+
+    @ApiOperation(value = "专家编辑预警库数据(alertRule)", notes = "专家编辑预警库数据(alertRule)")
+    @ResponseBody
+    @PutMapping("/alertRule")
+//    @RequiresPermissions("alertRule:add")
+    public Result alertRule(@RequestBody @Validated SysNewRuleEntity param
+    ) {
+        iEarlyWarningService.alertRule(param);
+        return Result.success();
+    }
+
+    @ApiOperation(value = "专家查询预警库数据(ruleInfo)", notes = "专家查询预警库数据(ruleInfo)")
+    @ResponseBody
+    @PostMapping("/ruleInfo")
+//    @RequiresPermissions("alertRule:add")
+    public Result ruleInfo(@RequestBody @Validated PageParam param
+    ) {
+        return Result.success(iEarlyWarningService.ruleInfo(param));
+    }
+
 
     @ApiOperation(value = "修改预警库数据(warnRuleUpdate)", notes = "新增预警库信息(warnRuleUpdate)")
     @ResponseBody

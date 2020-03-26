@@ -8,6 +8,7 @@ import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.dto.RtuData;
 import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.InsectRecByDateParam;
+import com.aiot.aiotbackstage.model.param.SysNewRuleParam;
 import com.aiot.aiotbackstage.model.vo.SysSensorRecVo2;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.ISensorRecService;
@@ -123,7 +124,8 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
                 }else{
                     humidity=null;
                 }
-                earlyWarningService.earlyWarningReportNew(time,temp,humidity,null);
+                SysNewRuleParam newRuleEntity=new SysNewRuleParam();
+                earlyWarningService.earlyWarningReportNew(newRuleEntity);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -138,7 +140,8 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
             Date date = new Date();
             SimpleDateFormat f = new SimpleDateFormat("MM-dd");
             String time = f.format(date);
-            earlyWarningService.earlyWarningReportNew(time,null,null,entity.getWc().toString());
+            SysNewRuleParam newRuleEntity=new SysNewRuleParam();
+            earlyWarningService.earlyWarningReportNew(newRuleEntity);
         } catch (Exception e) {
             e.printStackTrace();
         }

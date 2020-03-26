@@ -1,9 +1,11 @@
 package com.aiot.aiotbackstage.service;
 
+import com.aiot.aiotbackstage.model.entity.SysNewRuleEntity;
 import com.aiot.aiotbackstage.model.entity.SysWarnDictionariesEntity;
 import com.aiot.aiotbackstage.model.entity.SysWarnInfoEntity;
 import com.aiot.aiotbackstage.model.entity.SysWarnRuleEntity;
 import com.aiot.aiotbackstage.model.param.PageParam;
+import com.aiot.aiotbackstage.model.param.SysNewRuleParam;
 import com.aiot.aiotbackstage.model.param.WarnInfoParam;
 import com.aiot.aiotbackstage.model.param.WarnRuleParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
@@ -44,7 +46,7 @@ public interface IEarlyWarningService {
     void earlyWarningReport(String type, String typeName, String depth, String value, Integer siteId);
 
 
-    void earlyWarningReportNew(String time,String sensorTemp,String sensorHumidity,String dustTemp) throws Exception;
+    void earlyWarningReportNew(SysNewRuleParam newRuleEntity) throws Exception;
 
 
 
@@ -53,4 +55,10 @@ public interface IEarlyWarningService {
     void earlyInfoUpdate(WarnInfoParam param);
 
     Map<String, List<SysWarnDictionariesEntity>> warnDictionaries();
+
+    void newRule(SysNewRuleEntity param);
+
+    void alertRule(SysNewRuleEntity param);
+
+    PageResult<SysNewRuleEntity> ruleInfo(PageParam param);
 }
