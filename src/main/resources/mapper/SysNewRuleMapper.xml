@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiot.aiotbackstage.mapper.SysNewRuleMapper">
+  <resultMap id="BaseResultMap" type="com.aiot.aiotbackstage.model.entity.SysNewRuleEntity">
+    <!--@mbg.generated-->
+    <!--@Table sys_new_rule-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="crops" jdbcType="VARCHAR" property="crops" />
+    <result column="growthcycle" jdbcType="VARCHAR" property="growthcycle" />
+    <result column="wind_speed" jdbcType="VARCHAR" property="windSpeed" />
+    <result column="wind_direction" jdbcType="VARCHAR" property="windDirection" />
+    <result column="humidity" jdbcType="VARCHAR" property="humidity" />
+    <result column="temperature" jdbcType="VARCHAR" property="temperature" />
+    <result column="noise" jdbcType="VARCHAR" property="noise" />
+    <result column="pm25" jdbcType="VARCHAR" property="pm25" />
+    <result column="pm10" jdbcType="VARCHAR" property="pm10" />
+    <result column="atmos" jdbcType="VARCHAR" property="atmos" />
+    <result column="wc_dust" jdbcType="VARCHAR" property="wcDust" />
+    <result column="temperature_dust" jdbcType="VARCHAR" property="temperatureDust" />
+    <result column="ec_dust" jdbcType="VARCHAR" property="ecDust" />
+    <result column="salinity_dust" jdbcType="VARCHAR" property="salinityDust" />
+    <result column="tds_dust" jdbcType="VARCHAR" property="tdsDust" />
+    <result column="epsilon_dust" jdbcType="VARCHAR" property="epsilonDust" />
+    <result column="warn" jdbcType="LONGVARCHAR" property="warn" />
+    <result column="control" jdbcType="LONGVARCHAR" property="control" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, crops, growthcycle, wind_speed, wind_direction, humidity, temperature, noise, 
+    pm25, pm10, atmos, wc_dust, temperature_dust, ec_dust, salinity_dust, tds_dust, epsilon_dust, 
+    warn, control
+  </sql>
+</mapper>

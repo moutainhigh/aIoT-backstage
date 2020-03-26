@@ -337,23 +337,25 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
     @Override
     public void earlyWarningReportNew(SysNewRuleParam newRuleEntity) throws Exception {
 
+        //获取规则库数据
         List<SysNewRuleEntity> sysNewRuleEntities = newRuleMapper.selectList(null);
+        //根据农作物名称进行分组
         Map<String, List<SysNewRuleEntity>> collect = sysNewRuleEntities.stream().collect(Collectors.groupingBy(SysNewRuleEntity::getCrops));
 
         collect.keySet().forEach(crops -> {
 
             List<SysNewRuleEntity> sysNewRuleEntities1 = collect.get(crops);
             sysNewRuleEntities1.forEach(newRuleEntity1 -> {
-                String growthcycle = newRuleEntity1.getGrowthcycle();
+                String growthcycle = newRuleEntity1.getGrowthcycle();//获取生长周期就是日期范围 （比如：2020-01-03，2020-01-04）
                 String[] split = growthcycle.split(",");
                 List<String> list = Arrays.asList(split);
                 String minTime = list.get(0);
                 String maxTime = list.get(1);
                 String recTime = newRuleEntity.getGrowthcycle();
                 try {
-                    boolean flag = hourMinuteBetween(recTime, minTime, maxTime);
+                    boolean flag = hourMinuteBetween(recTime, minTime, maxTime);//判断当前传感器的时间是否在这段时间内也就是说是否在当前生长周期内
                     if(flag){
-                        warn(newRuleEntity1,newRuleEntity);
+                        warn(newRuleEntity1,newRuleEntity); //判断是否进行预警
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -386,21 +388,28 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
 
                 String  fieldName =field.getName();  //属性名称
                 String  fieldName1 =field1.getName();
-                if(fieldName.equals(fieldName1)){
+                if(fieldName.equals(fieldName1)&&
+                        !fieldName1.equals("crops")&&
+                        !fieldName1.equals("growthcycle")&&
+                        !fieldName1.equals("warn")&&
+                        !fieldName1.equals("control")
+                ){
                     if (value1 != null && value != null) {
-                        if (value1.contains(",")) {
+                        if (value1.contains(",")) { //前端传过来的值可能没有范围如果是包含“，”则是范围判断
                             String[] split = value1.split(",");
                             List<String> asList = Arrays.asList(split);
                             int min = Integer.parseInt(asList.get(0));
                             int max = Integer.parseInt(asList.get(1));
                             if (Integer.parseInt(value) > max || Integer.parseInt(value) < min) {
 //                                flag=false;
+                                //微信公众号推送
                                 weXinUtils.push(newRuleEntity1.getCrops(), newRuleEntity1.getWarn(), newRuleEntity1.getGrowthcycle(), newRuleEntity1.getControl());
                             }
                         } else {
                             int windSpeed = Integer.parseInt(value1);
                             if (Integer.parseInt(value) > windSpeed) {
 //                                flag=false;
+                                //微信公众号推送
                                 weXinUtils.push(newRuleEntity1.getCrops(), newRuleEntity1.getWarn(), newRuleEntity1.getGrowthcycle(), newRuleEntity1.getControl());
                             }
                         }
