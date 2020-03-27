@@ -147,6 +147,7 @@ public class DahuaSDK implements ApplicationRunner {
         return redisUtil.hmget(channelKey);
     }
 
+    //获取rtsp流
     public String real(String channelId) {
         Get_ExternalRealStreamUrl_Info_t pExternalRealStreamUrlInfo = new Get_ExternalRealStreamUrl_Info_t();
         pExternalRealStreamUrlInfo.szCameraId = channelId.getBytes();
@@ -166,6 +167,7 @@ public class DahuaSDK implements ApplicationRunner {
         return new String(pExternalRealStreamUrlInfo.szUrl).trim();
     }
 
+    //云台控制方向
     public void ptzDirectCtrl(String channelId, Integer direction) {
         Ptz_Direct_Info_t directInfo = new Ptz_Direct_Info_t();
         directInfo.szCameraId = channelId.getBytes();
@@ -177,6 +179,58 @@ public class DahuaSDK implements ApplicationRunner {
         nRet = IDpsdkCore.DPSDK_PtzDirection(m_nDLLHandle, directInfo, dpsdk_constant_value.DPSDK_CORE_DEFAULT_TIMEOUT);
         if (nRet != dpsdk_retval_e.DPSDK_RET_SUCCESS) {
             log.error("云台方向控制失败，nRet = {}", nRet);
+        }
+    }
+
+    //获取录像
+    public int records(String channelId, long beginTime, long endTime, String filePath) {
+        Query_Record_Info_t queryInfo = new Query_Record_Info_t();
+        Return_Value_Info_t nRecordCount = new Return_Value_Info_t();
+        queryInfo.szCameraId = channelId.getBytes();
+        queryInfo.nRecordType = dpsdk_record_type_e.DPSDK_CORE_PB_RECORD_UNKONWN;//下载模式
+        queryInfo.nRight = dpsdk_check_right_e.DPSDK_CORE_NOT_CHECK_RIGHT; //不检查权限，请求视频流，无需加载组织结构
+        queryInfo.nSource = 2;//设备录像
+        queryInfo.uBeginTime = beginTime;//转换成秒;
+        queryInfo.uEndTime = endTime;
+        int nRet = IDpsdkCore.DPSDK_QueryRecord(m_nDLLHandle, queryInfo, nRecordCount, 60 * 1000);
+
+        if (nRet != 0) {
+            System.out.printf("录像查询失败，nRet= %d", nRet);
+            System.out.println();
+            return -1;
+        }
+
+        if (nRecordCount.nReturnValue == 0) {
+            System.out.printf("没有录像！！！！！");
+            System.out.println();
+            return -1;
+        }
+
+        IDpsdkCore.DPSDK_SetDPSDKSaveRecordFinishedCallback(m_nDLLHandle, fSaveRecordFinished);
+
+        Return_Value_Info_t nDownLoadSeq = new Return_Value_Info_t();
+        Get_RecordStream_Time_Info_t getInfo = new Get_RecordStream_Time_Info_t();
+        getInfo.szCameraId = channelId.getBytes();
+        getInfo.nMode = 2;//下载模式
+        getInfo.nRight = dpsdk_check_right_e.DPSDK_CORE_NOT_CHECK_RIGHT; //不检查权限，请求视频流，无需加载组织结构
+        getInfo.nSource = 2;//设备录像
+
+        getInfo.uBeginTime = beginTime;//转换成秒;
+        getInfo.uEndTime = endTime;
+        int scType = 3;
+
+        nRet = IDpsdkCore.DPSDK_SaveRecordStreamByTime(m_nDLLHandle, nDownLoadSeq, getInfo, scType, filePath.getBytes(), 10000);
+
+        if (nRet == dpsdk_retval_e.DPSDK_RET_SUCCESS) {
+            System.out.printf("开始录像下载成功，nRet = %d， nSeq = %d", nRet, nDownLoadSeq.nReturnValue);
+        } else {
+            System.out.printf("开始录像下载失败，nRet = %d", nRet);
+        }
+        System.out.println();
+        if (nRet == dpsdk_retval_e.DPSDK_RET_SUCCESS) {
+            return nDownLoadSeq.nReturnValue;
+        } else {
+            return -1;
         }
     }
 
@@ -197,6 +251,14 @@ public class DahuaSDK implements ApplicationRunner {
                     }
                 }, 600);
             }
+        }
+    };
+
+    public fSaveRecordFinishedCallback fSaveRecordFinished = new fSaveRecordFinishedCallback() {
+        @Override
+        public void invoke(int nPDLLHandle, int nPlaybackSeq) {
+            System.out.printf("录像下载完成，nPlaybackSeq = %d", nPlaybackSeq);
+            System.out.println();
         }
     };
 }

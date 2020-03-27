@@ -18,11 +18,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**
@@ -109,23 +107,7 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
             redisUtils.set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getSensor(), entity.getValue());
             try {
                 earlyWarningService.earlyWarningReport("气象", entity.getSensor(), null, entity.getValue(), entity.getSiteId());
-                Date date = new Date();
-                SimpleDateFormat f = new SimpleDateFormat("MM-dd");
-                String time = f.format(date);
-                String temp="";
-                if(entity.getSensor().equals("temperature")){
-                    temp=entity.getValue();
-                }else{
-                    temp=null;
-                }
-                String humidity="";
-                if(entity.getSensor().equals("humidity")){
-                    humidity=entity.getValue();
-                }else{
-                    humidity=null;
-                }
-                SysNewRuleParam newRuleEntity=new SysNewRuleParam();
-                earlyWarningService.earlyWarningReportNew(newRuleEntity);
+                earlyWarningService.earlyWarningReportNew();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -137,11 +119,8 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         redisUtils.set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getDepth(), entity);
         sysDustRecMapper.insert(entity);
         try {
-            Date date = new Date();
-            SimpleDateFormat f = new SimpleDateFormat("MM-dd");
-            String time = f.format(date);
-            SysNewRuleParam newRuleEntity=new SysNewRuleParam();
-            earlyWarningService.earlyWarningReportNew(newRuleEntity);
+            //TODO 是否调用earlyWarningReport？
+            earlyWarningService.earlyWarningReportNew();
         } catch (Exception e) {
             e.printStackTrace();
         }

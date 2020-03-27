@@ -2,7 +2,10 @@ package com.aiot.aiotbackstage.server.schedule;
 
 import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.server.TcpServer;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +19,8 @@ public class RtuReadSchedule {
 
     @Resource
     private RedisUtils redisUtil;
-    @Resource
-    private TcpServer tcpServer;
+    @Value("${server.tcp.enable}")
+    private boolean enable;
 
     /**
      * frame问询帧结构
@@ -33,7 +36,7 @@ public class RtuReadSchedule {
     public void read() throws InterruptedException {
         String key = "SYNC-LOCK:RTU-READ";
         try {
-            if (redisUtil.get(key) == null) {
+            if (enable & redisUtil.get(key) == null) {
                 if (redisUtil.setScheduler(key, key)) {
                     //风速，从寄存器地址0000开始查询，查询1个寄存器地址
                     broadcast("010300000001840A");
@@ -55,13 +58,11 @@ public class RtuReadSchedule {
         } finally {
             redisUtil.del(key);
         }
-
-
     }
 
     private void broadcast(String frame) throws InterruptedException {
-        for (Object channel : tcpServer.rtuChannels().values()) {
-            ((Channel)channel).writeAndFlush(frame);
+        for (Channel channel : TcpServer.CHANNELS.values()) {
+            channel.writeAndFlush(frame);
         }
         Thread.sleep(2000);
     }

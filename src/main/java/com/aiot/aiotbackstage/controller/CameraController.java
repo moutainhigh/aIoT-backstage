@@ -6,6 +6,7 @@ import com.aiot.aiotbackstage.mapper.SysDeviceErrorRecMapper;
 import com.aiot.aiotbackstage.model.entity.SysCameraEntity;
 import com.aiot.aiotbackstage.model.entity.SysDeviceErrorRecEntity;
 import com.aiot.aiotbackstage.model.param.CameraPtzParam;
+import com.aiot.aiotbackstage.model.param.CameraRecRaram;
 import com.aiot.aiotbackstage.service.ISysCameraService;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.swagger.annotations.ApiOperation;
@@ -61,6 +62,13 @@ public class CameraController {
     @RequestMapping(value = "/ptz", method = RequestMethod.POST)
     private Result ptz(@RequestBody CameraPtzParam param) {
         boolean b = cameraService.PTZ_Control(param.getCameraId(), param.getDirection());
+        return Result.success(b);
+    }
+
+    @ApiOperation(value = "获取录像", notes = "获取录像")
+    @RequestMapping(value = "/rec", method = RequestMethod.POST)
+    private Result ptz(@RequestBody CameraRecRaram param) {
+        boolean b = cameraService.getVideoRec(param.getCameraId(), param.getBeginTime(), param.getEndTime());
         return Result.success(b);
     }
 

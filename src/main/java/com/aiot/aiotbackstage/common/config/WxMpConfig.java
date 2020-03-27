@@ -27,6 +27,8 @@ public class WxMpConfig {
     /**
      * 微信公众号的模板
      */
-    private String template;
+    private String device_error_template;
+
+    private String warn_template;
 
 }

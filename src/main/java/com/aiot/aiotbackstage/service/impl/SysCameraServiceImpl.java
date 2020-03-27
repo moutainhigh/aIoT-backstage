@@ -35,12 +35,7 @@ public class SysCameraServiceImpl extends ServiceImpl<SysCameraMapper, SysCamera
      */
     @Override
     public String getRTSP_URL(Integer cameraId) {
-        SysCameraEntity cameraEntity = baseMapper.selectById(cameraId);
-        String s = (String) sdk.cameraChannel().get(cameraEntity.getName());
-        if (s == null) {
-            sdk.init();
-            throw new MyException(ResultStatusCode.CAMERA_OFFLINE);
-        }
+        String s = cameraOnlineCheck(cameraId);
         StringBuffer sb = new StringBuffer();
         sb.append("http://")
                 .append(dahuaConfig.getIp())
@@ -50,21 +45,33 @@ public class SysCameraServiceImpl extends ServiceImpl<SysCameraMapper, SysCamera
                 .append(s.split("\\$")[0])
                 .append("%24")
                 .append(s.split("\\$")[3])
-                .append("/substream/1.m3u8");
+                .append("/substream/2.m3u8");
         return sb.toString();
     }
 
     @Override
     public boolean PTZ_Control(Integer cameraId, Integer direction) {
+        String s = cameraOnlineCheck(cameraId);
+        sdk.ptzDirectCtrl(s, direction);
+        return true;
+    }
+
+    @Override
+    public boolean getVideoRec(Integer cameraId, long beginTime, long endTime) {
+        String s = cameraOnlineCheck(cameraId);
+        sdk.records(s, beginTime, endTime, "D://TEST.mp4");
+        return true;
+    }
+
+    private String cameraOnlineCheck(Integer cameraId) {
         SysCameraEntity cameraEntity = baseMapper.selectById(cameraId);
+        //返回camera通道号字符串
         String s = (String) sdk.cameraChannel().get(cameraEntity.getName());
         if (s == null) {
             sdk.init();
             throw new MyException(ResultStatusCode.CAMERA_OFFLINE);
         }
-        sdk.ptzDirectCtrl(s, direction);
-        return true;
+        return s;
     }
-
 
 }

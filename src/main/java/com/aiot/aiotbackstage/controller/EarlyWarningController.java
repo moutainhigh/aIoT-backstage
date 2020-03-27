@@ -65,9 +65,8 @@ public class EarlyWarningController {
     @ApiOperation(value = "专家测试预警", notes = "专家测试预警")
     @ResponseBody
     @PostMapping("/test")
-    public Result test(@RequestBody @Validated SysNewRuleParam param
-    ) throws Exception {
-        iEarlyWarningService.earlyWarningReportNew(param);
+    public Result test() throws Exception {
+        iEarlyWarningService.earlyWarningReportNew();
         return Result.success();
     }
 

@@ -2,6 +2,8 @@
 server:
   port: 8080
   tcp:
+    #因tcp server暂不支持多实例部署，集群部署时，只能保留一个enable为true（同时作为定时任务的必须条件）
+    enable: true
     port: 18080
 spring:
   #配置数据源
@@ -76,7 +78,10 @@ wx:
 #微信公众号的appsecret
   secret: e1426ee6c3ff9f3984db7854c7ba5303
 #微信公众号的模板
-  template: PPelW5xAJTQF3WsilLnX7fuYL2HiLh71Ccjc_a9X-QQ
+  #设备故障
+  device_error_template: PPelW5xAJTQF3WsilLnX7fuYL2HiLh71Ccjc_a9X-QQ
+  #预警
+  warn_template: NEmNISr4pOg009gyQKmQ301U-Q2g2CFZs04ko2SezA4
 
 
 

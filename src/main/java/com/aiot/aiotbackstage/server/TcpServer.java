@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Avernus
@@ -31,12 +31,17 @@ public class TcpServer {
 
     @Value("${server.tcp.port}")
     private int port;
+    @Value("${server.tcp.enable}")
+    private boolean enable;
     @Resource
     private RedisUtils redisUtil;
 
-    public static String channelsKey = "RTU-CHANNEL";
+    public static final Map<Integer, Channel> CHANNELS = new ConcurrentHashMap<>();
 
     public void start() throws Exception {
+        if (!enable) {
+            return;
+        }
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -60,13 +65,5 @@ public class TcpServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
-    }
-
-    public Map<Object, Object> rtuChannels() {
-        return redisUtil.hmget(channelsKey);
-    }
-
-    public void putChannel(int item, Channel channel) {
-        redisUtil.hset(channelsKey, item + "", channel);
     }
 }

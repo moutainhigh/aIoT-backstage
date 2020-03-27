@@ -10,6 +10,7 @@ import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
 import com.aiot.aiotbackstage.server.TcpServer;
 import com.aiot.aiotbackstage.service.ISysDeviceErrorRecService;
 import io.netty.channel.Channel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -34,21 +35,21 @@ public class DeviceStatusReadSchedule {
     @Resource
     private DahuaSDK sdk;
     @Resource
-    private TcpServer tcpServer;
-    @Resource
     private RedisUtils redisUtil;
+    @Value("${server.tcp.enable}")
+    private boolean enable;
 
     @Scheduled(cron = "0 0 0/1 * * ? ")
     public void read() throws InterruptedException {
         String key = "SYNC-LOCK:DEVICE-STATUS";
         try {
-            if (redisUtil.get(key) == null) {
+            if (enable & redisUtil.get(key) == null) {
                 if (redisUtil.setScheduler(key, key)) {
                     //通过rtu通道集合检测rtu连接状态
                     List<SysSiteEntity> sites = sysSiteMapper.selectAll();
                     for (SysSiteEntity site : sites) {
                         boolean online = false;
-                        for (Object integer : tcpServer.rtuChannels().keySet()) {
+                        for (Integer integer : TcpServer.CHANNELS.keySet()) {
                             if (site.getId().equals(integer)) {
                                 online = true;
                                 break;
@@ -86,7 +87,5 @@ public class DeviceStatusReadSchedule {
         } finally {
             redisUtil.del(key);
         }
-
-
     }
 }

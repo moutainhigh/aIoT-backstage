@@ -20,5 +20,8 @@ public interface ISysCameraService extends IService<SysCameraEntity> {
      */
     boolean PTZ_Control(Integer cameraId, Integer direction);
 
-
+    /**
+     * 获取录像
+     */
+    boolean getVideoRec(Integer cameraId, long beginTime, long endTime);
 }

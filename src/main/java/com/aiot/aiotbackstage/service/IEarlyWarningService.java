@@ -5,7 +5,6 @@ import com.aiot.aiotbackstage.model.entity.SysWarnDictionariesEntity;
 import com.aiot.aiotbackstage.model.entity.SysWarnInfoEntity;
 import com.aiot.aiotbackstage.model.entity.SysWarnRuleEntity;
 import com.aiot.aiotbackstage.model.param.PageParam;
-import com.aiot.aiotbackstage.model.param.SysNewRuleParam;
 import com.aiot.aiotbackstage.model.param.WarnInfoParam;
 import com.aiot.aiotbackstage.model.param.WarnRuleParam;
 import com.aiot.aiotbackstage.model.vo.PageResult;
@@ -45,10 +44,7 @@ public interface IEarlyWarningService {
      */
     void earlyWarningReport(String type, String typeName, String depth, String value, Integer siteId);
 
-
-    void earlyWarningReportNew(SysNewRuleParam newRuleEntity) throws Exception;
-
-
+    void earlyWarningReportNew() throws Exception;
 
     List<Map<String,Object>> earlyData(Integer type);
 
