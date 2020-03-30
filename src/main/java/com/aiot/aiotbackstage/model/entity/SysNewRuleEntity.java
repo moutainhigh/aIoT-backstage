@@ -121,5 +121,11 @@ public class SysNewRuleEntity implements Serializable {
     @TableField(value = "control")
     public String control;
 
+    /**
+     * 描述
+     */
+    @TableField(value = "remark")
+    public String remark;
+
     private static final long serialVersionUID = 1L;
 }

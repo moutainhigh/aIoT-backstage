@@ -23,11 +23,12 @@
     <result column="epsilon_dust" jdbcType="VARCHAR" property="epsilonDust" />
     <result column="warn" jdbcType="LONGVARCHAR" property="warn" />
     <result column="control" jdbcType="LONGVARCHAR" property="control" />
+    <result column="remark" jdbcType="LONGVARCHAR" property="remark" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     id, crops, growthcycle, wind_speed, wind_direction, humidity, temperature, noise, 
     pm25, pm10, atmos, wc_dust, temperature_dust, ec_dust, salinity_dust, tds_dust, epsilon_dust, 
-    warn, control
+    warn, control,remark
   </sql>
 </mapper>
