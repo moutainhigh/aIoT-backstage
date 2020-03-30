@@ -45,6 +45,9 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
 
     @Override
     public void receive(RtuData rtuData) {
+
+        redisUtils.hset("RTU-STATUS", rtuData.getRtu() + "", rtuData.getAddr(), 6000);
+
         SysSiteEntity site = sysSiteMapper.selectById(rtuData.getRtu());
         if (site == null) {
             return;
@@ -91,15 +94,6 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         }
     }
 
-    @Override
-    public Map<String, Object> current(Integer siteId) {
-        Map<String, Object> result = new HashMap<>();
-        for (SensorType value : SensorType.values()) {
-            Object o = redisUtils.get("SENSOR-VALUE:" + siteId + ":" + value.name());
-            result.put(value.name(), o == null ? "-" : o);
-        }
-        return result;
-    }
 
     private void save(SysSensorRecEntity... entities) {
         List<SysSensorRecEntity> list = Arrays.asList(entities);
@@ -107,7 +101,6 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
             redisUtils.set("SENSOR-VALUE:" + entity.getSiteId() + ":" + entity.getSensor(), entity.getValue());
             try {
                 earlyWarningService.earlyWarningReport("气象", entity.getSensor(), null, entity.getValue(), entity.getSiteId());
-                earlyWarningService.earlyWarningReportNew();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -120,10 +113,19 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
         sysDustRecMapper.insert(entity);
         try {
             //TODO 是否调用earlyWarningReport？
-            earlyWarningService.earlyWarningReportNew();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Map<String, Object> current(Integer siteId) {
+        Map<String, Object> result = new HashMap<>();
+        for (SensorType value : SensorType.values()) {
+            Object o = redisUtils.get("SENSOR-VALUE:" + siteId + ":" + value.name());
+            result.put(value.name(), o == null ? "-" : o);
+        }
+        return result;
     }
 
     @Override

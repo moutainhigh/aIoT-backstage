@@ -10,6 +10,7 @@ import com.aiot.aiotbackstage.model.entity.SysInsectRecStatisEntity;
 import com.aiot.aiotbackstage.model.entity.SysSensorRecStatisEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,8 @@ public class DataStatisSchedule {
     private SysSensorRecStatisMapper sysSensorRecStatisMapper;
     @Resource
     private RedisUtils redisUtil;
+    @Value("${server.tcp.enable}")
+    private boolean enable;
 
     /**
      * 手动执行
@@ -60,7 +63,7 @@ public class DataStatisSchedule {
     public void statisHourly() {
         String key = "SYNC-LOCK:DATA-STATICS-HOURLY";
         try {
-            if (redisUtil.get(key) == null) {
+            if (enable & redisUtil.get(key) == null) {
                 if (redisUtil.setScheduler(key, key)) {
                     Calendar now = Calendar.getInstance();
                     Calendar beforeTwoHour = Calendar.getInstance();
@@ -78,11 +81,11 @@ public class DataStatisSchedule {
     /**
      * 每天【* 00：00：00】统计
      */
-//    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void statisDaily() {
         String key = "SYNC-LOCK:DATA-STATICS-DAILY";
         try {
-            if (redisUtil.get(key) == null) {
+            if (enable & redisUtil.get(key) == null) {
                 if (redisUtil.setScheduler(key, key)) {
                     Calendar now = Calendar.getInstance();
                     Calendar beforeOneDay = Calendar.getInstance();
@@ -99,8 +102,8 @@ public class DataStatisSchedule {
     }
 
     private void start(String startTime, String endTime) {
-//        startPestStatis(startTime, endTime);
-//        startSoilStatis(startTime, endTime);
+        startPestStatis(startTime, endTime);
+        startSoilStatis(startTime, endTime);
         startMeteStatis(startTime, endTime);
     }
 
