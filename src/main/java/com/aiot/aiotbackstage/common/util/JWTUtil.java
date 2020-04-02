@@ -30,7 +30,7 @@ public class JWTUtil {
     /**
      * JWT 过期时间值 这里写死为和小程序时间一致 7200 秒，也就是两个小时
      */
-    private static long expire_time = 60000;
+    private static long expire_time = 7200;
 
     @Resource
     private RedisTemplate redisTemplate;
