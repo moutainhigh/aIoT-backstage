@@ -343,7 +343,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
      * 自动预警  NEW
      */
     @Override
-    public void earlyWarningReportNew() throws Exception {
+    public void earlyWarningReportNew() {
 
         //获取规则库数据
         List<SysNewRuleEntity> sysNewRuleEntities = newRuleMapper.selectList(null);
@@ -373,52 +373,70 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
      * @throws IllegalAccessException
      */
     public void warn(SysNewRuleEntity rule) throws IllegalAccessException {
-        //fixme 获取id=8的站点的所有传感器指标
-        Map<String, Object> current = SensorRecService.current(8);
-        //fixme 土壤用20cm深度的数据
-        SysDustRecEntity dust = (SysDustRecEntity) dustRecService.current(8).get("20cm");
 
-        //预处理
-        current.put("windSpeed", current.get(SensorType.wind_speed.name()));
-        current.put("windDirection", current.get(SensorType.wind_direction.name()));
-        current.put("wcDust", dust.getWc());
-        current.put("temperatureDust", dust.getTemperature());
-        current.put("ecDust", dust.getEc());
-        current.put("salinityDust", dust.getSalinity());
-        current.put("tdsDust", dust.getTds());
-        current.put("epsilonDust", dust.getEpsilon());
+        StringBuilder sb = new StringBuilder();
+        List<SysSiteEntity> sites = siteMapper.selectAll();
+        for (SysSiteEntity site : sites) {
 
-        Field fields[] = rule.getClass().getDeclaredFields();
-        boolean shouldWarn = false;
-        for (Field field : fields) {
-            String fieldName = field.getName();
-            //排除掉不需要比对的属性
-            if ("crops".equals(fieldName) ||
-                    "growthcycle".equals(fieldName) ||
-                    "warn".equals(fieldName) ||
-                    "control".equals(fieldName) ||
-                    "id".equals(fieldName) ||
-                    "serialVersionUID".equals(fieldName)) {
+            Map<String, Object> current = SensorRecService.current(site.getId());
+            //fixme 土壤用20cm深度的数据
+            SysDustRecEntity dust;
+            Object o = dustRecService.current(site.getId()).get("20cm");
+            if ("-".equals(o)) {
                 continue;
             }
+            dust = (SysDustRecEntity) o;
 
-            Object ruleStr = field.get(rule);
-            if (ruleStr == null || !ruleStr.toString().contains(",")) {
-                continue;
+            //预处理
+            current.put("windSpeed", current.get(SensorType.wind_speed.name()));
+            current.put("windDirection", current.get(SensorType.wind_direction.name()));
+            current.put("wcDust", dust.getWc());
+            current.put("temperatureDust", dust.getTemperature());
+            current.put("ecDust", dust.getEc());
+            current.put("salinityDust", dust.getSalinity());
+            current.put("tdsDust", dust.getTds());
+            current.put("epsilonDust", dust.getEpsilon());
+
+            Field fields[] = rule.getClass().getDeclaredFields();
+            boolean shouldWarn = false;
+            for (Field field : fields) {
+                String fieldName = field.getName();
+                //排除掉不需要比对的属性
+                if ("crops".equals(fieldName) ||
+                        "growthcycle".equals(fieldName) ||
+                        "warn".equals(fieldName) ||
+                        "control".equals(fieldName) ||
+                        "id".equals(fieldName) ||
+                        "serialVersionUID".equals(fieldName)) {
+                    continue;
+                }
+
+                Object ruleStr = field.get(rule);
+                if (ruleStr == null || !ruleStr.toString().contains(",")) {
+                    continue;
+                }
+                String[] split = ruleStr.toString().split(",");
+                String value = current.get(fieldName).toString();
+                if ("-".equals(value) || "".equals(value)) {
+                    break;
+                }
+                if (Double.parseDouble(value) > Double.parseDouble(split[0])
+                        && Double.parseDouble(value) < Double.parseDouble(split[1])) {
+                    break;
+                }
+                shouldWarn = true;
             }
-            String[] split = ruleStr.toString().split(",");
-            String value = current.get(fieldName).toString();
-            if ("-".equals(value) || "".equals(value)) {
-                break;
+            if (shouldWarn) {
+                sb.append(site.getName())
+                        .append(",");
             }
-            if (Double.parseDouble(value) > Double.parseDouble(split[0])
-                    && Double.parseDouble(value) < Double.parseDouble(split[1])) {
-                break;
-            }
-            shouldWarn = true;
         }
-        if (shouldWarn) {
-            weXinUtils.warnPush(rule.getCrops(), rule.getWarn(), rule.getGrowthcycle(), rule.getControl());
+
+        if (sb.length() != 0) {
+            sb.insert(0, rule.getWarn())
+                    .insert(0, "(")
+                    .replace(sb.length() - 1, sb.length() - 1, ")");
+            weXinUtils.warnPush(rule.getCrops(), sb.toString(), rule.getGrowthcycle(), rule.getControl());
         }
     }
 

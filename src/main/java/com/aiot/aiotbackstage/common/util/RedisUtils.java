@@ -35,6 +35,8 @@ public class RedisUtils {
         this.redisTemplate = redisTemplate;
         this.redisTemplate.setKeySerializer(new StringRedisSerializer());
         this.redisTemplate.setValueSerializer(new FastJsonRedisSerializer(Object.class));
+        this.redisTemplate.setHashKeySerializer(new FastJsonRedisSerializer(Object.class));
+        this.redisTemplate.setHashValueSerializer(new FastJsonRedisSerializer(Object.class));
     }
 
     /**

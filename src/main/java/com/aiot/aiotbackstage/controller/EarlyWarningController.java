@@ -3,7 +3,6 @@ package com.aiot.aiotbackstage.controller;
 import com.aiot.aiotbackstage.common.constant.Result;
 import com.aiot.aiotbackstage.model.entity.SysNewRuleEntity;
 import com.aiot.aiotbackstage.model.param.PageParam;
-import com.aiot.aiotbackstage.model.param.SysNewRuleParam;
 import com.aiot.aiotbackstage.model.param.WarnInfoParam;
 import com.aiot.aiotbackstage.model.param.WarnRuleParam;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;

@@ -44,7 +44,7 @@ public interface IEarlyWarningService {
      */
     void earlyWarningReport(String type, String typeName, String depth, String value, Integer siteId);
 
-    void earlyWarningReportNew() throws Exception;
+    void earlyWarningReportNew();
 
     List<Map<String,Object>> earlyData(Integer type);
 
