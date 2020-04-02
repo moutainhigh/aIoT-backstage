@@ -127,5 +127,8 @@ public class SysNewRuleEntity implements Serializable {
     @TableField(value = "remark")
     public String remark;
 
+    @TableField(value = "growthcycle_type")
+    private String growthcycleType;
+
     private static final long serialVersionUID = 1L;
 }

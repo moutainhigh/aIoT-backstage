@@ -7,6 +7,7 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="crops" jdbcType="VARCHAR" property="crops" />
     <result column="growthcycle" jdbcType="VARCHAR" property="growthcycle" />
+    <result column="growthcycle_type" jdbcType="VARCHAR" property="growthcycleType" />
     <result column="wind_speed" jdbcType="VARCHAR" property="windSpeed" />
     <result column="wind_direction" jdbcType="VARCHAR" property="windDirection" />
     <result column="humidity" jdbcType="VARCHAR" property="humidity" />
