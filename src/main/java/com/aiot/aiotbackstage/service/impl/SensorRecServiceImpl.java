@@ -9,7 +9,6 @@ import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.dto.RtuData;
 import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.InsectRecByDateParam;
-import com.aiot.aiotbackstage.model.param.SysNewRuleParam;
 import com.aiot.aiotbackstage.model.vo.SysSensorRecVo2;
 import com.aiot.aiotbackstage.service.IEarlyWarningService;
 import com.aiot.aiotbackstage.service.ISensorRecService;
@@ -47,7 +46,7 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     @Override
     public void receive(RtuData rtuData) {
 
-        redisUtils.hset(Constants.RTU_STATUS, rtuData.getRtu() + "-" + rtuData.getAddr(), System.currentTimeMillis());
+        redisUtils.hset(Constants.RTU_LAST_TIME, rtuData.getRtu() + "-" + rtuData.getAddr(), System.currentTimeMillis());
 
         SysSiteEntity site = sysSiteMapper.selectById(rtuData.getRtu());
         if (site == null) {

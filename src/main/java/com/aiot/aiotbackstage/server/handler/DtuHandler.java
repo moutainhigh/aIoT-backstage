@@ -1,6 +1,8 @@
 package com.aiot.aiotbackstage.server.handler;
 
+import com.aiot.aiotbackstage.common.constant.Constants;
 import com.aiot.aiotbackstage.common.util.HexConvert;
+import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.common.util.SpringContextHolder;
 import com.aiot.aiotbackstage.model.dto.RtuData;
 import com.aiot.aiotbackstage.server.TcpServer;
@@ -27,14 +29,21 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
 
     private ISensorRecService service;
 
+    private RedisUtils redis;
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String hex) throws Exception {
         //转为ASCII
         String asc = HexConvert.convertHexToString(hex.replace(" ",""));
 
+        if (redis == null) {
+            redis = SpringContextHolder.getBean(RedisUtils.class);
+        }
         if (asc.startsWith("register")) {
             //注册包
-            TcpServer.CHANNELS.put(Integer.parseInt(asc.split("-")[1]), ctx.channel());
+            int siteId = Integer.parseInt(asc.split("-")[1]);
+            TcpServer.CHANNELS.put(siteId, ctx.channel());
+            redis.hset(Constants.RTU_LAST_TIME, siteId + "-00", System.currentTimeMillis());
             log.info("from {}, received hex {}, asc {}",ctx.channel().remoteAddress(), hex, asc);
         } else {
             //数据包
@@ -74,4 +83,16 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
         }
     }
 
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        for (Map.Entry<Integer, Channel> entry : TcpServer.CHANNELS.entrySet()) {
+            if (entry.getValue().equals(ctx.channel())) {
+                TcpServer.CHANNELS.remove(entry.getKey());
+                log.info("channels of rtu-{} removed", entry.getKey());
+                break;
+            }
+        }
+
+        super.channelInactive(ctx);
+    }
 }

@@ -3,7 +3,6 @@ package com.aiot.aiotbackstage.service.impl;
 import com.aiot.aiotbackstage.common.constant.Constants;
 import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.enums.RtuAddrCode;
-import com.aiot.aiotbackstage.common.enums.SensorType;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.mapper.SysDeviceErrorRecMapper;
@@ -300,26 +299,21 @@ public class DeviceServiceImpl implements IDeviceService {
         for (SysSiteEntity site : sites) {
             Map<String, Object> rtu = new HashMap<>(8);
             List<Map<String, Object>> sensors = new ArrayList<>();
-            long maxTime = 0;
             for (RtuAddrCode addr : RtuAddrCode.values()) {
                 Map<String, Object> sensor = new HashMap<>(8);
-                Object lastTime = redisUtils.hget(Constants.RTU_STATUS, site.getId() + "-" + addr.addr);
+                Object lastTime = redisUtils.hget(Constants.RTU_LAST_TIME, site.getId() + "-" + addr.addr);
                 sensor.put("id", addr.addr);
                 sensor.put("name", addr.type);
                 sensor.put("lastTime", lastTime);
                 //n分钟内有数据更新
                 sensor.put("status", null != lastTime && System.currentTimeMillis() - (Long)lastTime < 10 * 60 * 1000 );
                 sensors.add(sensor);
-
-                if (null != lastTime) {
-                    maxTime = Math.max(maxTime, (Long) lastTime);
-                }
             }
             rtu.put("id", site.getId());
             rtu.put("name", site.getName());
-            rtu.put("lastTime", maxTime == 0 ? null : maxTime);
-            //n分钟内有数据更新
-            rtu.put("status", System.currentTimeMillis() - maxTime < 10 * 60 * 1000);
+            Object lastTime = redisUtils.hget(Constants.RTU_LAST_TIME, site.getId() + "-00");
+            rtu.put("lastTime", lastTime);
+            rtu.put("status", null != lastTime && System.currentTimeMillis() - (Long)lastTime < 10 * 60 * 1000);
             rtu.put("children", sensors);
             result.add(rtu);
         }
