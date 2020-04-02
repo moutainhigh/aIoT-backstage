@@ -1,5 +1,6 @@
 package com.aiot.aiotbackstage.service.impl;
 
+import com.aiot.aiotbackstage.common.constant.Constants;
 import com.aiot.aiotbackstage.common.enums.RtuAddrCode;
 import com.aiot.aiotbackstage.common.enums.SensorType;
 import com.aiot.aiotbackstage.common.enums.WindDirection;
@@ -46,7 +47,7 @@ public class SensorRecServiceImpl extends ServiceImpl<SysSensorRecMapper, SysSen
     @Override
     public void receive(RtuData rtuData) {
 
-        redisUtils.hset("RTU-STATUS", rtuData.getRtu() + "", rtuData.getAddr(), 6000);
+        redisUtils.hset(Constants.RTU_STATUS, rtuData.getRtu() + "-" + rtuData.getAddr(), System.currentTimeMillis());
 
         SysSiteEntity site = sysSiteMapper.selectById(rtuData.getRtu());
         if (site == null) {

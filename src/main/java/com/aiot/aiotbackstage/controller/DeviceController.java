@@ -21,6 +21,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description  设备管理API
@@ -96,5 +98,13 @@ public class DeviceController {
     ) {
         deviceService.deviceInfoOldDel(id);
         return Result.success();
+    }
+
+    @ResponseBody
+    @GetMapping("/rtuStatus")
+    @ApiOperation(value = "rtu设备状态", notes = "rtu设备状态")
+    public Result rtuStatus() {
+        List<Map<String, Object>> result = deviceService.rtuStatus();
+        return Result.success(result);
     }
 }

@@ -380,7 +380,12 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
 
             Map<String, Object> current = SensorRecService.current(site.getId());
             //fixme 土壤用20cm深度的数据
-            SysDustRecEntity dust = (SysDustRecEntity) dustRecService.current(site.getId()).get("20cm");
+            SysDustRecEntity dust;
+            Object o = dustRecService.current(site.getId()).get("20cm");
+            if ("-".equals(o)) {
+                continue;
+            }
+            dust = (SysDustRecEntity) o;
 
             //预处理
             current.put("windSpeed", current.get(SensorType.wind_speed.name()));

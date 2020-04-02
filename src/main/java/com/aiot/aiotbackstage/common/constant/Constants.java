@@ -5,6 +5,8 @@ package com.aiot.aiotbackstage.common.constant;
  */
 public interface Constants {
 
+    public static final String RTU_STATUS = "RTU-STATUS";
+
     /**
      * 默认分页信息
      */
