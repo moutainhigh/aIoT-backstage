@@ -14,6 +14,7 @@ import com.aiot.aiotbackstage.model.param.DeviceInfoParam;
 import com.aiot.aiotbackstage.model.vo.DeviceResultVo;
 import com.aiot.aiotbackstage.model.vo.DeviceVo;
 import com.aiot.aiotbackstage.model.vo.PageResult;
+import com.aiot.aiotbackstage.server.TcpServer;
 import com.aiot.aiotbackstage.service.IDeviceService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -313,7 +314,7 @@ public class DeviceServiceImpl implements IDeviceService {
             rtu.put("name", site.getName());
             Object lastTime = redisUtils.hget(Constants.RTU_LAST_TIME, site.getId() + "-00");
             rtu.put("lastTime", lastTime);
-            rtu.put("status", null != lastTime && System.currentTimeMillis() - (Long)lastTime < 10 * 60 * 1000);
+            rtu.put("status", TcpServer.CHANNELS.containsKey(site.getId()));
             rtu.put("children", sensors);
             result.add(rtu);
         }

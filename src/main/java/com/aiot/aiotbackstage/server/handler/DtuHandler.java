@@ -95,4 +95,9 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
 
         super.channelInactive(ctx);
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+    }
 }

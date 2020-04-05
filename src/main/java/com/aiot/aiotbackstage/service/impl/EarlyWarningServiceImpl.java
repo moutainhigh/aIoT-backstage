@@ -403,7 +403,7 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                 String fieldName = field.getName();
                 //排除掉不需要比对的属性
                 if ("crops".equals(fieldName) ||
-                        "growthcycle".equals(fieldName) ||
+                        "growthcycleType".equals(fieldName) ||
                         "warn".equals(fieldName) ||
                         "control".equals(fieldName) ||
                         "id".equals(fieldName) ||
