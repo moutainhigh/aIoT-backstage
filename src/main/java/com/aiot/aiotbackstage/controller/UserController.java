@@ -149,5 +149,14 @@ public class UserController {
         return Result.success(iUserService.permissionInfo(token));
     }
 
+    @ApiOperation(value = "天气", notes = "天气")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "成功")
+    })
+    @ResponseBody
+    @GetMapping("/weather")
+    public Result weather(@RequestParam String cityName){
+        return Result.success(iUserService.weather(cityName));
+    }
 
 }

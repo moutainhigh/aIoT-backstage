@@ -6,6 +6,7 @@ import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.util.JWTUtil;
 import com.aiot.aiotbackstage.common.util.JsonUtils;
 import com.aiot.aiotbackstage.common.util.RedisUtils;
+import com.aiot.aiotbackstage.common.util.WeatherUtils;
 import com.aiot.aiotbackstage.mapper.*;
 import com.aiot.aiotbackstage.model.entity.*;
 import com.aiot.aiotbackstage.model.param.PageParam;
@@ -14,6 +15,7 @@ import com.aiot.aiotbackstage.model.param.UserParam;
 import com.aiot.aiotbackstage.model.vo.Code2SessionVo;
 import com.aiot.aiotbackstage.model.vo.PageResult;
 import com.aiot.aiotbackstage.model.vo.TokenVo;
+import com.aiot.aiotbackstage.model.vo.WeatherInfoVo;
 import com.aiot.aiotbackstage.service.IUserService;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -311,6 +313,13 @@ public class UserServiceImpl implements IUserService {
         }
         return permissions;
 
+    }
+
+    @Override
+    public WeatherInfoVo weather(String cityName) {
+        String info = WeatherUtils.GetWeatherData(cityName);
+        WeatherInfoVo weatherInfoVo = WeatherUtils.GetWeather(info);
+        return weatherInfoVo;
     }
 
     private List<SysMenuEntity> getTree(List<SysMenuEntity> list) {

@@ -85,9 +85,4 @@ public class WeatherUtils {
         return weatherInfo;
     }
 
-    public static void main(String[]  args){
-        String info = WeatherUtils.GetWeatherData("绵阳");
-        WeatherInfoVo weatherInfoVo = WeatherUtils.GetWeather(info);
-        System.out.println(weatherInfoVo.toString());
-    }
 }
