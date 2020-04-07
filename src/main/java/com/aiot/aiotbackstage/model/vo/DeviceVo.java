@@ -18,7 +18,7 @@ public class DeviceVo {
     private Integer id;
     private String deviceType;
     private String deviceName;
-    private Date startTime;
+    private Object startTime;
     private String status;
     private Integer isUpdate;
 //    private String statusCAMERA;
