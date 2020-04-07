@@ -9,4 +9,10 @@
     <sql id="Base_Column_List">
         id, site_id siteId, imei
     </sql>
+
+    <select id="selectAll" resultType="com.aiot.aiotbackstage.model.entity.SysInsectDeviceEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_insect_device
+    </select>
 </mapper>

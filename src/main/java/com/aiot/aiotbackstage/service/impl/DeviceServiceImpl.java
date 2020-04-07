@@ -5,9 +5,13 @@ import com.aiot.aiotbackstage.common.constant.ResultStatusCode;
 import com.aiot.aiotbackstage.common.enums.RtuAddrCode;
 import com.aiot.aiotbackstage.common.exception.MyException;
 import com.aiot.aiotbackstage.common.util.RedisUtils;
+import com.aiot.aiotbackstage.mapper.SysCameraMapper;
 import com.aiot.aiotbackstage.mapper.SysDeviceErrorRecMapper;
+import com.aiot.aiotbackstage.mapper.SysInsectDeviceMapper;
 import com.aiot.aiotbackstage.mapper.SysSiteMapper;
+import com.aiot.aiotbackstage.model.entity.SysCameraEntity;
 import com.aiot.aiotbackstage.model.entity.SysDeviceErrorRecEntity;
+import com.aiot.aiotbackstage.model.entity.SysInsectDeviceEntity;
 import com.aiot.aiotbackstage.model.entity.SysSiteEntity;
 import com.aiot.aiotbackstage.model.param.DeviceInfoOldParam;
 import com.aiot.aiotbackstage.model.param.DeviceInfoParam;
@@ -44,6 +48,12 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Autowired
     private SysSiteMapper siteMapper;
+
+    @Resource
+    private SysCameraMapper cameraMapper;
+
+    @Resource
+    private SysInsectDeviceMapper insectDeviceMapper;
 
     @Resource
     private RedisUtils redisUtils;
@@ -90,29 +100,45 @@ public class DeviceServiceImpl implements IDeviceService {
         List<DeviceResultVo> entities = new ArrayList<>();
         //查询出所有的站点
         List<SysSiteEntity> sysSiteEntities = siteMapper.selectAll();
+        List<SysCameraEntity> cameras = cameraMapper.selectAll();
+        List<SysInsectDeviceEntity> insectDevices = insectDeviceMapper.selectAll();
         sysSiteEntities.forEach(sysSiteEntity -> {
             DeviceResultVo deviceResultVo = new DeviceResultVo();
             deviceResultVo.setSiteId(sysSiteEntity.getId());
             deviceResultVo.setSiteName(sysSiteEntity.getName());
             List<DeviceVo> deviceVos = new ArrayList<>();
-            DeviceVo deviceVo = new DeviceVo();
-            deviceVo.setDeviceType("CAMERA");
-            deviceVo.setDeviceName("摄像头");
-            deviceVo.setStatus("正常");
-            deviceVo.setStartTime(null);
-            deviceVos.add(deviceVo);
+
+            for (SysCameraEntity camera : cameras) {
+                if (camera.getSiteId().equals(deviceResultVo.getSiteId())) {
+                    DeviceVo deviceVo = new DeviceVo();
+                    deviceVo.setDeviceType("CAMERA");
+                    deviceVo.setDeviceName("摄像头");
+                    deviceVo.setStatus("正常");
+                    deviceVo.setStartTime(null);
+                    deviceVos.add(deviceVo);
+                    break;
+                }
+            }
+
             DeviceVo deviceVo1 = new DeviceVo();
             deviceVo1.setDeviceType("RTU");
             deviceVo1.setDeviceName("传感器RTU");
             deviceVo1.setStatus("正常");
             deviceVo1.setStartTime(null);
             deviceVos.add(deviceVo1);
-            DeviceVo deviceVo2 = new DeviceVo();
-            deviceVo2.setDeviceType("InsectDevice");
-            deviceVo2.setDeviceName("虫情测报灯");
-            deviceVo2.setStatus("正常");
-            deviceVo2.setStartTime(null);
-            deviceVos.add(deviceVo2);
+
+            for (SysInsectDeviceEntity device : insectDevices) {
+                if (device.getSiteId().equals(deviceResultVo.getSiteId())) {
+                    DeviceVo deviceVo2 = new DeviceVo();
+                    deviceVo2.setDeviceType("InsectDevice");
+                    deviceVo2.setDeviceName("虫情测报灯");
+                    deviceVo2.setStatus("正常");
+                    deviceVo2.setStartTime(null);
+                    deviceVos.add(deviceVo2);
+                    break;
+                }
+            }
+
             deviceResultVo.setDeviceVo(deviceVos);
             entities.add(deviceResultVo);
         });
