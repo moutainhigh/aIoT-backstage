@@ -416,7 +416,12 @@ public class EarlyWarningServiceImpl implements IEarlyWarningService {
                     continue;
                 }
                 String[] split = ruleStr.toString().split(",");
-                String value = current.get(fieldName).toString();
+                String value ="";
+                if(fieldName == null || current.get(fieldName) == null){
+                    break;
+                }else{
+                    value = current.get(fieldName).toString();
+                }
                 if ("-".equals(value) || "".equals(value)) {
                     break;
                 }
