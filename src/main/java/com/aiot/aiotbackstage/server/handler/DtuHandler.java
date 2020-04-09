@@ -10,6 +10,8 @@ import com.aiot.aiotbackstage.service.ISensorRecService;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -45,6 +47,9 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
             TcpServer.CHANNELS.put(siteId, ctx.channel());
             redis.hset(Constants.RTU_LAST_TIME, siteId + "-00", System.currentTimeMillis());
             log.info("from {}, received hex {}, asc {}",ctx.channel().remoteAddress(), hex, asc);
+        } else if (asc.startsWith("ping")) {
+            //心跳包 do nothing
+            log.info("from {}, received {}", ctx.channel().remoteAddress(), asc);
         } else {
             //数据包
             Integer rtu = 0;
@@ -58,7 +63,7 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
             }
             String[] hexs = hex.split(" ");
             int[] datum = new int[hexs.length];
-            for (int i = 0; i < hexs.length; i ++) {
+            for (int i = 0; i < hexs.length; i++) {
                 datum[i] = Integer.parseInt(hexs[i], 16);
             }
 
@@ -66,20 +71,44 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
             int func = datum[1];
             int dataAreaLength = datum[2];
             int[] values = new int[dataAreaLength / 2];
-            for (int i = 0; i < dataAreaLength; i ++) {
+            for (int i = 0; i < dataAreaLength; i++) {
                 if (i % 2 != 0) {
                     continue;
                 }
                 values[i / 2] = Integer.parseInt(hexs[i + 3] + hexs[i + 4], 16);
             }
 
-            RtuData rtuData = new RtuData(rtu, addr, func, dataAreaLength, values, datum[datum.length -2], datum[datum.length - 1]);
-            log.info("from {}--{}, received data {}",ctx.channel().remoteAddress() , rtu, rtuData);
+            RtuData rtuData = new RtuData(rtu, addr, func, dataAreaLength, values, datum[datum.length - 2], datum[datum.length - 1]);
+            log.info("from {}--{}, received data {}", ctx.channel().remoteAddress(), rtu, rtuData);
 
             if (service == null) {
                 service = SpringContextHolder.getBean(ISensorRecService.class);
             }
             service.receive(rtuData);
+        }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
+        if (event instanceof IdleStateEvent) {
+            IdleStateEvent evt = (IdleStateEvent) event;
+            //未收到客户端信息（包含心跳）
+            if (evt.state() == IdleState.READER_IDLE) {
+                for (Map.Entry<Integer, Channel> entry : TcpServer.CHANNELS.entrySet()) {
+                    if (entry.getValue().equals(ctx.channel())) {
+                        TcpServer.CHANNELS.remove(entry.getKey());
+                        log.info("channels of rtu-{} removed -read idle", entry.getKey());
+                        break;
+                    }
+                }
+                ctx.channel().close();
+            } else if (evt.state() == IdleState.WRITER_IDLE) {
+
+            } else if (evt.state() == IdleState.ALL_IDLE) {
+
+            }
+        } else {
+            super.userEventTriggered(ctx, event);
         }
     }
 
@@ -98,6 +127,14 @@ public class DtuHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        for (Map.Entry<Integer, Channel> entry : TcpServer.CHANNELS.entrySet()) {
+            if (entry.getValue().equals(ctx.channel())) {
+                TcpServer.CHANNELS.remove(entry.getKey());
+                log.info("channels of rtu-{} removed - exception", entry.getKey());
+                break;
+            }
+        }
+
         super.exceptionCaught(ctx, cause);
     }
 }

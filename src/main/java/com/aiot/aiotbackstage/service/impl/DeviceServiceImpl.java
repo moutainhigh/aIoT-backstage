@@ -132,7 +132,7 @@ public class DeviceServiceImpl implements IDeviceService {
             deviceVo1.setId(sysSiteEntity.getId());
             deviceVo1.setDeviceType("RTU");
             deviceVo1.setDeviceName("传感器RTU");
-            deviceVo1.setStatus(TcpServer.CHANNELS.containsKey(sysSiteEntity.getId())==true?"正常":"异常");
+            deviceVo1.setStatus(TcpServer.CHANNELS.containsKey(sysSiteEntity.getId())?"正常":"异常");
             deviceVo1.setStartTime(redisUtils.hget(Constants.RTU_LAST_TIME, sysSiteEntity.getId() + "-00"));
             deviceVos.add(deviceVo1);
 

@@ -2,9 +2,8 @@ package com.aiot.aiotbackstage.server.schedule;
 
 import com.aiot.aiotbackstage.common.util.RedisUtils;
 import com.aiot.aiotbackstage.server.TcpServer;
-import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
-import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,6 +13,7 @@ import javax.annotation.Resource;
 /**
  * @author Avernus
  */
+@Slf4j
 @Component
 public class RtuReadSchedule {
 
@@ -51,6 +51,7 @@ public class RtuReadSchedule {
                     //土壤墒情-40CM，从寄存器地址0000开始查询，查询6个寄存器地址
                     broadcast("060300000006C47F");
                     //太阳能
+                    log.info("rtu read schedule finished");
                 }
             }
         } catch (InterruptedException e) {

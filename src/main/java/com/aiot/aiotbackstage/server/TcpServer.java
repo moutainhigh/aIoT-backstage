@@ -11,6 +11,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,7 @@ public class TcpServer {
                         protected void initChannel(NioSocketChannel channel) throws Exception {
                             channel.pipeline()
                                     .addLast(new ModbusRtuCodec())
+                                    .addLast(new IdleStateHandler(120,0,0))
                                     .addLast(new DtuHandler());
                         }
                     })
