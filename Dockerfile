@@ -15,4 +15,4 @@ ADD aiot-backstage-0.0.1-SNAPSHOT.jar /home/aiot-app.jar
 
 EXPOSE 8080 18080
 
-ENTRYPOINT [ "java", "-jar", "/home/aiot-app.jar" ]
+ENTRYPOINT [ "java", "-jar", "/home/aiot-app.jar", "--spring.config.location=/home/config/application.yml"]
